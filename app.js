@@ -259,6 +259,15 @@ function updatePainColor(element, value) {
     }
 }
 
+// Close instructions modal and restore scroll
+function closeInstructionsModal(el) {
+    const modal = el.closest('.instructions-modal');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = '';
+}
+
 // Show Exercise Instructions Modal
 function showInstructions(exercise) {
     if (!exercise.instructions) {
@@ -275,7 +284,7 @@ function showInstructions(exercise) {
         <div class="instructions-content">
             <div class="instructions-header">
                 <h2>${instr.title}</h2>
-                <button class="close-btn" onclick="this.closest('.instructions-modal').remove()">×</button>
+                <button class="close-btn" onclick="closeInstructionsModal(this)">×</button>
             </div>
             <div class="instructions-body">
                 <div class="instructions-section">
@@ -304,7 +313,7 @@ function showInstructions(exercise) {
                 </div>
             </div>
             <div class="instructions-footer">
-                <button class="btn btn-primary" onclick="this.closest('.instructions-modal').remove()">Got It!</button>
+                <button class="btn btn-primary" onclick="closeInstructionsModal(this)">Got It!</button>
             </div>
         </div>
     `;
