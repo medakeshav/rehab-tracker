@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4472C4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Rehabilitation Exercise Tracker">
+    <title>Rehab Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <h1 class="app-title">💪 Rehab Tracker</h1>
+        <button class="menu-btn" id="menuBtn">☰</button>
+    </nav>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h2>Menu</h2>
+            <button class="close-btn" id="closeMenuBtn">✕</button>
+        </div>
+        <div class="menu-items">
+            <button class="menu-item" onclick="showScreen('home')">🏠 Home</button>
+            <button class="menu-item" onclick="showScreen('daily')">📝 Daily Workout</button>
+            <button class="menu-item" onclick="showScreen('weekly')">📊 Weekly Assessment</button>
+            <button class="menu-item" onclick="showScreen('monthly')">📅 Monthly Assessment</button>
+            <button class="menu-item" onclick="showScreen('history')">📈 History</button>
+            <button class="menu-item" onclick="showScreen('export')">💾 Export Data</button>
+            <button class="menu-item" onclick="showScreen('instructions')">ℹ️ Instructions</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" id="mainContainer">
+        
+        <!-- HOME SCREEN -->
+        <div class="screen active" id="homeScreen">
+            <div class="welcome-card">
+                <h2>Welcome Back! 👋</h2>
+                <p class="current-date" id="currentDate"></p>
+            </div>
+
+            <div class="phase-selector">
+                <h3>Select Your Current Phase</h3>
+                <div class="phase-cards">
+                    <div class="phase-card" onclick="selectPhase(1)">
+                        <div class="phase-number">1</div>
+                        <h4>Foundation</h4>
+                        <p>Weeks 1-8</p>
+                    </div>
+                    <div class="phase-card" onclick="selectPhase(2)">
+                        <div class="phase-number">2</div>
+                        <h4>Functional Strength</h4>
+                        <p>Weeks 9-20</p>
+                    </div>
+                    <div class="phase-card" onclick="selectPhase(3)">
+                        <div class="phase-number">3</div>
+                        <h4>Advanced</h4>
+                        <p>Week 21+</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn primary" onclick="showScreen('daily')">
+                    📝 Start Today's Workout
+                </button>
+                <button class="action-btn secondary" onclick="showScreen('weekly')">
+                    📊 Weekly Assessment
+                </button>
+                <button class="action-btn secondary" onclick="showScreen('monthly')">
+                    📅 Monthly Assessment
+                </button>
+            </div>
+
+            <div class="stats-card">
+                <h3>Quick Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalWorkouts">0</div>
+                        <div class="stat-label">Workouts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="currentWeek">1</div>
+                        <div class="stat-label">Current Week</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAILY WORKOUT SCREEN -->
+        <div class="screen" id="dailyScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>Daily Workout</h2>
+            </div>
+
+            <div class="date-selector">
+                <label>Date:</label>
+                <input type="date" id="workoutDate" class="date-input">
+            </div>
+
+            <div class="phase-info" id="phaseInfo">
+                <span id="currentPhaseText">Phase 1: Foundation</span>
+                <button class="change-phase-btn" onclick="showScreen('home')">Change Phase</button>
+            </div>
+
+            <div id="exerciseList" class="exercise-list">
+                <!-- Exercises will be loaded dynamically -->
+            </div>
+
+            <div class="save-section">
+                <button class="save-btn" onclick="saveWorkout()">💾 Save Workout</button>
+            </div>
+        </div>
+
+        <!-- WEEKLY ASSESSMENT SCREEN -->
+        <div class="screen" id="weeklyScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>Weekly Assessment</h2>
+            </div>
+
+            <p class="assessment-note">Complete every Sunday to track progress</p>
+
+            <form class="assessment-form" id="weeklyForm">
+                <div class="form-group">
+                    <label>Week Number:</label>
+                    <input type="number" id="weekNumber" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="weeklyDate" required>
+                </div>
+
+                <h3>Single-Leg Stand (Eyes Closed)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Left Leg (seconds):</label>
+                        <input type="number" id="standLeft" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Right Leg (seconds):</label>
+                        <input type="number" id="standRight" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <h3>Single-Leg Bridge (Max Reps)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Left Leg:</label>
+                        <input type="number" id="bridgeLeft" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Right Leg:</label>
+                        <input type="number" id="bridgeRight" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <h3>Balance Reaches (Time in seconds)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Left Leg:</label>
+                        <input type="number" id="reachLeft" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Right Leg:</label>
+                        <input type="number" id="reachRight" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <h3>Pain Levels (0-10)</h3>
+                <div class="form-group">
+                    <label>Knee Pain: <span id="kneePainValue">0</span></label>
+                    <input type="range" id="kneePain" min="0" max="10" value="0" class="pain-slider">
+                </div>
+                <div class="form-group">
+                    <label>Back Pain: <span id="backPainValue">0</span></label>
+                    <input type="range" id="backPain" min="0" max="10" value="0" class="pain-slider">
+                </div>
+                <div class="form-group">
+                    <label>Foot Pain: <span id="footPainValue">0</span></label>
+                    <input type="range" id="footPain" min="0" max="10" value="0" class="pain-slider">
+                </div>
+
+                <div class="form-group">
+                    <label>Notes / Observations:</label>
+                    <textarea id="weeklyNotes" rows="4" placeholder="Any observations, improvements, concerns..."></textarea>
+                </div>
+
+                <button type="submit" class="save-btn">💾 Save Weekly Assessment</button>
+            </form>
+        </div>
+
+        <!-- MONTHLY ASSESSMENT SCREEN -->
+        <div class="screen" id="monthlyScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>Monthly Assessment</h2>
+            </div>
+
+            <p class="assessment-note">Complete at the end of each month</p>
+
+            <form class="assessment-form" id="monthlyForm">
+                <div class="form-group">
+                    <label>Month Number:</label>
+                    <input type="number" id="monthNumber" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="monthlyDate" required>
+                </div>
+
+                <h3>Measurements (cm)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Right Calf:</label>
+                        <input type="number" id="calfRight" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Left Calf:</label>
+                        <input type="number" id="calfLeft" step="0.1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Right Thigh:</label>
+                        <input type="number" id="thighRight" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Left Thigh:</label>
+                        <input type="number" id="thighLeft" step="0.1" required>
+                    </div>
+                </div>
+
+                <h3>Documentation</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="photosTaken">
+                        Photos taken (Front/Back/Side)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="videoTaken">
+                        Gait video analysis done
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Phase:</label>
+                    <select id="monthlyPhase" required>
+                        <option value="1">Phase 1: Foundation (Weeks 1-8)</option>
+                        <option value="2">Phase 2: Functional Strength (Weeks 9-20)</option>
+                        <option value="3">Phase 3: Advanced (Week 21+)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="readyNextPhase">
+                        Ready to progress to next phase
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Overall Progress Notes:</label>
+                    <textarea id="monthlyNotes" rows="6" placeholder="Strength improvements, pain changes, functional abilities, goals achieved..." required></textarea>
+                </div>
+
+                <button type="submit" class="save-btn">💾 Save Monthly Assessment</button>
+            </form>
+        </div>
+
+        <!-- HISTORY SCREEN -->
+        <div class="screen" id="historyScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>History</h2>
+            </div>
+
+            <div class="history-tabs">
+                <button class="tab-btn active" onclick="showHistoryTab('workouts')">Workouts</button>
+                <button class="tab-btn" onclick="showHistoryTab('weekly')">Weekly</button>
+                <button class="tab-btn" onclick="showHistoryTab('monthly')">Monthly</button>
+            </div>
+
+            <div class="history-content" id="historyContent">
+                <!-- History will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- EXPORT SCREEN -->
+        <div class="screen" id="exportScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>Export Data</h2>
+            </div>
+
+            <div class="export-options">
+                <div class="export-card">
+                    <h3>📊 Export All Data</h3>
+                    <p>Download all your workout data as CSV files</p>
+                    <button class="action-btn primary" onclick="exportAllData()">Download CSV Files</button>
+                </div>
+
+                <div class="export-card">
+                    <h3>🗑️ Clear All Data</h3>
+                    <p>⚠️ This will delete all stored data. Cannot be undone!</p>
+                    <button class="action-btn danger" onclick="clearAllData()">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTRUCTIONS SCREEN -->
+        <div class="screen" id="instructionsScreen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <h2>Instructions</h2>
+            </div>
+
+            <div class="instructions-content">
+                <div class="instruction-card">
+                    <h3>🎯 How to Use</h3>
+                    <ol>
+                        <li>Select your current phase from the home screen</li>
+                        <li>Log daily workouts with left/right reps and pain levels</li>
+                        <li>Complete weekly assessments every Sunday</li>
+                        <li>Complete monthly assessments at end of each month</li>
+                        <li>Export data regularly to backup</li>
+                    </ol>
+                </div>
+
+                <div class="instruction-card">
+                    <h3>⚠️ Pain Scale Guide</h3>
+                    <ul>
+                        <li><strong>0-3/10:</strong> Normal discomfort - CONTINUE</li>
+                        <li><strong>4-6/10:</strong> Significant pain - REDUCE intensity</li>
+                        <li><strong>7-10/10:</strong> STOP immediately - consult physio</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-card">
+                    <h3>📱 Install This App</h3>
+                    <p><strong>iPhone:</strong></p>
+                    <ol>
+                        <li>Tap the Share button in Safari</li>
+                        <li>Scroll down and tap "Add to Home Screen"</li>
+                        <li>Tap "Add"</li>
+                    </ol>
+                    <p><strong>Android:</strong></p>
+                    <ol>
+                        <li>Tap the menu (⋮) in Chrome</li>
+                        <li>Tap "Add to Home Screen"</li>
+                        <li>Tap "Add"</li>
+                    </ol>
+                </div>
+
+                <div class="instruction-card">
+                    <h3>📞 Contact Information</h3>
+                    <ul>
+                        <li><strong>Hope Physio (BTM):</strong> +91 89991 68508</li>
+                        <li><strong>Dr. Shetty's Foot Centre:</strong> +91 80 4953 8629</li>
+                        <li><strong>Dr. Akshay Dhanda:</strong> +91 95351 55018</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-card">
+                    <h3>🚨 Red Flags - See Doctor</h3>
+                    <ul>
+                        <li>Sharp pain in knee</li>
+                        <li>Increasing back pain</li>
+                        <li>Swelling in knee or ankle</li>
+                        <li>Numbness/tingling in leg</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="exercises.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
