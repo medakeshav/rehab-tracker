@@ -140,52 +140,187 @@ function loadExercises() {
 function createExerciseCard(exercise, index) {
     const card = document.createElement('div');
     card.className = 'exercise-card';
+    
+    // Add progression note if applicable
+    let progressionNote = '';
+    if (exercise.progressionLevel) {
+        const progressionTexts = {
+            1: '🟢 Start here - easiest level',
+            2: '🟡 Progress when Level 1 feels easy',
+            3: '🟠 Intermediate - adds challenge',
+            4: '🔴 Advanced - no support',
+            5: '⚫ Expert - most challenging'
+        };
+        progressionNote = `<div style="background: var(--bg-light); padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; color: var(--text-dark);">${progressionTexts[exercise.progressionLevel]}</div>`;
+    }
+    
     card.innerHTML = `
+        ${progressionNote}
         <div class="exercise-header">
             <div class="exercise-name">${exercise.name}</div>
-            <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
+            <div class="exercise-actions">
+                <button class="info-btn" id="info_${exercise.id}" title="View Instructions">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/>
+                        <path d="M10 14V10M10 6H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
+            </div>
         </div>
         <div class="exercise-inputs">
             <div class="input-group">
                 <label>Left Leg Reps:</label>
-                <input type="number" id="left_${exercise.id}" min="0" placeholder="${exercise.leftTarget}">
+                <input type="number" id="left_${exercise.id}" min="0" placeholder="${exercise.leftTarget}" inputmode="numeric">
             </div>
             <div class="input-group">
                 <label>Right Leg Reps:</label>
-                <input type="number" id="right_${exercise.id}" min="0" placeholder="${exercise.rightTarget}">
+                <input type="number" id="right_${exercise.id}" min="0" placeholder="${exercise.rightTarget}" inputmode="numeric">
             </div>
         </div>
         <div class="input-group">
             <label>Sets Completed:</label>
-            <input type="number" id="sets_${exercise.id}" min="0" max="${exercise.sets}" placeholder="${exercise.sets}">
+            <input type="number" id="sets_${exercise.id}" min="0" max="${exercise.sets}" placeholder="${exercise.sets}" inputmode="numeric">
         </div>
         <div class="pain-section">
             <label>
                 Pain Level (0-10): 
                 <span class="pain-value" id="pain_value_${exercise.id}">0</span>
             </label>
-            <input type="range" class="pain-slider" id="pain_${exercise.id}" 
-                   min="0" max="10" value="0">
+            <div style="padding: 15px 5px;">
+                <input type="range" class="pain-slider" id="pain_${exercise.id}" 
+                       min="0" max="10" value="0" step="1">
+            </div>
         </div>
         <textarea class="notes-input" id="notes_${exercise.id}" 
                   placeholder="Notes (optional)..."></textarea>
     `;
     
-    // Add pain slider listener
+    // Add pain slider listener with scroll protection
     const painSlider = card.querySelector(`#pain_${exercise.id}`);
     const painValue = card.querySelector(`#pain_value_${exercise.id}`);
+    
+    let isSliding = false;
+    
+    // Start sliding only on deliberate touch/click
+    painSlider.addEventListener('touchstart', function(e) {
+        isSliding = true;
+        e.stopPropagation();
+    }, { passive: false });
+    
+    painSlider.addEventListener('mousedown', function(e) {
+        isSliding = true;
+        e.stopPropagation();
+    });
+    
+    // Update value during slide
     painSlider.addEventListener('input', function() {
-        painValue.textContent = this.value;
-        if (this.value >= 7) {
-            painValue.style.background = 'var(--danger-color)';
-        } else if (this.value >= 4) {
-            painValue.style.background = 'var(--warning-color)';
-        } else {
-            painValue.style.background = 'var(--primary-color)';
+        if (isSliding) {
+            painValue.textContent = this.value;
+            updatePainColor(painValue, this.value);
         }
     });
     
+    // Change event for final value
+    painSlider.addEventListener('change', function() {
+        painValue.textContent = this.value;
+        updatePainColor(painValue, this.value);
+        isSliding = false;
+    });
+    
+    // Reset sliding state
+    painSlider.addEventListener('touchend', function() {
+        isSliding = false;
+    });
+    
+    painSlider.addEventListener('mouseup', function() {
+        isSliding = false;
+    });
+    
+    // Add info button listener
+    const infoBtn = card.querySelector(`#info_${exercise.id}`);
+    if (exercise.instructions && infoBtn) {
+        infoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showInstructions(exercise);
+        });
+    }
+    
     return card;
+}
+
+function updatePainColor(element, value) {
+    if (value >= 7) {
+        element.style.background = 'var(--danger-color)';
+    } else if (value >= 4) {
+        element.style.background = 'var(--warning-color)';
+    } else {
+        element.style.background = 'var(--primary-color)';
+    }
+}
+
+// Show Exercise Instructions Modal
+function showInstructions(exercise) {
+    if (!exercise.instructions) {
+        showToast('No instructions available', 'info');
+        return;
+    }
+    
+    const instr = exercise.instructions;
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'instructions-modal';
+    modal.innerHTML = `
+        <div class="instructions-content">
+            <div class="instructions-header">
+                <h2>${instr.title}</h2>
+                <button class="close-btn" onclick="this.closest('.instructions-modal').remove()">×</button>
+            </div>
+            <div class="instructions-body">
+                <div class="instructions-section">
+                    <h3>📋 How to Perform:</h3>
+                    <ol class="steps-list">
+                        ${instr.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                <div class="instructions-section">
+                    <h3>🎯 Target:</h3>
+                    <p><strong>Reps:</strong> ${instr.reps}</p>
+                    <p><strong>Sets:</strong> ${instr.sets}</p>
+                </div>
+                
+                <div class="instructions-section why-section">
+                    <h3>💡 Why This Exercise:</h3>
+                    <p>${instr.why}</p>
+                </div>
+                
+                <div class="instructions-section tips-section">
+                    <h3>✅ Pro Tips:</h3>
+                    <ul class="tips-list">
+                        ${instr.tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+            <div class="instructions-footer">
+                <button class="btn btn-primary" onclick="this.closest('.instructions-modal').remove()">Got It!</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Close on backdrop click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+            document.body.style.overflow = '';
+        }
+    });
 }
 
 // Save Workout

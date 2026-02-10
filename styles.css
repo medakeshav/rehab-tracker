@@ -119,11 +119,13 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
+    min-height: calc(100vh - 60px);
 }
 
 /* Screen Management */
 .screen {
     display: none;
+    padding-top: 10px;
 }
 
 .screen.active {
@@ -287,14 +289,21 @@ body {
 .date-selector {
     background: white;
     border-radius: 10px;
-    padding: 15px;
+    padding: 18px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+.date-selector label {
+    font-weight: 500;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 8px;
+}
+
 .date-input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
@@ -305,12 +314,13 @@ body {
 .phase-info {
     background: var(--primary-color);
     color: white;
-    padding: 12px 15px;
+    padding: 15px 18px;
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(68, 114, 196, 0.3);
 }
 
 .change-phase-btn {
@@ -328,14 +338,16 @@ body {
 .exercise-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    padding-bottom: 20px;
 }
 
 .exercise-card {
     background: white;
     border-radius: 12px;
-    padding: 15px;
+    padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 5px;
 }
 
 .exercise-header {
@@ -343,6 +355,34 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 12px;
+}
+
+.exercise-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.info-btn:hover {
+    background: var(--bg-light);
+    transform: scale(1.1);
+}
+
+.info-btn:active {
+    transform: scale(0.95);
 }
 
 .exercise-name {
@@ -376,13 +416,20 @@ body {
 .input-group label {
     font-size: 13px;
     color: var(--text-light);
+    font-weight: 500;
 }
 
 .input-group input {
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(68, 114, 196, 0.1);
 }
 
 .pain-section {
@@ -398,9 +445,11 @@ body {
 
 .pain-slider {
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
+    height: 8px;
+    border-radius: 4px;
     outline: none;
+    touch-action: none;
+    cursor: pointer;
     background: linear-gradient(to right, 
         var(--success-color) 0%, 
         var(--success-color) 30%, 
@@ -408,6 +457,40 @@ body {
         var(--warning-color) 60%, 
         var(--danger-color) 60%, 
         var(--danger-color) 100%);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.pain-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.pain-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.pain-slider:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+    border-color: var(--primary-dark);
+}
+
+.pain-slider:active::-moz-range-thumb {
+    transform: scale(1.2);
+    border-color: var(--primary-dark);
 }
 
 .pain-value {
@@ -691,4 +774,241 @@ body {
 
 .toast.error {
     background: var(--danger-color);
+}
+
+/* Instructions Modal */
+.instructions-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.instructions-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.instructions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.instructions-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+    flex: 1;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.instructions-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.instructions-section {
+    margin-bottom: 24px;
+}
+
+.instructions-section:last-child {
+    margin-bottom: 0;
+}
+
+.instructions-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+}
+
+.steps-list {
+    list-style: none;
+    counter-reset: step-counter;
+    padding: 0;
+    margin: 0;
+}
+
+.steps-list li {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.steps-list li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.tips-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.why-section {
+    background: var(--bg-light);
+    padding: 16px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.why-section p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.tips-section {
+    background: #f0f9ff;
+    padding: 16px;
+    border-radius: 10px;
+    border-left: 4px solid var(--success-color);
+}
+
+.instructions-section p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.instructions-section p strong {
+    color: var(--primary-color);
+}
+
+.instructions-footer {
+    padding: 16px 24px;
+    border-top: 2px solid var(--bg-light);
+    display: flex;
+    justify-content: center;
+}
+
+.instructions-footer .btn {
+    min-width: 120px;
+}
+
+/* Mobile Optimization for Instructions */
+@media (max-width: 480px) {
+    .instructions-modal {
+        padding: 10px;
+    }
+    
+    .instructions-content {
+        max-height: 95vh;
+        border-radius: 12px;
+    }
+    
+    .instructions-header {
+        padding: 16px 20px;
+    }
+    
+    .instructions-header h2 {
+        font-size: 18px;
+    }
+    
+    .instructions-body {
+        padding: 20px;
+    }
+    
+    .steps-list li {
+        padding-left: 36px;
+        font-size: 14px;
+    }
+    
+    .steps-list li:before {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+    }
 }
