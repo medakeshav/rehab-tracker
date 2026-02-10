@@ -127,7 +127,7 @@ const exercises = {
             rightTarget: 45,
             sets: 3,
             category: 'Balance',
-            progressionLevel: 2
+            progressionLevel: 2,
             instructions: {
                 title: 'Single-Leg Balance: Level 2',
                 steps: [
@@ -157,7 +157,7 @@ const exercises = {
             rightTarget: 30,
             sets: 3,
             category: 'Balance',
-            progressionLevel: 3
+            progressionLevel: 3,
             instructions: {
                 title: 'Single-Leg Balance: Level 3 (Intermediate)',
                 steps: [
@@ -187,7 +187,7 @@ const exercises = {
             rightTarget: 22,
             sets: 3,
             category: 'Balance',
-            progressionLevel: 4
+            progressionLevel: 4,
             instructions: {
                 title: 'Single-Leg Balance: Level 4 (Advanced)',
                 steps: [
@@ -218,7 +218,7 @@ const exercises = {
             rightTarget: 22,
             sets: 3,
             category: 'Balance',
-            progressionLevel: 5
+            progressionLevel: 5,
             instructions: {
                 title: 'Single-Leg Balance: Level 5 (Expert)',
                 steps: [

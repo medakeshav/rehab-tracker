@@ -2,7 +2,7 @@
   "name": "Rehab Exercise Tracker",
   "short_name": "Rehab Tracker",
   "description": "Personal rehabilitation exercise tracking application",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#4472C4",

@@ -1,12 +1,12 @@
 // Service Worker for Rehab Tracker
-const CACHE_NAME = 'rehab-tracker-v1';
+const CACHE_NAME = 'rehab-tracker-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/exercises.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './exercises.js',
+  './manifest.json'
 ];
 
 // Install Service Worker
