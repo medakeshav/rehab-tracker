@@ -53,12 +53,16 @@ document.addEventListener('pointerdown', function (e) {
 
 // Lock active picker on page-level scroll only (not picker-internal scroll).
 // Use capture phase but check that the scroll target is not inside a picker.
-window.addEventListener('scroll', function (e) {
-    if (!activePicker) return;
-    // Ignore scroll events from within any picker's scroll area
-    if (e.target && e.target.closest && e.target.closest('.wheel-picker-container')) return;
-    lockPicker(activePicker);
-}, true);
+window.addEventListener(
+    'scroll',
+    function (e) {
+        if (!activePicker) return;
+        // Ignore scroll events from within any picker's scroll area
+        if (e.target && e.target.closest && e.target.closest('.wheel-picker-container')) return;
+        lockPicker(activePicker);
+    },
+    true
+);
 
 /**
  * Create a new wheel picker DOM element.
@@ -171,9 +175,13 @@ function createWheelPicker(id, min, max, step, defaultValue) {
 
     // Tap the scroll area to toggle: if active, re-lock it (freeze the value)
     let didScroll = false;
-    scroll.addEventListener('scroll', function () {
-        didScroll = true;
-    }, { passive: true });
+    scroll.addEventListener(
+        'scroll',
+        function () {
+            didScroll = true;
+        },
+        { passive: true }
+    );
 
     scroll.addEventListener('pointerdown', function (e) {
         if (!container.classList.contains('wheel-picker--active')) return;
@@ -199,7 +207,10 @@ function createWheelPicker(id, min, max, step, defaultValue) {
             const val = parseInt(item.getAttribute('data-value'));
             const targetIndex = values.indexOf(val);
             if (targetIndex >= 0) {
-                scroll.scrollTo({ top: targetIndex * WHEEL_PICKER_ITEM_HEIGHT, behavior: 'smooth' });
+                scroll.scrollTo({
+                    top: targetIndex * WHEEL_PICKER_ITEM_HEIGHT,
+                    behavior: 'smooth',
+                });
             }
         }
     });

@@ -35,7 +35,7 @@ function saveDailyProgress(progress) {
 // ========== Tests ==========
 
 describe('createFreshProgress', () => {
-    it('should return an object with today\'s date', () => {
+    it("should return an object with today's date", () => {
         const progress = createFreshProgress();
         const today = new Date().toISOString().split('T')[0];
         expect(progress.date).toBe(today);

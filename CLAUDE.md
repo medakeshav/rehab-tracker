@@ -41,10 +41,12 @@ All files share browser global scope. Cross-module functions registered in `esli
 ## File APIs
 
 ### exercises.js
+
 - `exercises` — Object with phase1, phase2, phase3 arrays
 - `getExercisesForPhase(phase)` — Returns exercises (cumulative: Phase 2 includes Phase 1, etc.)
 
 ### js/utils.js
+
 - `safeGetItem(key, fallback)` / `safeSetItem(key, value)` — localStorage with error handling
 - `showToast(message, type)` — Notification ('success'|'error'|'info')
 - `showConfirmDialog(title, message, confirmText, onConfirm, isDestructive)` — iOS-style dialog
@@ -54,6 +56,7 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `formatDate(dateString)` / `calculateAvgPain(exercisesList)`
 
 ### js/state.js — Globals
+
 - `currentPhase` (1-3), `workoutData`, `weeklyData`, `monthlyData` — Persisted arrays
 - `PROGRESS_BAR_VERSION` ('A'|'C'), `darkMode` (boolean) — Persisted settings
 - `dailyProgress` — Today's completion state (auto-resets on new day)
@@ -61,16 +64,19 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `loadDailyProgress()` / `createFreshProgress()` / `saveDailyProgress()`
 
 ### js/wheel-picker.js
+
 - `createWheelPicker(id, min, max, step, defaultValue)` — Returns DOM element
 - `getPickerValue(id)` / `setPickerValue(id, value)` — Read/write picker values
 - `WHEEL_PICKER_ITEM_HEIGHT` = 36px
 
 ### js/navigation.js
+
 - `openMenu()` / `closeMenu()` — Side menu
 - `showScreen(screenName)` / `goBack()` — Screen navigation with history stack
 - `initSwipeBack()` — Edge swipe gesture (40px zone, 80px threshold)
 
 ### js/progress.js
+
 - `updateProgressBar()` — Render Version A (sticky bar) or C (thumbnail circles)
 - `checkAllComplete()` / `showCelebration()` / `hideCelebration()`
 - `playCompletionSound()` / `showCompletionToast()` / `getCompletionMessage()`
@@ -80,6 +86,7 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `clearDailyProgress()` / `scrollToExercise(id)`
 
 ### js/exercises-ui.js
+
 - `loadExercises()` — Render all exercise cards for current phase
 - `createExerciseCard(exercise, index)` / `createCompletedCard(exercise)`
 - `collapseCard(card, exercise)` / `expandCard(card, exercise)`
@@ -87,19 +94,20 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `showInstructions(exercise)` — Full-screen instruction modal
 
 ### js/app.js — Delegated Actions
+
 `navigate`, `select-phase`, `toggle-sound`, `toggle-progress-bar`, `toggle-dark-mode`, `clear-progress`, `save-workout`, `history-tab`, `export-data`, `clear-all-data`
 
 ## HTML Screens (index.html)
 
-| Screen ID | Purpose |
-|-----------|---------|
-| `homeScreen` | Welcome card, phase selector, quick actions, stats |
-| `dailyScreen` | Date picker, progress bar, exercise list, save button |
-| `weeklyScreen` | Weekly assessment form (stand, bridge, reach, pain) |
-| `monthlyScreen` | Monthly assessment form (measurements, photos, phase) |
-| `historyScreen` | Tab-based history viewer (workouts, weekly, monthly) |
-| `exportScreen` | CSV export + clear all data |
-| `instructionsScreen` | Static how-to cards |
+| Screen ID            | Purpose                                               |
+| -------------------- | ----------------------------------------------------- |
+| `homeScreen`         | Welcome card, phase selector, quick actions, stats    |
+| `dailyScreen`        | Date picker, progress bar, exercise list, save button |
+| `weeklyScreen`       | Weekly assessment form (stand, bridge, reach, pain)   |
+| `monthlyScreen`      | Monthly assessment form (measurements, photos, phase) |
+| `historyScreen`      | Tab-based history viewer (workouts, weekly, monthly)  |
+| `exportScreen`       | CSV export + clear all data                           |
+| `instructionsScreen` | Static how-to cards                                   |
 
 Key element IDs: `exerciseList`, `progressBarA`, `progressBarC`, `workoutDate`, `phaseInfo`, `menuBtn`, `sideMenu`
 
@@ -120,14 +128,14 @@ Key element IDs: `exerciseList`, `progressBarA`, `progressBarC`, `workoutDate`, 
 
 ## Common Tasks
 
-| Task | Files to modify |
-|------|----------------|
-| Add new exercise | `exercises.js` |
-| Add menu toggle | `js/state.js` (var), `js/progress.js` (toggle fn), `index.html` (button), `js/app.js` (action + init), `eslint.config.js` (globals) |
-| New screen | `index.html` (HTML), `styles.css` (styles), `js/navigation.js` or new module |
-| UI styling | `styles.css` (+ dark mode overrides in `body.dark-mode` section) |
-| New test | `tests/*.test.js` (inline function copies, jsdom env) |
-| Cache update | `sw.js` (bump version number) |
+| Task             | Files to modify                                                                                                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Add new exercise | `exercises.js`                                                                                                                      |
+| Add menu toggle  | `js/state.js` (var), `js/progress.js` (toggle fn), `index.html` (button), `js/app.js` (action + init), `eslint.config.js` (globals) |
+| New screen       | `index.html` (HTML), `styles.css` (styles), `js/navigation.js` or new module                                                        |
+| UI styling       | `styles.css` (+ dark mode overrides in `body.dark-mode` section)                                                                    |
+| New test         | `tests/*.test.js` (inline function copies, jsdom env)                                                                               |
+| Cache update     | `sw.js` (bump version number)                                                                                                       |
 
 ## Documentation & Maintenance Rules
 

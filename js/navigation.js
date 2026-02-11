@@ -176,10 +176,7 @@ function initSwipeBack() {
                 activeScreen.style.transform = `translateX(${offset}px)`;
                 activeScreen.style.transition = 'none';
                 // Dim slightly as it drags
-                activeScreen.style.opacity = Math.max(
-                    0.5,
-                    1 - (offset / window.innerWidth) * 0.5
-                );
+                activeScreen.style.opacity = Math.max(0.5, 1 - (offset / window.innerWidth) * 0.5);
             }
         },
         { passive: true }

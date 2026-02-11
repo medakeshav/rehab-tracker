@@ -123,12 +123,15 @@ function createExerciseCard(exercise, _index) {
             <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
         </div>
         <div class="exercise-inputs">
-            ${exercise.bilateral ? `
+            ${
+                exercise.bilateral
+                    ? `
             <div class="input-group">
                 <label>Reps:</label>
                 <div id="picker_reps_${exercise.id}"></div>
             </div>
-            ` : `
+            `
+                    : `
             <div class="input-group">
                 <label>Left Leg Reps:</label>
                 <div id="picker_left_${exercise.id}"></div>
@@ -137,13 +140,14 @@ function createExerciseCard(exercise, _index) {
                 <label>Right Leg Reps:</label>
                 <div id="picker_right_${exercise.id}"></div>
             </div>
-            `}
+            `
+            }
         </div>
         <div class="input-group">
             <label>Sets Completed:</label>
             <input type="hidden" id="sets_${exercise.id}" value="${exercise.sets}">
             <div class="sets-radio-group" data-sets-id="sets_${exercise.id}">
-                ${[1,2,3,4,5].map(n => `<button type="button" class="sets-radio-btn${n === exercise.sets ? ' active' : ''}" data-value="${n}">${n}</button>`).join('')}
+                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="sets-radio-btn${n === exercise.sets ? ' active' : ''}" data-value="${n}">${n}</button>`).join('')}
             </div>
         </div>
         <div class="pain-section">
@@ -185,7 +189,9 @@ function createExerciseCard(exercise, _index) {
         setsGroup.addEventListener('click', function (e) {
             const btn = e.target.closest('.sets-radio-btn');
             if (!btn) return;
-            setsGroup.querySelectorAll('.sets-radio-btn').forEach(b => b.classList.remove('active'));
+            setsGroup
+                .querySelectorAll('.sets-radio-btn')
+                .forEach((b) => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(`sets_${exercise.id}`).value = btn.dataset.value;
         });

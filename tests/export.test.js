@@ -173,8 +173,6 @@ describe('Monthly CSV export', () => {
         const csv = buildMonthlyCSV(data);
         const lines = csv.trim().split('\n');
         expect(lines.length).toBe(2);
-        expect(lines[1]).toBe(
-            '2,2025-02-28,36.5,35,52,51.5,true,false,1,false,"Good progress"'
-        );
+        expect(lines[1]).toBe('2,2025-02-28,36.5,35,52,51.5,true,false,1,false,"Good progress"');
     });
 });

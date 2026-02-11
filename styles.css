@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -25,17 +25,17 @@
    ============================================================ */
 :root {
     /* Colors */
-    --primary-color: #4472C4;
-    --primary-dark: #2E5090;
-    --secondary-color: #70AD47;
-    --danger-color: #E74C3C;
-    --text-dark: #2C3E50;
-    --text-light: #7F8C8D;
-    --bg-light: #F8F9FA;
-    --bg-white: #FFFFFF;
-    --border-color: #E0E0E0;
-    --success-color: #27AE60;
-    --warning-color: #F39C12;
+    --primary-color: #4472c4;
+    --primary-dark: #2e5090;
+    --secondary-color: #70ad47;
+    --danger-color: #e74c3c;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --bg-light: #f8f9fa;
+    --bg-white: #ffffff;
+    --border-color: #e0e0e0;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
 
     /* Spacing */
     --space-xs: 4px;
@@ -296,7 +296,9 @@ body {
     padding: var(--space-xl);
     text-align: center;
     cursor: pointer;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .phase-card:hover {
@@ -638,7 +640,7 @@ body {
 
 .pain-value {
     display: inline-block;
-    background: #4CAF50;
+    background: #4caf50;
     color: white;
     padding: var(--space-xs) var(--space-md);
     border-radius: var(--radius-sm);
@@ -995,9 +997,13 @@ body {
 
 .wheel-picker--active {
     opacity: 1;
-    box-shadow: 0 0 0 2px var(--primary-color), var(--shadow-sm);
+    box-shadow:
+        0 0 0 2px var(--primary-color),
+        var(--shadow-sm);
     border-radius: var(--radius-lg);
-    transition: opacity var(--transition-fast), box-shadow var(--transition-fast);
+    transition:
+        opacity var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 /* Sets Radio Buttons */
@@ -1022,9 +1028,9 @@ body {
 }
 
 .sets-radio-btn.active {
-    background: #4CAF50;
+    background: #4caf50;
     color: white;
-    border-color: #43A047;
+    border-color: #43a047;
 }
 
 .sets-radio-btn:active {
@@ -1726,17 +1732,17 @@ body {
 
 /* Override design tokens for dark theme */
 body.dark {
-    --primary-color: #5B8DD9;
-    --primary-dark: #4472C4;
-    --secondary-color: #85C45E;
-    --danger-color: #FF6B6B;
-    --text-dark: #E8E8E8;
-    --text-light: #A0A0A0;
+    --primary-color: #5b8dd9;
+    --primary-dark: #4472c4;
+    --secondary-color: #85c45e;
+    --danger-color: #ff6b6b;
+    --text-dark: #e8e8e8;
+    --text-light: #a0a0a0;
     --bg-light: #121212;
-    --bg-white: #1E1E1E;
+    --bg-white: #1e1e1e;
     --border-color: #333333;
-    --success-color: #4ADE80;
-    --warning-color: #FBBF24;
+    --success-color: #4ade80;
+    --warning-color: #fbbf24;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.6);
@@ -1753,7 +1759,7 @@ body.dark .nav-bar {
 
 /* ---- Side Menu ---- */
 body.dark .side-menu {
-    background: #1E1E1E;
+    background: #1e1e1e;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -1775,7 +1781,7 @@ body.dark .stats-card,
 body.dark .phase-selector,
 body.dark .export-card,
 body.dark .instruction-card {
-    background: #1E1E1E;
+    background: #1e1e1e;
 }
 
 /* ---- Phase Cards ---- */
@@ -1789,7 +1795,7 @@ body.dark .phase-card:hover {
 
 /* ---- Exercise Cards ---- */
 body.dark .exercise-card {
-    background: #1E1E1E;
+    background: #1e1e1e;
 }
 
 body.dark .exercise-card--completed {
@@ -1808,13 +1814,13 @@ body.dark .phase-info {
 }
 
 body.dark .change-phase-btn {
-    background: #1E1E1E;
+    background: #1e1e1e;
     color: var(--primary-color);
 }
 
 /* ---- Assessment Forms ---- */
 body.dark .assessment-form {
-    background: #1E1E1E;
+    background: #1e1e1e;
 }
 
 /* ---- Form Inputs ---- */
@@ -1836,13 +1842,13 @@ body.dark .input-group input:focus {
 
 /* ---- Buttons ---- */
 body.dark .action-btn.secondary {
-    background: #1E1E1E;
+    background: #1e1e1e;
     color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
 body.dark .mark-complete-btn {
-    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    background: linear-gradient(135deg, var(--success-color), #36b37e);
     box-shadow: 0 2px 8px rgba(74, 222, 128, 0.2);
 }
 
@@ -1851,12 +1857,12 @@ body.dark .save-section {
 }
 
 body.dark .save-btn {
-    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    background: linear-gradient(135deg, var(--success-color), #36b37e);
 }
 
 /* ---- Progress Bar Version A ---- */
 body.dark .progress-bar-sticky {
-    background: #1E1E1E;
+    background: #1e1e1e;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -1865,7 +1871,7 @@ body.dark .progress-bar-track {
 }
 
 body.dark .progress-bar-fill {
-    background: linear-gradient(90deg, var(--success-color), #36B37E);
+    background: linear-gradient(90deg, var(--success-color), #36b37e);
 }
 
 /* ---- Progress Bar Version C (thumbnails) ---- */
@@ -1907,9 +1913,9 @@ body.dark .sets-radio-btn {
 }
 
 body.dark .sets-radio-btn.active {
-    background: #4CAF50;
+    background: #4caf50;
     color: white;
-    border-color: #43A047;
+    border-color: #43a047;
 }
 
 /* ---- Pain Slider ---- */
@@ -1930,7 +1936,7 @@ body.dark .toast {
 
 /* ---- Completion Toast ---- */
 body.dark .completion-toast {
-    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    background: linear-gradient(135deg, var(--success-color), #36b37e);
     box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
 }
 
@@ -1974,7 +1980,7 @@ body.dark .instructions-modal-content {
 }
 
 body.dark .why-section {
-    background: #1E1E1E;
+    background: #1e1e1e;
 }
 
 body.dark .tips-section {
@@ -1996,7 +2002,7 @@ body.dark .bottom-sheet-handle {
 
 /* ---- History Page ---- */
 body.dark .tab-btn {
-    background: #1E1E1E;
+    background: #1e1e1e;
     color: var(--text-dark);
 }
 
@@ -2007,12 +2013,12 @@ body.dark .tab-btn.active {
 }
 
 body.dark .history-item {
-    background: #1E1E1E;
+    background: #1e1e1e;
 }
 
 /* ---- Celebration Banner ---- */
 body.dark .celebration-banner {
-    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    background: linear-gradient(135deg, var(--success-color), #36b37e);
     box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
 }
 

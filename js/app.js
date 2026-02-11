@@ -9,8 +9,21 @@
  * this file just calls into them.
  */
 
-import { openMenu, closeMenu, showScreen, initSwipeBack, setOnHistoryScreen } from './navigation.js';
-import { updateStats, selectPhase, updatePhaseInfo, setupPainSliders, calculateCurrentWeek, setLoadExercises } from './utils.js';
+import {
+    openMenu,
+    closeMenu,
+    showScreen,
+    initSwipeBack,
+    setOnHistoryScreen,
+} from './navigation.js';
+import {
+    updateStats,
+    selectPhase,
+    updatePhaseInfo,
+    setupPainSliders,
+    calculateCurrentWeek,
+    setLoadExercises,
+} from './utils.js';
 import { autoSaveDailyProgress } from './state.js';
 import {
     updateProgressBar,

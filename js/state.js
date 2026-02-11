@@ -126,7 +126,7 @@ function restoreExerciseData(exercise) {
         if (setsHidden) setsHidden.value = data.sets;
         const setsGroup = document.querySelector(`[data-sets-id="sets_${exercise.id}"]`);
         if (setsGroup) {
-            setsGroup.querySelectorAll('.sets-radio-btn').forEach(btn => {
+            setsGroup.querySelectorAll('.sets-radio-btn').forEach((btn) => {
                 btn.classList.toggle('active', parseInt(btn.dataset.value) === data.sets);
             });
         }
@@ -205,13 +205,27 @@ function updatePainColor(element, value) {
 
 // ========== State Setters (for ES module live binding) ==========
 
-function setCurrentPhase(v) { currentPhase = v; }
-function setWorkoutData(v) { workoutData = v; }
-function setWeeklyData(v) { weeklyData = v; }
-function setMonthlyData(v) { monthlyData = v; }
-function setProgressBarVersion(v) { PROGRESS_BAR_VERSION = v; }
-function setDarkMode(v) { darkMode = v; }
-function setDailyProgress(v) { dailyProgress = v; }
+function setCurrentPhase(v) {
+    currentPhase = v;
+}
+function setWorkoutData(v) {
+    workoutData = v;
+}
+function setWeeklyData(v) {
+    weeklyData = v;
+}
+function setMonthlyData(v) {
+    monthlyData = v;
+}
+function setProgressBarVersion(v) {
+    PROGRESS_BAR_VERSION = v;
+}
+function setDarkMode(v) {
+    darkMode = v;
+}
+function setDailyProgress(v) {
+    dailyProgress = v;
+}
 
 export {
     currentPhase,

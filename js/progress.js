@@ -274,10 +274,10 @@ function getCompletionMessage(exercise) {
     if (done === total) {
         return pickFreshMessage([
             'Every single one — crushed it! 🎉',
-            'Full session complete! You\'re unstoppable! 🏆',
+            "Full session complete! You're unstoppable! 🏆",
             'All done! Your knees thank you! 🦵✨',
             'Perfect session — nothing left behind! 💯',
-            'That\'s the whole list! Champion effort! 🥇',
+            "That's the whole list! Champion effort! 🥇",
             'Complete sweep! Recovery is happening! 🌟',
         ]);
     }
@@ -288,7 +288,7 @@ function getCompletionMessage(exercise) {
             `${name} done — great way to start! 💪`,
             'First one in the books! Momentum is building! 🚀',
             `Starting strong with ${name}! 💥`,
-            'And we\'re off! The hardest part is starting! 🏁',
+            "And we're off! The hardest part is starting! 🏁",
             `${name} complete — ${remaining} more to go! 👊`,
             'Day started right! Keep that energy! ⚡',
         ];
@@ -310,7 +310,7 @@ function getCompletionMessage(exercise) {
     if (pct >= 0.75) {
         return pickFreshMessage([
             `Only ${remaining} left — you can taste the finish! 🔥`,
-            'Home stretch! Don\'t let up now! 🏃',
+            "Home stretch! Don't let up now! 🏃",
             `Just ${remaining} more — the end is in sight! 👀`,
             'So close to a full session! Push through! 💫',
             `Nearly there! ${remaining} to go — finish strong! 🎯`,
@@ -322,11 +322,11 @@ function getCompletionMessage(exercise) {
     if (pct >= 0.5) {
         return pickFreshMessage([
             `Past halfway! ${remaining} left — downhill from here! ⚡`,
-            'More done than left — you\'re rolling! 🎢',
+            "More done than left — you're rolling! 🎢",
             `Over the hump! Just ${remaining} more! 💪`,
             `${done} down, ${remaining} to go — solid pace! 👊`,
             'Halfway hero! Keep this rhythm going! 🥁',
-            'The back half begins — you\'ve got this! 🌊',
+            "The back half begins — you've got this! 🌊",
         ]);
     }
 

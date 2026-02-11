@@ -17,7 +17,7 @@ const exercises = {
                     'Pull arch up without curling toes',
                     'Think: "Make foot shorter"',
                     'Hold for 5 seconds',
-                    'Release and repeat'
+                    'Release and repeat',
                 ],
                 reps: '15 each foot (22 right foot)',
                 sets: '3 sets',
@@ -26,9 +26,9 @@ const exercises = {
                     'Do barefoot, 2x daily',
                     'NO toe curling - toes stay relaxed',
                     'You should see arch lift',
-                    'Foot should visibly shorten'
-                ]
-            }
+                    'Foot should visibly shorten',
+                ],
+            },
         },
         {
             id: 'toe_yoga',
@@ -46,7 +46,7 @@ const exercises = {
                     'Hold 2 seconds, release',
                     'Movement 2: Keep big toe down, lift other 4 toes',
                     'Hold 2 seconds, release',
-                    'Alternate between movements'
+                    'Alternate between movements',
                 ],
                 reps: '10 each direction, each foot (15 right)',
                 sets: '2 sets',
@@ -55,9 +55,9 @@ const exercises = {
                     'Do barefoot',
                     'Start slowly - this is HARD at first',
                     'Use your fingers to help initially if needed',
-                    'Focus on isolating toe muscles'
-                ]
-            }
+                    'Focus on isolating toe muscles',
+                ],
+            },
         },
         {
             id: 'towel_scrunch',
@@ -75,7 +75,7 @@ const exercises = {
                     'Use toes to grip towel',
                     'Scrunch towel toward you',
                     'Release and reposition',
-                    'Repeat until towel is bunched up'
+                    'Repeat until towel is bunched up',
                 ],
                 reps: '20 scrunches per foot (30 right)',
                 sets: '2 sets',
@@ -84,9 +84,9 @@ const exercises = {
                     'Keep heel planted on ground',
                     'Use only toes to grip',
                     'Make sure arch stays engaged',
-                    'Can add weight on towel for progression'
-                ]
-            }
+                    'Can add weight on towel for progression',
+                ],
+            },
         },
         {
             id: 'balance_level1',
@@ -105,7 +105,7 @@ const exercises = {
                     'Touch support lightly with fingertips',
                     'Keep eyes open, focus on fixed point',
                     'Hold for 30 seconds (45 seconds right leg)',
-                    'Rest and switch legs'
+                    'Rest and switch legs',
                 ],
                 reps: '30 seconds each leg (45 right)',
                 sets: '3 sets per leg',
@@ -115,9 +115,9 @@ const exercises = {
                     'Progress to 1 finger as you improve',
                     'Keep hips level',
                     'Engage your core',
-                    'Breathe normally'
-                ]
-            }
+                    'Breathe normally',
+                ],
+            },
         },
         {
             id: 'balance_level2',
@@ -136,7 +136,7 @@ const exercises = {
                     'Arms out to sides for balance if needed',
                     'Keep eyes open, focus on fixed point',
                     'Hold for 30 seconds (45 seconds right leg)',
-                    'Rest and switch legs'
+                    'Rest and switch legs',
                 ],
                 reps: '30 seconds each leg (45 right)',
                 sets: '3 sets per leg',
@@ -145,8 +145,8 @@ const exercises = {
                     'Have support nearby just in case',
                     'Gradually reduce arm movement',
                     'If wobbling, focus harder on fixed point',
-                    'Core should stay engaged'
-                ]
+                    'Core should stay engaged',
+                ],
             },
         },
         {
@@ -166,7 +166,7 @@ const exercises = {
                     'Close your eyes',
                     'Hold for 20 seconds (30 seconds right leg)',
                     'Open eyes and rest',
-                    'Switch legs'
+                    'Switch legs',
                 ],
                 reps: '20 seconds each leg (30 right)',
                 sets: '3 sets per leg',
@@ -175,8 +175,8 @@ const exercises = {
                     'This is MUCH harder than it sounds',
                     'Touch support with 1-2 fingers',
                     'Stay relaxed, breathe normally',
-                    'Don\'t worry if you need to peek at first'
-                ]
+                    "Don't worry if you need to peek at first",
+                ],
             },
         },
         {
@@ -196,7 +196,7 @@ const exercises = {
                     'Close your eyes completely',
                     'Hold for 15 seconds (22 seconds right leg)',
                     'Open eyes and rest',
-                    'Switch legs'
+                    'Switch legs',
                 ],
                 reps: '15 seconds each leg (22 right)',
                 sets: '3 sets per leg',
@@ -206,8 +206,8 @@ const exercises = {
                     'Have support very nearby',
                     'Perfect posture is key',
                     'Even 5 seconds is good initially',
-                    'No shame in opening eyes if needed'
-                ]
+                    'No shame in opening eyes if needed',
+                ],
             },
         },
         {
@@ -227,7 +227,7 @@ const exercises = {
                     'Eyes open initially',
                     'Progress to eyes closed when ready',
                     'Hold for 15 seconds (22 seconds right leg)',
-                    'Step off carefully and switch legs'
+                    'Step off carefully and switch legs',
                 ],
                 reps: '15 seconds each leg (22 right)',
                 sets: '3 sets per leg',
@@ -237,8 +237,8 @@ const exercises = {
                     'Start with eyes open',
                     'Use balance pad or thick pillow',
                     'Progress to eyes closed only when very stable',
-                    'This will really expose asymmetries'
-                ]
+                    'This will really expose asymmetries',
+                ],
             },
         },
         {
@@ -255,7 +255,7 @@ const exercises = {
                     'Rise up on toes as high as possible',
                     'Hold at top for 2 seconds',
                     'Lower slowly, below step level if on step',
-                    'Control the descent'
+                    'Control the descent',
                 ],
                 reps: '15-20 (Week 1-4: Both feet, Week 5-8: Single leg)',
                 sets: '3 sets',
@@ -265,10 +265,10 @@ const exercises = {
                     'Slow and controlled',
                     'Hold at top for 2 seconds',
                     'Progress to single leg Week 5+',
-                    'Right leg gets extra set'
-                ]
+                    'Right leg gets extra set',
+                ],
             },
-            category: 'Foot & Ankle'
+            category: 'Foot & Ankle',
         },
         {
             id: 'clamshells',
@@ -285,20 +285,20 @@ const exercises = {
                     'Keep feet together',
                     'Lift top knee as high as possible',
                     'Squeeze glutes at top',
-                    'Lower with control'
+                    'Lower with control',
                 ],
                 reps: '20 each side (30 right side)',
                 sets: '3 sets',
                 why: 'Glute med weakness causes pronation and knee instability - KEY EXERCISE',
                 tips: [
-                    'Don\'t roll hips back',
+                    "Don't roll hips back",
                     'Feet stay glued together',
                     'Feel it in side of hip/glute',
                     'Add resistance band above knees Week 5+',
-                    'Keep core engaged'
-                ]
+                    'Keep core engaged',
+                ],
             },
-            category: 'Hip & Glute'
+            category: 'Hip & Glute',
         },
         {
             id: 'hip_abduction',
@@ -313,21 +313,21 @@ const exercises = {
                     'Lie on side, bottom leg bent for stability',
                     'Top leg straight, toes pointing forward (NOT up)',
                     'Lift top leg up toward ceiling',
-                    'Keep hips stacked, don\'t roll back',
-                    'Lower with control'
+                    "Keep hips stacked, don't roll back",
+                    'Lower with control',
                 ],
                 reps: '15 each side (22 right side)',
                 sets: '3 sets',
                 why: 'Strengthens hip stabilizers, particularly glute med and glute min',
                 tips: [
                     'Toes forward, not toward ceiling',
-                    'Don\'t go too high - quality over height',
+                    "Don't go too high - quality over height",
                     'Feel burn in side of hip',
                     'Keep body in straight line',
-                    'No swinging or momentum'
-                ]
+                    'No swinging or momentum',
+                ],
             },
-            category: 'Hip & Glute'
+            category: 'Hip & Glute',
         },
         {
             id: 'glute_bridges',
@@ -346,20 +346,20 @@ const exercises = {
                     'Form straight line from shoulders to knees',
                     'Squeeze glutes hard at top',
                     'Hold 3 seconds',
-                    'Lower with control'
+                    'Lower with control',
                 ],
                 reps: '20',
                 sets: '3 sets',
                 why: 'Activates glutes, safe for back, fundamental posterior chain movement',
                 tips: [
-                    'Don\'t arch lower back at top',
+                    "Don't arch lower back at top",
                     'Push through heels, not toes',
                     'Squeeze glutes, not hamstrings',
                     'Ribs stay down',
-                    'Breathe at top'
-                ]
+                    'Breathe at top',
+                ],
             },
-            category: 'Hip & Glute'
+            category: 'Hip & Glute',
         },
         {
             id: 'single_leg_bridge',
@@ -374,10 +374,10 @@ const exercises = {
                     'Lie on back, one knee bent, foot flat',
                     'Extend other leg straight',
                     'Press through grounded heel, lift hips',
-                    'Keep hips level - don\'t let them drop',
+                    "Keep hips level - don't let them drop",
                     'Squeeze glute at top',
                     'Hold 2 seconds',
-                    'Lower and repeat'
+                    'Lower and repeat',
                 ],
                 reps: '12 each leg (18 right) - Start Week 5',
                 sets: '3 sets',
@@ -387,10 +387,10 @@ const exercises = {
                     'Keep hips perfectly level',
                     'Extended leg stays straight',
                     'Drive through heel of grounded foot',
-                    'Right side will be harder initially'
-                ]
+                    'Right side will be harder initially',
+                ],
             },
-            category: 'Hip & Glute'
+            category: 'Hip & Glute',
         },
         {
             id: 'dead_bug',
@@ -407,20 +407,20 @@ const exercises = {
                     'Press lower back into floor',
                     'Lower opposite arm and leg simultaneously',
                     'Hover just above floor',
-                    'Return to start, switch sides'
+                    'Return to start, switch sides',
                 ],
                 reps: '12 each side (alternating)',
                 sets: '3 sets',
                 why: 'Core stability without spine loading - perfect for L5-S1 protection',
                 tips: [
                     'Lower back NEVER leaves floor',
-                    'If back arches, don\'t go as low',
+                    "If back arches, don't go as low",
                     'Breathe out as you extend',
                     'Move slowly and controlled',
-                    'This protects your disc!'
-                ]
+                    'This protects your disc!',
+                ],
             },
-            category: 'Core'
+            category: 'Core',
         },
         {
             id: 'bird_dog',
@@ -438,20 +438,20 @@ const exercises = {
                     'Arm and leg parallel to ground',
                     'Hold 5 seconds',
                     'Keep hips level, no rotation',
-                    'Return and switch sides'
+                    'Return and switch sides',
                 ],
                 reps: '10 each side (15 right side)',
                 sets: '3 sets',
                 why: 'Posterior chain + stability, teaches anti-rotation',
                 tips: [
-                    'Don\'t let hips rotate or drop',
+                    "Don't let hips rotate or drop",
                     'Back stays flat, no sagging',
                     'Look down to keep neck neutral',
                     'Squeeze glute of extended leg',
-                    'Move deliberately, not quickly'
-                ]
+                    'Move deliberately, not quickly',
+                ],
             },
-            category: 'Core'
+            category: 'Core',
         },
         {
             id: 'plank',
@@ -469,20 +469,20 @@ const exercises = {
                     'Week 5+: Full plank from toes if comfortable',
                     'Body in straight line from head to heels',
                     'Hold position, breathe normally',
-                    'Stop if hips sag or back hurts'
+                    'Stop if hips sag or back hurts',
                 ],
                 reps: '20-40 seconds',
                 sets: '3 sets',
                 why: 'Total core engagement, full anterior chain activation',
                 tips: [
-                    'Don\'t let hips sag down',
-                    'Don\'t pike hips up',
+                    "Don't let hips sag down",
+                    "Don't pike hips up",
                     'Squeeze glutes',
                     'Push floor away with forearms',
-                    'If back hurts, return to knees-down version'
-                ]
+                    'If back hurts, return to knees-down version',
+                ],
             },
-            category: 'Core'
+            category: 'Core',
         },
         {
             id: 'ankle_mobility',
@@ -500,7 +500,7 @@ const exercises = {
                     'Keep heel DOWN on floor',
                     'Feel stretch in calf and ankle',
                     'Hold 2 seconds, return',
-                    'Repeat 15 times'
+                    'Repeat 15 times',
                 ],
                 reps: '15 each side',
                 sets: '3 sets',
@@ -510,10 +510,10 @@ const exercises = {
                     'If heel lifts, move closer to wall',
                     'Aim to touch wall with knee',
                     'Do daily, especially before exercise',
-                    'Progress = moving further from wall'
-                ]
+                    'Progress = moving further from wall',
+                ],
             },
-            category: 'Mobility'
+            category: 'Mobility',
         },
         {
             id: 'hip_flexor_stretch',
@@ -531,20 +531,20 @@ const exercises = {
                     'Push hips forward',
                     'Keep torso upright',
                     'Feel stretch in front of back hip',
-                    'Hold 30 seconds'
+                    'Hold 30 seconds',
                 ],
                 reps: '30 seconds each side',
                 sets: '3 sets',
                 why: 'Tight hip flexors affect posture, gait, and can cause back pain',
                 tips: [
-                    'Don\'t lean forward',
+                    "Don't lean forward",
                     'Squeeze glute of back leg',
                     'Gentle stretch, not painful',
                     'Breathe deeply',
-                    'Hold consistent tension'
-                ]
+                    'Hold consistent tension',
+                ],
             },
-            category: 'Mobility'
+            category: 'Mobility',
         },
         {
             id: 'piriformis_stretch',
@@ -562,7 +562,7 @@ const exercises = {
                     'Pull left knee toward chest',
                     'Feel stretch in right glute',
                     'Hold 30 seconds',
-                    'Switch sides'
+                    'Switch sides',
                 ],
                 reps: '30 seconds each side',
                 sets: '3 sets',
@@ -572,13 +572,13 @@ const exercises = {
                     'Pull toward chest, not to side',
                     'Relax into stretch',
                     'Should feel deep in glute',
-                    'Critical for sciatic relief'
-                ]
+                    'Critical for sciatic relief',
+                ],
             },
-            category: 'Mobility'
-        }
+            category: 'Mobility',
+        },
     ],
-    
+
     phase2: [
         // Continue Phase 1 exercises, plus add these:
         {
@@ -588,7 +588,7 @@ const exercises = {
             leftTarget: 12,
             rightTarget: 18,
             sets: 3,
-            category: 'Single-Leg Strength'
+            category: 'Single-Leg Strength',
         },
         {
             id: 'split_squats',
@@ -597,7 +597,7 @@ const exercises = {
             leftTarget: 10,
             rightTarget: 15,
             sets: 3,
-            category: 'Single-Leg Strength'
+            category: 'Single-Leg Strength',
         },
         {
             id: 'single_leg_deadlift',
@@ -606,7 +606,7 @@ const exercises = {
             leftTarget: 10,
             rightTarget: 15,
             sets: 3,
-            category: 'Single-Leg Strength'
+            category: 'Single-Leg Strength',
         },
         {
             id: 'lateral_band_walks',
@@ -615,7 +615,7 @@ const exercises = {
             leftTarget: 15,
             rightTarget: 22,
             sets: 3,
-            category: 'Dynamic Stability'
+            category: 'Dynamic Stability',
         },
         {
             id: 'balance_reaches',
@@ -624,7 +624,7 @@ const exercises = {
             leftTarget: 8,
             rightTarget: 12,
             sets: 2,
-            category: 'Dynamic Stability'
+            category: 'Dynamic Stability',
         },
         {
             id: 'goblet_squats',
@@ -633,10 +633,10 @@ const exercises = {
             leftTarget: 12,
             rightTarget: 12,
             sets: 3,
-            category: 'Controlled Loading'
-        }
+            category: 'Controlled Loading',
+        },
     ],
-    
+
     phase3: [
         // Continue Phase 2 exercises, plus add these:
         {
@@ -646,7 +646,7 @@ const exercises = {
             leftTarget: 10,
             rightTarget: 15,
             sets: 3,
-            category: 'Power & Plyometrics'
+            category: 'Power & Plyometrics',
         },
         {
             id: 'single_leg_hops',
@@ -655,23 +655,23 @@ const exercises = {
             leftTarget: 5,
             rightTarget: 8,
             sets: 3,
-            category: 'Power & Plyometrics'
+            category: 'Power & Plyometrics',
         },
         {
             id: 'farmers_carries',
-            name: '24. Farmer\'s Carries',
+            name: "24. Farmer's Carries",
             targetReps: '20m each side',
             leftTarget: 20,
             rightTarget: 20,
             sets: 3,
-            category: 'Power & Plyometrics'
-        }
-    ]
+            category: 'Power & Plyometrics',
+        },
+    ],
 };
 
 // Get exercises for a specific phase
 function getExercisesForPhase(phase) {
-    switch(phase) {
+    switch (phase) {
         case 1:
             return exercises.phase1;
         case 2:

@@ -29,7 +29,7 @@ function createFreshProgress() {
         date: new Date().toISOString().split('T')[0],
         completedExercises: [],
         exerciseData: {},
-        soundEnabled: true
+        soundEnabled: true,
     };
 }
 
@@ -38,7 +38,7 @@ function saveDailyProgress() {
 }
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeApp();
     setupEventListeners();
     initSwipeBack();
@@ -47,17 +47,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeApp() {
     // Set current date
-    const today = new Date().toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+    const today = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
     });
     document.getElementById('currentDate').textContent = today;
-    
+
     // Set workout date to today
     document.getElementById('workoutDate').valueAsDate = new Date();
-    
+
     // Load current phase
     updatePhaseInfo();
     loadExercises();
@@ -70,28 +70,28 @@ function setupEventListeners() {
     // Menu functionality
     document.getElementById('menuBtn').addEventListener('click', openMenu);
     document.getElementById('closeMenuBtn').addEventListener('click', closeMenu);
-    
+
     // Overlay click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const sideMenu = document.getElementById('sideMenu');
         const menuBtn = document.getElementById('menuBtn');
         if (!sideMenu.contains(e.target) && !menuBtn.contains(e.target)) {
             closeMenu();
         }
     });
-    
+
     // Pain slider listeners
     setupPainSliders();
-    
+
     // Form submissions
     document.getElementById('weeklyForm').addEventListener('submit', saveWeeklyAssessment);
     document.getElementById('monthlyForm').addEventListener('submit', saveMonthlyAssessment);
-    
+
     // Set default week and month numbers
     const currentWeek = calculateCurrentWeek();
     document.getElementById('weekNumber').value = currentWeek;
     document.getElementById('monthNumber').value = Math.ceil(currentWeek / 4);
-    
+
     // Set today's date for assessments
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('weeklyDate').value = today;
@@ -100,11 +100,11 @@ function setupEventListeners() {
 
 function setupPainSliders() {
     const sliders = ['kneePain', 'backPain', 'footPain'];
-    sliders.forEach(id => {
+    sliders.forEach((id) => {
         const slider = document.getElementById(id);
         const display = document.getElementById(id + 'Value');
         if (slider && display) {
-            slider.addEventListener('input', function() {
+            slider.addEventListener('input', function () {
                 display.textContent = this.value;
             });
         }
@@ -141,7 +141,7 @@ function showScreen(screenName, useSlideBack) {
         }, 300);
     } else {
         // Normal instant switch
-        document.querySelectorAll('.screen').forEach(screen => {
+        document.querySelectorAll('.screen').forEach((screen) => {
             screen.classList.remove('active', 'swipe-leaving', 'swipe-entering');
         });
         targetScreen.classList.add('active');
@@ -183,111 +183,127 @@ function initSwipeBack() {
     let isSwiping = false;
     let swipeLocked = false; // once we decide swipe vs scroll, lock it
 
-    const EDGE_ZONE = 40;         // px from left edge to start swipe
-    const SWIPE_THRESHOLD = 80;   // px to trigger back navigation
-    const ANGLE_THRESHOLD = 30;   // max degrees from horizontal
+    const EDGE_ZONE = 40; // px from left edge to start swipe
+    const SWIPE_THRESHOLD = 80; // px to trigger back navigation
+    const ANGLE_THRESHOLD = 30; // max degrees from horizontal
 
-    container.addEventListener('touchstart', function(e) {
-        const touch = e.touches[0];
-        // Only start if touch begins near left edge
-        if (touch.clientX > EDGE_ZONE) return;
+    container.addEventListener(
+        'touchstart',
+        function (e) {
+            const touch = e.touches[0];
+            // Only start if touch begins near left edge
+            if (touch.clientX > EDGE_ZONE) return;
 
-        // Don't swipe on home screen
-        const activeScreen = document.querySelector('.screen.active');
-        if (!activeScreen || activeScreen.id === 'homeScreen') return;
+            // Don't swipe on home screen
+            const activeScreen = document.querySelector('.screen.active');
+            if (!activeScreen || activeScreen.id === 'homeScreen') return;
 
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        touchCurrentX = touch.clientX;
-        isSwiping = false;
-        swipeLocked = false;
-    }, { passive: true });
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchCurrentX = touch.clientX;
+            isSwiping = false;
+            swipeLocked = false;
+        },
+        { passive: true }
+    );
 
-    container.addEventListener('touchmove', function(e) {
-        if (touchStartX === 0 && !isSwiping) return;
+    container.addEventListener(
+        'touchmove',
+        function (e) {
+            if (touchStartX === 0 && !isSwiping) return;
 
-        const touch = e.touches[0];
-        const dx = touch.clientX - touchStartX;
-        const dy = touch.clientY - touchStartY;
+            const touch = e.touches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
 
-        // Once locked, don't re-evaluate
-        if (!swipeLocked) {
-            // Need some movement before deciding
-            if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+            // Once locked, don't re-evaluate
+            if (!swipeLocked) {
+                // Need some movement before deciding
+                if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
 
-            const angle = Math.abs(Math.atan2(dy, dx) * (180 / Math.PI));
-            if (angle > ANGLE_THRESHOLD && angle < (180 - ANGLE_THRESHOLD)) {
-                // Vertical scroll — abort swipe
+                const angle = Math.abs(Math.atan2(dy, dx) * (180 / Math.PI));
+                if (angle > ANGLE_THRESHOLD && angle < 180 - ANGLE_THRESHOLD) {
+                    // Vertical scroll — abort swipe
+                    touchStartX = 0;
+                    swipeLocked = true;
+                    return;
+                }
+                // Horizontal and going right — it's a swipe
+                if (dx > 0) {
+                    isSwiping = true;
+                    swipeLocked = true;
+                } else {
+                    touchStartX = 0;
+                    swipeLocked = true;
+                    return;
+                }
+            }
+
+            if (!isSwiping) return;
+
+            touchCurrentX = touch.clientX;
+            const offset = Math.max(0, touchCurrentX - touchStartX);
+
+            // Live drag the active screen
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen) {
+                activeScreen.style.transform = `translateX(${offset}px)`;
+                activeScreen.style.transition = 'none';
+                // Dim slightly as it drags
+                activeScreen.style.opacity = Math.max(0.5, 1 - (offset / window.innerWidth) * 0.5);
+            }
+        },
+        { passive: true }
+    );
+
+    container.addEventListener(
+        'touchend',
+        function (e) {
+            if (!isSwiping) {
                 touchStartX = 0;
-                swipeLocked = true;
                 return;
             }
-            // Horizontal and going right — it's a swipe
-            if (dx > 0) {
-                isSwiping = true;
-                swipeLocked = true;
-            } else {
-                touchStartX = 0;
-                swipeLocked = true;
-                return;
+
+            const offset = touchCurrentX - touchStartX;
+            const activeScreen = document.querySelector('.screen.active');
+
+            if (activeScreen) {
+                // Reset inline styles
+                activeScreen.style.transform = '';
+                activeScreen.style.transition = '';
+                activeScreen.style.opacity = '';
             }
-        }
 
-        if (!isSwiping) return;
+            if (offset >= SWIPE_THRESHOLD) {
+                // Trigger back navigation with slide animation
+                goBack();
+            }
 
-        touchCurrentX = touch.clientX;
-        const offset = Math.max(0, touchCurrentX - touchStartX);
-
-        // Live drag the active screen
-        const activeScreen = document.querySelector('.screen.active');
-        if (activeScreen) {
-            activeScreen.style.transform = `translateX(${offset}px)`;
-            activeScreen.style.transition = 'none';
-            // Dim slightly as it drags
-            activeScreen.style.opacity = Math.max(0.5, 1 - (offset / window.innerWidth) * 0.5);
-        }
-    }, { passive: true });
-
-    container.addEventListener('touchend', function(e) {
-        if (!isSwiping) {
+            // Reset state
             touchStartX = 0;
-            return;
-        }
+            touchCurrentX = 0;
+            isSwiping = false;
+            swipeLocked = false;
+        },
+        { passive: true }
+    );
 
-        const offset = touchCurrentX - touchStartX;
-        const activeScreen = document.querySelector('.screen.active');
-
-        if (activeScreen) {
-            // Reset inline styles
-            activeScreen.style.transform = '';
-            activeScreen.style.transition = '';
-            activeScreen.style.opacity = '';
-        }
-
-        if (offset >= SWIPE_THRESHOLD) {
-            // Trigger back navigation with slide animation
-            goBack();
-        }
-
-        // Reset state
-        touchStartX = 0;
-        touchCurrentX = 0;
-        isSwiping = false;
-        swipeLocked = false;
-    }, { passive: true });
-
-    container.addEventListener('touchcancel', function() {
-        const activeScreen = document.querySelector('.screen.active');
-        if (activeScreen) {
-            activeScreen.style.transform = '';
-            activeScreen.style.transition = '';
-            activeScreen.style.opacity = '';
-        }
-        touchStartX = 0;
-        touchCurrentX = 0;
-        isSwiping = false;
-        swipeLocked = false;
-    }, { passive: true });
+    container.addEventListener(
+        'touchcancel',
+        function () {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen) {
+                activeScreen.style.transform = '';
+                activeScreen.style.transition = '';
+                activeScreen.style.opacity = '';
+            }
+            touchStartX = 0;
+            touchCurrentX = 0;
+            isSwiping = false;
+            swipeLocked = false;
+        },
+        { passive: true }
+    );
 }
 
 // Phase Management
@@ -304,7 +320,7 @@ function updatePhaseInfo() {
     const phaseNames = {
         1: 'Phase 1: Foundation (Weeks 1-8)',
         2: 'Phase 2: Functional Strength (Weeks 9-20)',
-        3: 'Phase 3: Advanced (Week 21+)'
+        3: 'Phase 3: Advanced (Week 21+)',
     };
     document.getElementById('currentPhaseText').textContent = phaseNames[currentPhase];
 }
@@ -348,7 +364,7 @@ function createCompletedCard(exercise) {
     `;
 
     // Click to expand — expandCard rebuilds the full card from scratch
-    card.addEventListener('click', function(e) {
+    card.addEventListener('click', function (e) {
         expandCard(card, exercise);
     });
 
@@ -359,7 +375,7 @@ function createExerciseCard(exercise, index) {
     const card = document.createElement('div');
     card.className = 'exercise-card';
     card.setAttribute('data-exercise-id', exercise.id);
-    
+
     // Add progression note if applicable
     let progressionNote = '';
     if (exercise.progressionLevel) {
@@ -368,11 +384,11 @@ function createExerciseCard(exercise, index) {
             2: '🟡 Progress when Level 1 feels easy',
             3: '🟠 Intermediate - adds challenge',
             4: '🔴 Advanced - no support',
-            5: '⚫ Expert - most challenging'
+            5: '⚫ Expert - most challenging',
         };
         progressionNote = `<div style="background: var(--bg-light); padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; color: var(--text-dark);">${progressionTexts[exercise.progressionLevel]}</div>`;
     }
-    
+
     card.innerHTML = `
         ${progressionNote}
         <div class="exercise-header">
@@ -420,60 +436,70 @@ function createExerciseCard(exercise, index) {
     const setsPickerContainer = card.querySelector(`#picker_sets_${exercise.id}`);
 
     if (leftPickerContainer) {
-        leftPickerContainer.replaceWith(createWheelPicker(`left_${exercise.id}`, 0, 30, 1, exercise.leftTarget));
+        leftPickerContainer.replaceWith(
+            createWheelPicker(`left_${exercise.id}`, 0, 30, 1, exercise.leftTarget)
+        );
     }
     if (rightPickerContainer) {
-        rightPickerContainer.replaceWith(createWheelPicker(`right_${exercise.id}`, 0, 30, 1, exercise.rightTarget));
+        rightPickerContainer.replaceWith(
+            createWheelPicker(`right_${exercise.id}`, 0, 30, 1, exercise.rightTarget)
+        );
     }
     if (setsPickerContainer) {
-        setsPickerContainer.replaceWith(createWheelPicker(`sets_${exercise.id}`, 1, 5, 1, exercise.sets));
+        setsPickerContainer.replaceWith(
+            createWheelPicker(`sets_${exercise.id}`, 1, 5, 1, exercise.sets)
+        );
     }
-    
+
     // Add pain slider listener with scroll protection
     const painSlider = card.querySelector(`#pain_${exercise.id}`);
     const painValue = card.querySelector(`#pain_value_${exercise.id}`);
-    
+
     let isSliding = false;
-    
+
     // Start sliding only on deliberate touch/click
-    painSlider.addEventListener('touchstart', function(e) {
-        isSliding = true;
-        e.stopPropagation();
-    }, { passive: false });
-    
-    painSlider.addEventListener('mousedown', function(e) {
+    painSlider.addEventListener(
+        'touchstart',
+        function (e) {
+            isSliding = true;
+            e.stopPropagation();
+        },
+        { passive: false }
+    );
+
+    painSlider.addEventListener('mousedown', function (e) {
         isSliding = true;
         e.stopPropagation();
     });
-    
+
     // Update value during slide
-    painSlider.addEventListener('input', function() {
+    painSlider.addEventListener('input', function () {
         if (isSliding) {
             painValue.textContent = this.value;
             updatePainColor(painValue, this.value);
         }
     });
-    
+
     // Change event for final value
-    painSlider.addEventListener('change', function() {
+    painSlider.addEventListener('change', function () {
         painValue.textContent = this.value;
         updatePainColor(painValue, this.value);
         isSliding = false;
     });
-    
+
     // Reset sliding state
-    painSlider.addEventListener('touchend', function() {
+    painSlider.addEventListener('touchend', function () {
         isSliding = false;
     });
-    
-    painSlider.addEventListener('mouseup', function() {
+
+    painSlider.addEventListener('mouseup', function () {
         isSliding = false;
     });
-    
+
     // Add info button listener
     const infoBtn = card.querySelector(`#info_${exercise.id}`);
     if (exercise.instructions && infoBtn) {
-        infoBtn.addEventListener('click', function(e) {
+        infoBtn.addEventListener('click', function (e) {
             e.preventDefault();
             showInstructions(exercise);
         });
@@ -482,7 +508,7 @@ function createExerciseCard(exercise, index) {
     // Mark Complete button handler
     const completeBtn = card.querySelector(`#complete_${exercise.id}`);
     if (completeBtn) {
-        completeBtn.addEventListener('click', function(e) {
+        completeBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             collapseCard(card, exercise);
@@ -660,13 +686,13 @@ function createWheelPicker(id, min, max, step, defaultValue) {
 
     // Real-time scroll handler for smooth opacity transitions
     let rafId = null;
-    scroll.addEventListener('scroll', function() {
+    scroll.addEventListener('scroll', function () {
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(updateVisualState);
     });
 
     // Allow clicking an item to scroll it to center
-    scroll.addEventListener('click', function(e) {
+    scroll.addEventListener('click', function (e) {
         const item = e.target.closest('.wheel-picker-item');
         if (item && item.hasAttribute('data-value')) {
             const val = parseInt(item.getAttribute('data-value'));
@@ -743,9 +769,9 @@ function updateProgressBar() {
                 const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
                 const thumb = document.createElement('button');
                 thumb.className = 'progress-thumb' + (isCompleted ? ' completed' : '');
-                thumb.textContent = isCompleted ? '✓' : (index + 1);
+                thumb.textContent = isCompleted ? '✓' : index + 1;
                 thumb.title = exercise.name;
-                thumb.addEventListener('click', function() {
+                thumb.addEventListener('click', function () {
                     scrollToExercise(exercise.id);
                 });
                 barC.appendChild(thumb);
@@ -779,7 +805,7 @@ function clearDailyProgress() {
         'Clear Progress',
         'Clear all progress for today? Your saved workouts are not affected.',
         'Clear',
-        function() {
+        function () {
             dailyProgress.completedExercises = [];
             dailyProgress.exerciseData = {};
             saveDailyProgress();
@@ -810,12 +836,12 @@ function showCelebration() {
         confetti({
             particleCount: 80,
             spread: 70,
-            origin: { x: 0.2, y: 0.6 }
+            origin: { x: 0.2, y: 0.6 },
         });
         confetti({
             particleCount: 80,
             spread: 70,
-            origin: { x: 0.8, y: 0.6 }
+            origin: { x: 0.8, y: 0.6 },
         });
 
         // Second wave after a short delay
@@ -824,7 +850,7 @@ function showCelebration() {
                 confetti({
                     particleCount: 50,
                     spread: 100,
-                    origin: { x: 0.5, y: 0.4 }
+                    origin: { x: 0.5, y: 0.4 },
                 });
             }
         }, 500);
@@ -871,7 +897,7 @@ function captureExerciseData(exerciseId) {
         right: right,
         sets: sets,
         pain: painEl ? parseInt(painEl.value) || 0 : 0,
-        notes: notesEl ? notesEl.value || '' : ''
+        notes: notesEl ? notesEl.value || '' : '',
     };
     saveDailyProgress();
 }
@@ -905,36 +931,44 @@ function reattachCardListeners(card, exercise) {
     if (painSlider && painValue) {
         let isSliding = false;
 
-        painSlider.addEventListener('touchstart', function(e) {
-            isSliding = true;
-            e.stopPropagation();
-        }, { passive: false });
+        painSlider.addEventListener(
+            'touchstart',
+            function (e) {
+                isSliding = true;
+                e.stopPropagation();
+            },
+            { passive: false }
+        );
 
-        painSlider.addEventListener('mousedown', function(e) {
+        painSlider.addEventListener('mousedown', function (e) {
             isSliding = true;
             e.stopPropagation();
         });
 
-        painSlider.addEventListener('input', function() {
+        painSlider.addEventListener('input', function () {
             if (isSliding) {
                 painValue.textContent = this.value;
                 updatePainColor(painValue, this.value);
             }
         });
 
-        painSlider.addEventListener('change', function() {
+        painSlider.addEventListener('change', function () {
             painValue.textContent = this.value;
             updatePainColor(painValue, this.value);
             isSliding = false;
         });
 
-        painSlider.addEventListener('touchend', function() { isSliding = false; });
-        painSlider.addEventListener('mouseup', function() { isSliding = false; });
+        painSlider.addEventListener('touchend', function () {
+            isSliding = false;
+        });
+        painSlider.addEventListener('mouseup', function () {
+            isSliding = false;
+        });
     }
 
     const infoBtn = card.querySelector(`#info_${exercise.id}`);
     if (exercise.instructions && infoBtn) {
-        infoBtn.addEventListener('click', function(e) {
+        infoBtn.addEventListener('click', function (e) {
             e.preventDefault();
             showInstructions(exercise);
         });
@@ -943,7 +977,7 @@ function reattachCardListeners(card, exercise) {
     // Re-attach Mark Complete button handler
     const completeBtn = card.querySelector(`#complete_${exercise.id}`);
     if (completeBtn) {
-        completeBtn.addEventListener('click', function(e) {
+        completeBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             collapseCard(card, exercise);
@@ -1002,7 +1036,9 @@ function collapseCard(card, exercise) {
 
 function expandCard(card, exercise) {
     // Remove from completed
-    dailyProgress.completedExercises = dailyProgress.completedExercises.filter(id => id !== exercise.id);
+    dailyProgress.completedExercises = dailyProgress.completedExercises.filter(
+        (id) => id !== exercise.id
+    );
     saveDailyProgress();
 
     // Rebuild the card completely from scratch (guarantees pickers + listeners work)
@@ -1061,9 +1097,9 @@ function showInstructions(exercise) {
         showToast('No instructions available', 'info');
         return;
     }
-    
+
     const instr = exercise.instructions;
-    
+
     // Create modal
     const modal = document.createElement('div');
     modal.className = 'instructions-modal';
@@ -1077,7 +1113,7 @@ function showInstructions(exercise) {
                 <div class="instructions-section">
                     <h3>📋 How to Perform:</h3>
                     <ol class="steps-list">
-                        ${instr.steps.map(step => `<li>${step}</li>`).join('')}
+                        ${instr.steps.map((step) => `<li>${step}</li>`).join('')}
                     </ol>
                 </div>
                 
@@ -1095,7 +1131,7 @@ function showInstructions(exercise) {
                 <div class="instructions-section tips-section">
                     <h3>✅ Pro Tips:</h3>
                     <ul class="tips-list">
-                        ${instr.tips.map(tip => `<li>${tip}</li>`).join('')}
+                        ${instr.tips.map((tip) => `<li>${tip}</li>`).join('')}
                     </ul>
                 </div>
             </div>
@@ -1104,14 +1140,14 @@ function showInstructions(exercise) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     // Prevent background scroll
     document.body.style.overflow = 'hidden';
-    
+
     // Close on backdrop click
-    modal.addEventListener('click', function(e) {
+    modal.addEventListener('click', function (e) {
         if (e.target === modal) {
             modal.remove();
             document.body.style.overflow = '';
@@ -1134,11 +1170,11 @@ function saveWorkout() {
     const workout = {
         date: date,
         phase: currentPhase,
-        exercises: []
+        exercises: [],
     };
 
     let hasData = false;
-    phaseExercises.forEach(exercise => {
+    phaseExercises.forEach((exercise) => {
         const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
         const savedData = dailyProgress.exerciseData[exercise.id];
 
@@ -1178,7 +1214,7 @@ function saveWorkout() {
                 rightReps: rightReps,
                 sets: sets,
                 pain: pain,
-                notes: notes
+                notes: notes,
             });
         }
     });
@@ -1211,7 +1247,7 @@ function saveWorkout() {
 // Weekly Assessment
 function saveWeeklyAssessment(e) {
     e.preventDefault();
-    
+
     const assessment = {
         week: document.getElementById('weekNumber').value,
         date: document.getElementById('weeklyDate').value,
@@ -1224,14 +1260,14 @@ function saveWeeklyAssessment(e) {
         kneePain: document.getElementById('kneePain').value,
         backPain: document.getElementById('backPain').value,
         footPain: document.getElementById('footPain').value,
-        notes: document.getElementById('weeklyNotes').value
+        notes: document.getElementById('weeklyNotes').value,
     };
-    
+
     weeklyData.push(assessment);
     localStorage.setItem('weeklyData', JSON.stringify(weeklyData));
-    
+
     showToast('✓ Weekly assessment saved!', 'success');
-    
+
     setTimeout(() => {
         document.getElementById('weeklyForm').reset();
         document.getElementById('weekNumber').value = calculateCurrentWeek() + 1;
@@ -1242,7 +1278,7 @@ function saveWeeklyAssessment(e) {
 // Monthly Assessment
 function saveMonthlyAssessment(e) {
     e.preventDefault();
-    
+
     const assessment = {
         month: document.getElementById('monthNumber').value,
         date: document.getElementById('monthlyDate').value,
@@ -1254,14 +1290,14 @@ function saveMonthlyAssessment(e) {
         videoTaken: document.getElementById('videoTaken').checked,
         phase: document.getElementById('monthlyPhase').value,
         readyNextPhase: document.getElementById('readyNextPhase').checked,
-        notes: document.getElementById('monthlyNotes').value
+        notes: document.getElementById('monthlyNotes').value,
     };
-    
+
     monthlyData.push(assessment);
     localStorage.setItem('monthlyData', JSON.stringify(monthlyData));
-    
+
     showToast('✓ Monthly assessment saved!', 'success');
-    
+
     setTimeout(() => {
         document.getElementById('monthlyForm').reset();
         document.getElementById('monthNumber').value = Math.ceil(calculateCurrentWeek() / 4) + 1;
@@ -1272,7 +1308,7 @@ function saveMonthlyAssessment(e) {
 // History Management
 function showHistoryTab(tab) {
     // Update tab buttons — highlight the one matching the selected tab
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
         btn.classList.remove('active');
     });
     // Find the button whose onclick contains this tab name and mark it active
@@ -1285,9 +1321,9 @@ function showHistoryTab(tab) {
 function loadHistory(type) {
     const historyContent = document.getElementById('historyContent');
     historyContent.innerHTML = '';
-    
+
     let data = [];
-    switch(type) {
+    switch (type) {
         case 'workouts':
             data = workoutData.slice().reverse();
             break;
@@ -1298,13 +1334,14 @@ function loadHistory(type) {
             data = monthlyData.slice().reverse();
             break;
     }
-    
+
     if (data.length === 0) {
-        historyContent.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px;">No data yet. Start tracking!</p>';
+        historyContent.innerHTML =
+            '<p style="text-align: center; color: var(--text-light); padding: 40px;">No data yet. Start tracking!</p>';
         return;
     }
-    
-    data.forEach(item => {
+
+    data.forEach((item) => {
         const card = createHistoryCard(item, type);
         historyContent.appendChild(card);
     });
@@ -1313,7 +1350,7 @@ function loadHistory(type) {
 function createHistoryCard(item, type) {
     const card = document.createElement('div');
     card.className = 'history-item';
-    
+
     if (type === 'workouts') {
         card.innerHTML = `
             <div class="history-item-header">
@@ -1348,7 +1385,7 @@ function createHistoryCard(item, type) {
             </div>
         `;
     }
-    
+
     return card;
 }
 
@@ -1358,54 +1395,56 @@ function exportAllData() {
         showToast('No data to export', 'error');
         return;
     }
-    
+
     // Export workouts
     if (workoutData.length > 0) {
         exportWorkoutsCSV();
     }
-    
+
     // Export weekly assessments
     if (weeklyData.length > 0) {
         exportWeeklyCSV();
     }
-    
+
     // Export monthly assessments
     if (monthlyData.length > 0) {
         exportMonthlyCSV();
     }
-    
+
     showToast('✓ Data exported successfully!', 'success');
 }
 
 function exportWorkoutsCSV() {
     let csv = 'Date,Phase,Exercise,Left Reps,Right Reps,Sets,Pain Level,Notes\n';
-    
-    workoutData.forEach(workout => {
-        workout.exercises.forEach(ex => {
+
+    workoutData.forEach((workout) => {
+        workout.exercises.forEach((ex) => {
             csv += `${workout.date},${workout.phase},"${ex.name}",${ex.leftReps},${ex.rightReps},${ex.sets},${ex.pain},"${ex.notes}"\n`;
         });
     });
-    
+
     downloadCSV(csv, 'rehab_workouts.csv');
 }
 
 function exportWeeklyCSV() {
-    let csv = 'Week,Date,Stand Left,Stand Right,Bridge Left,Bridge Right,Reach Left,Reach Right,Knee Pain,Back Pain,Foot Pain,Notes\n';
-    
-    weeklyData.forEach(week => {
+    let csv =
+        'Week,Date,Stand Left,Stand Right,Bridge Left,Bridge Right,Reach Left,Reach Right,Knee Pain,Back Pain,Foot Pain,Notes\n';
+
+    weeklyData.forEach((week) => {
         csv += `${week.week},${week.date},${week.standLeft},${week.standRight},${week.bridgeLeft},${week.bridgeRight},${week.reachLeft},${week.reachRight},${week.kneePain},${week.backPain},${week.footPain},"${week.notes}"\n`;
     });
-    
+
     downloadCSV(csv, 'rehab_weekly_assessments.csv');
 }
 
 function exportMonthlyCSV() {
-    let csv = 'Month,Date,Calf Right,Calf Left,Thigh Right,Thigh Left,Photos,Video,Phase,Ready Next Phase,Notes\n';
-    
-    monthlyData.forEach(month => {
+    let csv =
+        'Month,Date,Calf Right,Calf Left,Thigh Right,Thigh Left,Photos,Video,Phase,Ready Next Phase,Notes\n';
+
+    monthlyData.forEach((month) => {
         csv += `${month.month},${month.date},${month.calfRight},${month.calfLeft},${month.thighRight},${month.thighLeft},${month.photosTaken},${month.videoTaken},${month.phase},${month.readyNextPhase},"${month.notes}"\n`;
     });
-    
+
     downloadCSV(csv, 'rehab_monthly_assessments.csv');
 }
 
@@ -1429,7 +1468,7 @@ function clearAllData() {
         'Delete All Data',
         '⚠️ This will permanently delete all workouts, assessments, and progress. This cannot be undone.',
         'Delete Everything',
-        function() {
+        function () {
             localStorage.clear();
             workoutData = [];
             weeklyData = [];
@@ -1452,40 +1491,38 @@ function updateStats() {
 
 function calculateStreak() {
     if (workoutData.length === 0) return 0;
-    
-    const sortedDates = workoutData
-        .map(w => new Date(w.date))
-        .sort((a, b) => b - a);
-    
+
+    const sortedDates = workoutData.map((w) => new Date(w.date)).sort((a, b) => b - a);
+
     let streak = 1;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const lastWorkout = sortedDates[0];
     lastWorkout.setHours(0, 0, 0, 0);
-    
+
     const daysDiff = Math.floor((today - lastWorkout) / (1000 * 60 * 60 * 24));
-    
+
     if (daysDiff > 1) return 0;
-    
+
     for (let i = 1; i < sortedDates.length; i++) {
         const prevDate = sortedDates[i - 1];
         const currDate = sortedDates[i];
         const diff = Math.floor((prevDate - currDate) / (1000 * 60 * 60 * 24));
-        
+
         if (diff === 1) {
             streak++;
         } else {
             break;
         }
     }
-    
+
     return streak;
 }
 
 function calculateCurrentWeek() {
     if (workoutData.length === 0) return 1;
-    
+
     const firstWorkout = new Date(workoutData[0].date);
     const today = new Date();
     const daysDiff = Math.floor((today - firstWorkout) / (1000 * 60 * 60 * 24));
@@ -1510,7 +1547,7 @@ function showToast(message, type = 'success') {
     toast.className = `toast ${type}`;
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.remove();
     }, 3000);
@@ -1552,12 +1589,12 @@ function showConfirmDialog(title, message, confirmText, onConfirm, isDestructive
 
     // Cancel
     dialog.querySelector('.confirm-dialog-cancel').addEventListener('click', dismiss);
-    overlay.addEventListener('click', function(e) {
+    overlay.addEventListener('click', function (e) {
         if (e.target === overlay) dismiss();
     });
 
     // Confirm
-    dialog.querySelector('.confirm-dialog-confirm').addEventListener('click', function() {
+    dialog.querySelector('.confirm-dialog-confirm').addEventListener('click', function () {
         dismiss();
         if (onConfirm) onConfirm();
     });
@@ -1566,7 +1603,7 @@ function showConfirmDialog(title, message, confirmText, onConfirm, isDestructive
 // Auto-save daily progress on page close/tab switch
 function autoSaveDailyProgress() {
     const phaseExercises = getExercisesForPhase(currentPhase);
-    phaseExercises.forEach(exercise => {
+    phaseExercises.forEach((exercise) => {
         // Only capture from DOM if the card is expanded (not collapsed)
         if (!dailyProgress.completedExercises.includes(exercise.id)) {
             const left = getPickerValue(`left_${exercise.id}`);
@@ -1582,7 +1619,7 @@ function autoSaveDailyProgress() {
                     right: right,
                     sets: sets,
                     pain: painEl ? parseInt(painEl.value) || 0 : 0,
-                    notes: notesEl ? notesEl.value || '' : ''
+                    notes: notesEl ? notesEl.value || '' : '',
                 };
             }
         }
@@ -1591,7 +1628,7 @@ function autoSaveDailyProgress() {
 }
 
 window.addEventListener('beforeunload', autoSaveDailyProgress);
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') {
         autoSaveDailyProgress();
     }
@@ -1600,8 +1637,9 @@ document.addEventListener('visibilitychange', function() {
 // Service Worker Registration (for PWA functionality)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker registered'))
-            .catch(err => console.log('Service Worker registration failed'));
+        navigator.serviceWorker
+            .register('sw.js')
+            .then((reg) => console.log('Service Worker registered'))
+            .catch((err) => console.log('Service Worker registration failed'));
     });
 }

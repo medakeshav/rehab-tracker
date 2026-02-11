@@ -140,7 +140,7 @@ export default [
             'no-redeclare': 'off',
             'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
             'no-undef': 'error',
-            'eqeqeq': 'warn',
+            eqeqeq: 'warn',
             'no-var': 'warn',
             'prefer-const': 'warn',
         },
@@ -161,7 +161,7 @@ export default [
         rules: {
             'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
             'no-undef': 'error',
-            'eqeqeq': 'warn',
+            eqeqeq: 'warn',
             'no-var': 'warn',
             'prefer-const': 'warn',
         },

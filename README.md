@@ -18,40 +18,40 @@ A custom-built mobile-optimized web application for tracking your rehabilitation
 ### Option 1: GitHub Pages (Recommended - FREE)
 
 1. **Create GitHub Account** (if you don't have one)
-   - Go to https://github.com
-   - Sign up for free
+    - Go to https://github.com
+    - Sign up for free
 
 2. **Create New Repository**
-   - Click "New Repository"
-   - Name it: `rehab-tracker`
-   - Make it Public
-   - Don't add README
-   - Click "Create repository"
+    - Click "New Repository"
+    - Name it: `rehab-tracker`
+    - Make it Public
+    - Don't add README
+    - Click "Create repository"
 
 3. **Upload Files**
-   - Click "uploading an existing file"
-   - Drag and drop ALL files from this folder:
-     - index.html
-     - styles.css
-     - app.js
-     - exercises.js
-     - manifest.json
-     - sw.js
-     - icon-192.png
-     - icon-512.png
-   - Click "Commit changes"
+    - Click "uploading an existing file"
+    - Drag and drop ALL files from this folder:
+        - index.html
+        - styles.css
+        - app.js
+        - exercises.js
+        - manifest.json
+        - sw.js
+        - icon-192.png
+        - icon-512.png
+    - Click "Commit changes"
 
 4. **Enable GitHub Pages**
-   - Go to Settings → Pages
-   - Source: "Deploy from a branch"
-   - Branch: "main" / "master"
-   - Folder: "/ (root)"
-   - Click "Save"
+    - Go to Settings → Pages
+    - Source: "Deploy from a branch"
+    - Branch: "main" / "master"
+    - Folder: "/ (root)"
+    - Click "Save"
 
 5. **Access Your App**
-   - Wait 2-3 minutes
-   - Your app will be at: `https://[your-username].github.io/rehab-tracker`
-   - Bookmark this URL!
+    - Wait 2-3 minutes
+    - Your app will be at: `https://[your-username].github.io/rehab-tracker`
+    - Bookmark this URL!
 
 ### Option 2: Google Drive (Simple)
 
@@ -78,6 +78,7 @@ Then open: http://localhost:8000
 ## 📱 Installing on Your Phone
 
 ### iPhone (Safari):
+
 1. Open the app URL in Safari
 2. Tap the Share button (box with arrow)
 3. Scroll down and tap "Add to Home Screen"
@@ -85,6 +86,7 @@ Then open: http://localhost:8000
 5. The app icon will appear on your home screen
 
 ### Android (Chrome):
+
 1. Open the app URL in Chrome
 2. Tap the menu (⋮) in the top right
 3. Tap "Add to Home screen"
@@ -94,43 +96,47 @@ Then open: http://localhost:8000
 ## 📊 Using the App
 
 ### Daily Workout:
+
 1. Select your current phase from home screen
 2. Go to "Daily Workout"
 3. For each exercise:
-   - Enter left leg reps
-   - Enter right leg reps (app shows target 1.5x for right)
-   - Enter sets completed
-   - Set pain level (0-10 slider)
-   - Add notes if needed
+    - Enter left leg reps
+    - Enter right leg reps (app shows target 1.5x for right)
+    - Enter sets completed
+    - Set pain level (0-10 slider)
+    - Add notes if needed
 4. Click "Save Workout"
 
 ### Weekly Assessment (Every Sunday):
+
 1. Go to "Weekly Assessment"
 2. Complete all tests:
-   - Single-leg balance (eyes closed)
-   - Single-leg bridges (max reps)
-   - Balance reaches
-   - Pain levels
+    - Single-leg balance (eyes closed)
+    - Single-leg bridges (max reps)
+    - Balance reaches
+    - Pain levels
 3. Add notes about progress
 4. Save assessment
 
 ### Monthly Assessment (End of Month):
+
 1. Go to "Monthly Assessment"
 2. Measure and record:
-   - Calf circumference (both legs)
-   - Thigh circumference (both legs)
+    - Calf circumference (both legs)
+    - Thigh circumference (both legs)
 3. Check off if photos/video taken
 4. Note current phase and readiness
 5. Add progress notes
 6. Save assessment
 
 ### Exporting Data:
+
 1. Go to Menu → Export Data
 2. Click "Download CSV Files"
 3. Three CSV files will download:
-   - `rehab_workouts.csv`
-   - `rehab_weekly_assessments.csv`
-   - `rehab_monthly_assessments.csv`
+    - `rehab_workouts.csv`
+    - `rehab_weekly_assessments.csv`
+    - `rehab_monthly_assessments.csv`
 4. Import these into your Google Sheet for backup
 
 ## 🔒 Data Privacy
@@ -144,21 +150,25 @@ Then open: http://localhost:8000
 ## 🆘 Troubleshooting
 
 **App not loading?**
+
 - Clear browser cache
 - Try different browser (Chrome/Safari)
 - Check if files uploaded correctly
 
 **Can't install to homescreen?**
+
 - Make sure using HTTPS (GitHub Pages provides this)
 - Try on different browser
 - Check phone settings allow app installation
 
 **Data not saving?**
+
 - Check browser allows local storage
 - Clear cache and try again
 - Export data before clearing
 
 **Lost data?**
+
 - Check if you have exported CSV backups
 - Data only stored on that specific device/browser
 
@@ -171,12 +181,15 @@ Then open: http://localhost:8000
 ## 🎯 Exercise Phases
 
 ### Phase 1: Foundation (Weeks 1-8)
+
 15 exercises focusing on foot/ankle, hip/glute, core, and mobility
 
 ### Phase 2: Functional Strength (Weeks 9-20)
+
 Phase 1 + 6 new exercises for single-leg strength and dynamic stability
 
 ### Phase 3: Advanced (Week 21+)
+
 Phase 2 + 3 power/plyometric exercises
 
 ## 💡 Tips
@@ -190,6 +203,7 @@ Phase 2 + 3 power/plyometric exercises
 ## 🔄 Updates
 
 To update the app with new features:
+
 1. Download updated files
 2. Replace old files in your hosting location
 3. Clear browser cache
