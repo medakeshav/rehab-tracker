@@ -1271,12 +1271,14 @@ function saveMonthlyAssessment(e) {
 
 // History Management
 function showHistoryTab(tab) {
-    // Update tab buttons
+    // Update tab buttons — highlight the one matching the selected tab
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    event.target.classList.add('active');
-    
+    // Find the button whose onclick contains this tab name and mark it active
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="${tab}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+
     loadHistory(tab);
 }
 
