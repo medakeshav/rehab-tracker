@@ -412,6 +412,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="exercises.js"></script>
-    <script src="app.js"></script>
+    <!-- App modules (order matters: dependencies load first) -->
+    <script src="js/utils.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/wheel-picker.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/assessments.js"></script>
+    <script src="js/exercises-ui.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

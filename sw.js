@@ -1,11 +1,20 @@
 // Service Worker for Rehab Tracker
-const CACHE_NAME = 'rehab-tracker-v9';
+const CACHE_NAME = 'rehab-tracker-v10';
 const urlsToCache = [
   './',
   './index.html',
   './styles.css',
-  './app.js',
   './exercises.js',
+  './js/utils.js',
+  './js/state.js',
+  './js/wheel-picker.js',
+  './js/navigation.js',
+  './js/export.js',
+  './js/history.js',
+  './js/progress.js',
+  './js/assessments.js',
+  './js/exercises-ui.js',
+  './js/app.js',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js'
 ];
