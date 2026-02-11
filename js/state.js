@@ -199,7 +199,7 @@ function updatePainColor(element, value) {
     } else if (value >= 4) {
         element.style.background = 'var(--warning-color)';
     } else {
-        element.style.background = 'var(--primary-color)';
+        element.style.background = '#4CAF50';
     }
 }
 

@@ -341,7 +341,7 @@ function collapseCard(card, exercise) {
 
     // Play sound and show toast
     playCompletionSound();
-    showCompletionToast();
+    showCompletionToast(exercise);
 
     // Update progress bar
     updateProgressBar();

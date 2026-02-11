@@ -4,10 +4,61 @@
  * Self-contained component with zero dependencies on other app modules.
  * Creates a vertically-scrolling number picker with scroll-snap behavior,
  * iOS-style highlight band, and fade gradients.
+ *
+ * Tap-to-activate guard: pickers start locked (no scroll) to prevent
+ * accidental value changes during page scroll. Tap the picker to unlock,
+ * then scroll to select a value. Tapping outside or scrolling the page
+ * re-locks the picker.
  */
 
 /** @constant {number} Height of each picker row in pixels */
 const WHEEL_PICKER_ITEM_HEIGHT = 36;
+
+/** @type {HTMLElement|null} Currently active (unlocked) picker container */
+let activePicker = null;
+
+/**
+ * Lock a picker — disable scrolling and show the locked overlay.
+ * @param {HTMLElement} container - The picker container element
+ */
+function lockPicker(container) {
+    container.classList.remove('wheel-picker--active');
+    const scroll = container.querySelector('.wheel-picker-scroll');
+    if (scroll) scroll.style.overflowY = 'hidden';
+    if (activePicker === container) activePicker = null;
+}
+
+/**
+ * Unlock a picker — enable scrolling and hide the locked overlay.
+ * Locks any previously active picker first.
+ * @param {HTMLElement} container - The picker container element
+ */
+function unlockPicker(container) {
+    // Lock the previously active picker if different
+    if (activePicker && activePicker !== container) {
+        lockPicker(activePicker);
+    }
+    container.classList.add('wheel-picker--active');
+    const scroll = container.querySelector('.wheel-picker-scroll');
+    if (scroll) scroll.style.overflowY = 'scroll';
+    activePicker = container;
+}
+
+// Global listener: lock active picker when user taps outside
+document.addEventListener('pointerdown', function (e) {
+    if (activePicker && !activePicker.contains(e.target)) {
+        lockPicker(activePicker);
+    }
+});
+
+// Lock active picker on page-level scroll only (not picker-internal scroll).
+// Use capture phase but check that the scroll target is not inside a picker.
+window.addEventListener('scroll', function (e) {
+    if (!activePicker) return;
+    // Ignore scroll events from within any picker's scroll area
+    if (e.target && e.target.closest && e.target.closest('.wheel-picker-container')) return;
+    lockPicker(activePicker);
+}, true);
 
 /**
  * Create a new wheel picker DOM element.
@@ -30,6 +81,8 @@ function createWheelPicker(id, min, max, step, defaultValue) {
 
     const scroll = document.createElement('div');
     scroll.className = 'wheel-picker-scroll';
+    // Start locked — no scrolling until tapped
+    scroll.style.overflowY = 'hidden';
 
     // Top spacer — allows first item to scroll to center
     const topSpacer = document.createElement('div');
@@ -60,6 +113,11 @@ function createWheelPicker(id, min, max, step, defaultValue) {
     highlight.className = 'wheel-picker-highlight';
     container.appendChild(highlight);
 
+    // Invisible tap-guard — covers the picker when locked to intercept taps
+    const tapGuard = document.createElement('div');
+    tapGuard.className = 'wheel-picker-tap-guard';
+    container.appendChild(tapGuard);
+
     // Hidden input to store the selected value
     const hidden = document.createElement('input');
     hidden.type = 'hidden';
@@ -87,11 +145,14 @@ function createWheelPicker(id, min, max, step, defaultValue) {
     // Scroll to default value after render (double rAF ensures layout is complete)
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+            // Temporarily enable scroll to position, then re-lock
+            scroll.style.overflowY = 'scroll';
             const targetIndex = values.indexOf(defaultValue);
             if (targetIndex >= 0) {
                 scroll.scrollTop = targetIndex * WHEEL_PICKER_ITEM_HEIGHT;
             }
             updateVisualState();
+            scroll.style.overflowY = 'hidden';
         });
     });
 
@@ -102,8 +163,37 @@ function createWheelPicker(id, min, max, step, defaultValue) {
         rafId = requestAnimationFrame(updateVisualState);
     });
 
-    // Allow clicking an item to scroll it to center
+    // Tap anywhere on the picker to activate it (guard intercepts when locked)
+    tapGuard.addEventListener('pointerdown', function (e) {
+        e.stopPropagation();
+        unlockPicker(container);
+    });
+
+    // Tap the scroll area to toggle: if active, re-lock it (freeze the value)
+    let didScroll = false;
+    scroll.addEventListener('scroll', function () {
+        didScroll = true;
+    }, { passive: true });
+
+    scroll.addEventListener('pointerdown', function (e) {
+        if (!container.classList.contains('wheel-picker--active')) return;
+        didScroll = false;
+        // On pointerup, if user tapped without scrolling, lock the picker
+        function onUp() {
+            scroll.removeEventListener('pointerup', onUp);
+            scroll.removeEventListener('pointercancel', onUp);
+            if (!didScroll) {
+                e.stopPropagation();
+                lockPicker(container);
+            }
+        }
+        scroll.addEventListener('pointerup', onUp);
+        scroll.addEventListener('pointercancel', onUp);
+    });
+
+    // Allow clicking an item to scroll it to center (only when active)
     scroll.addEventListener('click', function (e) {
+        if (!container.classList.contains('wheel-picker--active')) return;
         const item = e.target.closest('.wheel-picker-item');
         if (item && item.hasAttribute('data-value')) {
             const val = parseInt(item.getAttribute('data-value'));
@@ -139,6 +229,9 @@ function setPickerValue(id, value) {
     const scroll = container.querySelector('.wheel-picker-scroll');
     if (hidden) hidden.value = value;
     if (scroll) {
+        // Temporarily enable scroll to set position (picker may be locked)
+        const wasLocked = scroll.style.overflowY === 'hidden';
+        if (wasLocked) scroll.style.overflowY = 'scroll';
         const items = scroll.querySelectorAll('.wheel-picker-item');
         items.forEach((item, i) => {
             const itemVal = parseInt(item.getAttribute('data-value'));
@@ -148,6 +241,7 @@ function setPickerValue(id, value) {
                 item.classList.add('selected');
             }
         });
+        if (wasLocked) scroll.style.overflowY = 'hidden';
     }
 }
 

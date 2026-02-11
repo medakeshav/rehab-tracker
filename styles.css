@@ -443,7 +443,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-xl);
-    padding-bottom: var(--space-xl);
+    padding-bottom: 80px;
 }
 
 /* Stats */
@@ -638,7 +638,7 @@ body {
 
 .pain-value {
     display: inline-block;
-    background: var(--primary-color);
+    background: #4CAF50;
     color: white;
     padding: var(--space-xs) var(--space-md);
     border-radius: var(--radius-sm);
@@ -714,19 +714,23 @@ body {
 /* Save Button */
 .save-section {
     position: sticky;
-    bottom: var(--space-xl);
-    margin-top: var(--space-3xl);
-    padding: var(--space-xl) 0;
+    bottom: 0;
+    margin-top: var(--space-xl);
+    padding: var(--space-md) 0 var(--space-xl);
+    background: linear-gradient(to top, var(--bg-light) 60%, transparent);
+    z-index: var(--z-sticky);
+    display: flex;
+    justify-content: center;
 }
 
 .save-btn {
-    width: 100%;
-    padding: var(--space-lg);
+    width: 50%;
+    padding: var(--space-md);
     background: linear-gradient(135deg, var(--success-color), #229954);
     color: white;
     border: none;
     border-radius: var(--radius-lg);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-md);
@@ -800,7 +804,7 @@ body {
 /* Progress Bar Version A: Sticky Top Bar */
 .progress-bar-sticky {
     position: sticky;
-    top: 56px;
+    top: 64px;
     z-index: var(--z-sticky);
     background: white;
     padding: var(--space-md) var(--space-lg);
@@ -840,7 +844,7 @@ body {
     margin-bottom: var(--space-md);
     justify-content: center;
     position: sticky;
-    top: 56px;
+    top: 64px;
     z-index: var(--z-sticky);
     background: var(--bg-light);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -969,6 +973,33 @@ body {
     border-radius: var(--radius-sm);
 }
 
+/* Invisible tap-guard — covers locked picker to intercept taps */
+.wheel-picker-tap-guard {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    cursor: pointer;
+    border-radius: var(--radius-lg);
+}
+
+/* Locked picker: slightly dimmed to hint it needs a tap */
+.wheel-picker-container:not(.wheel-picker--active) {
+    opacity: 0.55;
+    transition: opacity var(--transition-fast);
+}
+
+/* When picker is active, hide the tap guard and show active styling */
+.wheel-picker--active .wheel-picker-tap-guard {
+    pointer-events: none;
+}
+
+.wheel-picker--active {
+    opacity: 1;
+    box-shadow: 0 0 0 2px var(--primary-color), var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    transition: opacity var(--transition-fast), box-shadow var(--transition-fast);
+}
+
 /* Sets Radio Buttons */
 .sets-radio-group {
     display: flex;
@@ -977,22 +1008,23 @@ body {
 
 .sets-radio-btn {
     flex: 1;
-    padding: var(--space-md);
-    border: 2px solid var(--border-color);
+    padding: var(--space-xs) var(--space-sm);
+    border: 1.5px solid var(--border-color);
     border-radius: var(--radius-sm);
     background: var(--bg-white);
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-fast);
     text-align: center;
     color: var(--text-dark);
+    min-height: 34px;
 }
 
 .sets-radio-btn.active {
-    background: var(--primary-color);
+    background: #4CAF50;
     color: white;
-    border-color: var(--primary-color);
+    border-color: #43A047;
 }
 
 .sets-radio-btn:active {
@@ -1814,6 +1846,10 @@ body.dark .mark-complete-btn {
     box-shadow: 0 2px 8px rgba(74, 222, 128, 0.2);
 }
 
+body.dark .save-section {
+    background: linear-gradient(to top, #121212 60%, transparent);
+}
+
 body.dark .save-btn {
     background: linear-gradient(135deg, var(--success-color), #36B37E);
 }
@@ -1871,9 +1907,9 @@ body.dark .sets-radio-btn {
 }
 
 body.dark .sets-radio-btn.active {
-    background: var(--primary-color);
+    background: #4CAF50;
     color: white;
-    border-color: var(--primary-color);
+    border-color: #43A047;
 }
 
 /* ---- Pain Slider ---- */

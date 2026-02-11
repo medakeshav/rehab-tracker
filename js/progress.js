@@ -231,26 +231,123 @@ function playCompletionSound() {
 
 // ========== Completion Toast ==========
 
+/** @type {number[]} Indices of recently used messages to avoid repeats */
+let usedMessageIndices = [];
+
 /**
- * Build a motivational message based on current completion percentage.
+ * Pick a random item from an array, avoiding recently used indices.
+ * Resets the used pool when all options have been exhausted.
+ * @param {string[]} pool - Array of messages to choose from
+ * @returns {string} A message that hasn't been shown recently
+ */
+function pickFreshMessage(pool) {
+    // Reset if we've used them all
+    if (usedMessageIndices.length >= pool.length) {
+        usedMessageIndices = [];
+    }
+    const available = pool
+        .map((msg, i) => ({ msg, i }))
+        .filter(({ i }) => !usedMessageIndices.includes(i));
+    const pick = available[Math.floor(Math.random() * available.length)];
+    usedMessageIndices.push(pick.i);
+    return pick.msg;
+}
+
+/**
+ * Build a contextual motivational message based on the exercise just completed,
+ * the number of sets done, exercises remaining, and overall progress.
+ * Messages don't repeat until the full pool for a category is exhausted.
+ *
+ * @param {Object} [exercise] - The exercise that was just completed
  * @returns {string} Encouraging message with emoji
  */
-function getCompletionMessage() {
+function getCompletionMessage(exercise) {
     const total = getExercisesForPhase(currentPhase).length;
     const done = dailyProgress.completedExercises.length;
+    const remaining = total - done;
     const pct = done / total;
+    const data = exercise ? dailyProgress.exerciseData[exercise.id] : null;
+    const sets = data ? data.sets : 0;
+    const name = exercise ? exercise.name : '';
 
-    if (done === 1) return 'Great start! 💪';
-    if (done === total) return 'All done! 🎉';
-    if (pct >= 0.75) return 'Almost done! 🔥';
-    if (pct >= 0.5) return 'Halfway there! ⚡';
-    return 'Keep it up! 👊';
+    // All exercises complete
+    if (done === total) {
+        return pickFreshMessage([
+            'Every single one — crushed it! 🎉',
+            'Full session complete! You\'re unstoppable! 🏆',
+            'All done! Your knees thank you! 🦵✨',
+            'Perfect session — nothing left behind! 💯',
+            'That\'s the whole list! Champion effort! 🥇',
+            'Complete sweep! Recovery is happening! 🌟',
+        ]);
+    }
+
+    // First exercise of the day
+    if (done === 1) {
+        const firstMsgs = [
+            `${name} done — great way to start! 💪`,
+            'First one in the books! Momentum is building! 🚀',
+            `Starting strong with ${name}! 💥`,
+            'And we\'re off! The hardest part is starting! 🏁',
+            `${name} complete — ${remaining} more to go! 👊`,
+            'Day started right! Keep that energy! ⚡',
+        ];
+        return pickFreshMessage(firstMsgs);
+    }
+
+    // High sets (4-5) — acknowledge the effort
+    if (sets >= 4) {
+        return pickFreshMessage([
+            `${sets} sets of ${name}! That\'s serious work! 🔥`,
+            `Maxing out at ${sets} sets — beast mode! 💪`,
+            `${sets} sets done! Your dedication shows! 🏋️`,
+            `Pushing through ${sets} sets — incredible effort! ⚡`,
+            `${name} with ${sets} sets — you mean business! 🎯`,
+        ]);
+    }
+
+    // Almost done (75%+)
+    if (pct >= 0.75) {
+        return pickFreshMessage([
+            `Only ${remaining} left — you can taste the finish! 🔥`,
+            'Home stretch! Don\'t let up now! 🏃',
+            `Just ${remaining} more — the end is in sight! 👀`,
+            'So close to a full session! Push through! 💫',
+            `Nearly there! ${remaining} to go — finish strong! 🎯`,
+            'The final few — this is where champions are made! 🏆',
+        ]);
+    }
+
+    // Halfway (50%+)
+    if (pct >= 0.5) {
+        return pickFreshMessage([
+            `Past halfway! ${remaining} left — downhill from here! ⚡`,
+            'More done than left — you\'re rolling! 🎢',
+            `Over the hump! Just ${remaining} more! 💪`,
+            `${done} down, ${remaining} to go — solid pace! 👊`,
+            'Halfway hero! Keep this rhythm going! 🥁',
+            'The back half begins — you\'ve got this! 🌊',
+        ]);
+    }
+
+    // Early progress (general)
+    return pickFreshMessage([
+        `${name} — checked off! ${remaining} remaining! ✅`,
+        `Nice work on ${name}! Keep the chain going! 🔗`,
+        `${done} done already — building momentum! 🚂`,
+        `${name} complete! Every rep counts! 💪`,
+        `That\'s ${done} in the bag — stay locked in! 🎯`,
+        'Steady progress! One at a time! 🪜',
+        `${remaining} left — you\'re making it happen! 👊`,
+        `Another one down! ${name} is history! 📝`,
+    ]);
 }
 
 /**
  * Show a brief floating toast with the completion count and motivational message.
+ * @param {Object} [exercise] - The exercise that was just completed
  */
-function showCompletionToast() {
+function showCompletionToast(exercise) {
     // Remove any existing completion toast
     const existing = document.querySelector('.completion-toast');
     if (existing) existing.remove();
@@ -260,7 +357,7 @@ function showCompletionToast() {
 
     const total = getExercisesForPhase(currentPhase).length;
     const done = dailyProgress.completedExercises.length;
-    toast.innerHTML = `<span class="completion-toast-msg">${getCompletionMessage()}</span><span class="completion-toast-count">${done}/${total}</span>`;
+    toast.innerHTML = `<span class="completion-toast-msg">${getCompletionMessage(exercise)}</span><span class="completion-toast-count">${done}/${total}</span>`;
 
     document.body.appendChild(toast);
 
