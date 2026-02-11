@@ -106,6 +106,12 @@ function createExerciseCard(exercise, _index) {
             </div>
         </div>
         <div class="exercise-inputs">
+            ${exercise.bilateral ? `
+            <div class="input-group">
+                <label>Reps:</label>
+                <div id="picker_reps_${exercise.id}"></div>
+            </div>
+            ` : `
             <div class="input-group">
                 <label>Left Leg Reps:</label>
                 <div id="picker_left_${exercise.id}"></div>
@@ -114,6 +120,7 @@ function createExerciseCard(exercise, _index) {
                 <label>Right Leg Reps:</label>
                 <div id="picker_right_${exercise.id}"></div>
             </div>
+            `}
         </div>
         <div class="input-group">
             <label>Sets Completed:</label>
@@ -133,10 +140,16 @@ function createExerciseCard(exercise, _index) {
     `;
 
     // Insert wheel pickers into placeholder divs
+    const repsPickerContainer = card.querySelector(`#picker_reps_${exercise.id}`);
     const leftPickerContainer = card.querySelector(`#picker_left_${exercise.id}`);
     const rightPickerContainer = card.querySelector(`#picker_right_${exercise.id}`);
     const setsPickerContainer = card.querySelector(`#picker_sets_${exercise.id}`);
 
+    if (repsPickerContainer) {
+        repsPickerContainer.replaceWith(
+            createWheelPicker(`reps_${exercise.id}`, 0, 30, 1, exercise.leftTarget)
+        );
+    }
     if (leftPickerContainer) {
         leftPickerContainer.replaceWith(
             createWheelPicker(`left_${exercise.id}`, 0, 30, 1, exercise.leftTarget)
@@ -520,8 +533,16 @@ function saveWorkout() {
             pain = savedData.pain;
             notes = savedData.notes;
         } else {
-            leftReps = getPickerValue(`left_${exercise.id}`);
-            rightReps = getPickerValue(`right_${exercise.id}`);
+            // Bilateral exercises use a single "reps" picker
+            const repsPicker = document.getElementById(`reps_${exercise.id}`);
+            if (repsPicker) {
+                const reps = getPickerValue(`reps_${exercise.id}`);
+                leftReps = reps;
+                rightReps = reps;
+            } else {
+                leftReps = getPickerValue(`left_${exercise.id}`);
+                rightReps = getPickerValue(`right_${exercise.id}`);
+            }
             sets = getPickerValue(`sets_${exercise.id}`);
             const painEl = document.getElementById(`pain_${exercise.id}`);
             const notesEl = document.getElementById(`notes_${exercise.id}`);

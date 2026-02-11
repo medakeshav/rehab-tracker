@@ -72,8 +72,17 @@ function saveDailyProgress() {
  * @param {string} exerciseId - The exercise ID to capture data for
  */
 function captureExerciseData(exerciseId) {
-    const left = getPickerValue(`left_${exerciseId}`);
-    const right = getPickerValue(`right_${exerciseId}`);
+    // Bilateral exercises use a single "reps" picker instead of left/right
+    const repsPicker = document.getElementById(`reps_${exerciseId}`);
+    let left, right;
+    if (repsPicker) {
+        const reps = getPickerValue(`reps_${exerciseId}`);
+        left = reps;
+        right = reps;
+    } else {
+        left = getPickerValue(`left_${exerciseId}`);
+        right = getPickerValue(`right_${exerciseId}`);
+    }
     const sets = getPickerValue(`sets_${exerciseId}`);
     const painEl = document.getElementById(`pain_${exerciseId}`);
     const notesEl = document.getElementById(`notes_${exerciseId}`);
@@ -97,8 +106,13 @@ function restoreExerciseData(exercise) {
     const data = dailyProgress.exerciseData[exercise.id];
     if (!data) return;
 
-    if (data.left) setPickerValue(`left_${exercise.id}`, data.left);
-    if (data.right) setPickerValue(`right_${exercise.id}`, data.right);
+    // Bilateral exercises use a single "reps" picker
+    if (exercise.bilateral) {
+        if (data.left) setPickerValue(`reps_${exercise.id}`, data.left);
+    } else {
+        if (data.left) setPickerValue(`left_${exercise.id}`, data.left);
+        if (data.right) setPickerValue(`right_${exercise.id}`, data.right);
+    }
     if (data.sets) setPickerValue(`sets_${exercise.id}`, data.sets);
 
     const painEl = document.getElementById(`pain_${exercise.id}`);
@@ -125,14 +139,23 @@ function autoSaveDailyProgress() {
     phaseExercises.forEach((exercise) => {
         // Only capture from DOM if the card is expanded (not collapsed)
         if (!dailyProgress.completedExercises.includes(exercise.id)) {
-            const left = getPickerValue(`left_${exercise.id}`);
-            const right = getPickerValue(`right_${exercise.id}`);
+            // Bilateral exercises use a single "reps" picker
+            const repsPicker = document.getElementById(`reps_${exercise.id}`);
+            let left, right;
+            if (repsPicker) {
+                const reps = getPickerValue(`reps_${exercise.id}`);
+                left = reps;
+                right = reps;
+            } else {
+                left = getPickerValue(`left_${exercise.id}`);
+                right = getPickerValue(`right_${exercise.id}`);
+            }
             const sets = getPickerValue(`sets_${exercise.id}`);
             const painEl = document.getElementById(`pain_${exercise.id}`);
             const notesEl = document.getElementById(`notes_${exercise.id}`);
 
             // Only save if picker exists (card is in DOM)
-            if (document.getElementById(`left_${exercise.id}`)) {
+            if (repsPicker || document.getElementById(`left_${exercise.id}`)) {
                 dailyProgress.exerciseData[exercise.id] = {
                     left: left,
                     right: right,

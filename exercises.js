@@ -336,6 +336,7 @@ const exercises = {
             leftTarget: 20,
             rightTarget: 20,
             sets: 3,
+            bilateral: true,
             instructions: {
                 title: 'Glute Bridges (Both Legs)',
                 steps: [
@@ -459,6 +460,7 @@ const exercises = {
             leftTarget: 20,
             rightTarget: 20,
             sets: 3,
+            bilateral: true,
             instructions: {
                 title: 'Plank (Modified → Full)',
                 steps: [
