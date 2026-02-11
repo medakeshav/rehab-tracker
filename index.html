@@ -412,21 +412,20 @@
 
     </div>
 
+    <!-- Confirm Dialog (native <dialog>) -->
+    <dialog id="confirmDialog" class="confirm-dialog">
+        <div class="confirm-dialog-title"></div>
+        <div class="confirm-dialog-message"></div>
+        <div class="confirm-dialog-actions">
+            <button class="confirm-dialog-btn confirm-dialog-cancel">Cancel</button>
+            <button class="confirm-dialog-btn confirm-dialog-confirm">Confirm</button>
+        </div>
+    </dialog>
+
     <!-- Toast region for screen readers -->
     <div id="toastRegion" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <script src="exercises.js"></script>
-    <!-- App modules (order matters: dependencies load first) -->
-    <script src="js/utils.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/wheel-picker.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/export.js"></script>
-    <script src="js/history.js"></script>
-    <script src="js/progress.js"></script>
-    <script src="js/assessments.js"></script>
-    <script src="js/exercises-ui.js"></script>
-    <script src="js/app.js"></script>
+    <script type="module" src="/js/app.js"></script>
 </body>
 </html>

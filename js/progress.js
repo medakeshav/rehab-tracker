@@ -5,6 +5,29 @@
  * confetti celebrations, completion sounds, and toast messages.
  */
 
+import { getExercisesForPhase } from '../exercises.js';
+import { safeSetItem, showToast, showConfirmDialog } from './utils.js';
+import {
+    currentPhase,
+    dailyProgress,
+    saveDailyProgress,
+    PROGRESS_BAR_VERSION,
+    setProgressBarVersion,
+    darkMode,
+    setDarkMode,
+} from './state.js';
+
+/** @type {Function|null} Callback to reload exercises (set by app.js to avoid circular import) */
+let reloadExercises = null;
+
+/**
+ * Register a callback to reload exercises after clearing progress.
+ * @param {Function} fn
+ */
+function setReloadExercises(fn) {
+    reloadExercises = fn;
+}
+
 // ========== Progress Bar ==========
 
 /**
@@ -96,7 +119,7 @@ function clearDailyProgress() {
             dailyProgress.completedExercises = [];
             dailyProgress.exerciseData = {};
             saveDailyProgress();
-            loadExercises();
+            if (reloadExercises) reloadExercises();
             updateProgressBar();
             showToast('Progress cleared', 'success');
         }
@@ -276,11 +299,12 @@ function updateSoundToggleBtn() {
  * Persists the choice to localStorage.
  */
 function toggleProgressBar() {
-    PROGRESS_BAR_VERSION = PROGRESS_BAR_VERSION === 'C' ? 'A' : 'C';
-    safeSetItem('progressBarVersion', PROGRESS_BAR_VERSION);
+    const newVersion = PROGRESS_BAR_VERSION === 'C' ? 'A' : 'C';
+    setProgressBarVersion(newVersion);
+    safeSetItem('progressBarVersion', newVersion);
     updateProgressBar();
     updateProgressBarToggleBtn();
-    const label = PROGRESS_BAR_VERSION === 'A' ? '📊 Progress Bar' : '⊙ Progress Circles';
+    const label = newVersion === 'A' ? '📊 Progress Bar' : '⊙ Progress Circles';
     showToast(label, 'success');
 }
 
@@ -301,11 +325,12 @@ function updateProgressBarToggleBtn() {
  * Toggle dark mode on/off, persist to localStorage, and update the UI.
  */
 function toggleDarkMode() {
-    darkMode = !darkMode;
-    safeSetItem('darkMode', darkMode);
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    safeSetItem('darkMode', newMode);
     applyDarkMode();
     updateDarkModeToggleBtn();
-    showToast(darkMode ? '🌙 Dark Mode ON' : '☀️ Light Mode ON', 'success');
+    showToast(newMode ? '🌙 Dark Mode ON' : '☀️ Light Mode ON', 'success');
 }
 
 /**
@@ -314,10 +339,10 @@ function toggleDarkMode() {
  */
 function applyDarkMode() {
     if (darkMode) {
-        document.body.classList.add('dark-mode');
+        document.body.classList.add('dark');
         document.querySelector('meta[name="theme-color"]').setAttribute('content', '#1a1a2e');
     } else {
-        document.body.classList.remove('dark-mode');
+        document.body.classList.remove('dark');
         document.querySelector('meta[name="theme-color"]').setAttribute('content', '#4472C4');
     }
 }
@@ -331,3 +356,23 @@ function updateDarkModeToggleBtn() {
         btn.textContent = darkMode ? '☀️ Theme: Dark' : '🌙 Theme: Light';
     }
 }
+
+export {
+    updateProgressBar,
+    scrollToExercise,
+    clearDailyProgress,
+    checkAllComplete,
+    showCelebration,
+    hideCelebration,
+    playCompletionSound,
+    getCompletionMessage,
+    showCompletionToast,
+    toggleSound,
+    updateSoundToggleBtn,
+    toggleProgressBar,
+    updateProgressBarToggleBtn,
+    toggleDarkMode,
+    applyDarkMode,
+    updateDarkModeToggleBtn,
+    setReloadExercises,
+};

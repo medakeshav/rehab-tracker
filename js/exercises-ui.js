@@ -6,8 +6,33 @@
  * - Creating full exercise cards with wheel pickers and pain sliders
  * - Collapsing cards on completion (with animation)
  * - Expanding completed cards back to full state
- * - Showing exercise instruction modals
+ * - Showing exercise instruction modals (bottom sheet)
  */
+
+import { getExercisesForPhase } from '../exercises.js';
+import { showToast } from './utils.js';
+import { createWheelPicker, getPickerValue } from './wheel-picker.js';
+import {
+    currentPhase,
+    dailyProgress,
+    saveDailyProgress,
+    captureExerciseData,
+    restoreExerciseData,
+    autoSaveDailyProgress,
+    updatePainColor,
+    workoutData,
+    createFreshProgress,
+    setDailyProgress,
+} from './state.js';
+import {
+    updateProgressBar,
+    checkAllComplete,
+    playCompletionSound,
+    showCompletionToast,
+    hideCelebration,
+} from './progress.js';
+import { updateStats } from './utils.js';
+import { safeSetItem } from './utils.js';
 
 // ========== Exercise Loading ==========
 
@@ -94,16 +119,8 @@ function createExerciseCard(exercise, _index) {
     card.innerHTML = `
         ${progressionNote}
         <div class="exercise-header">
-            <div class="exercise-name">${exercise.name}</div>
-            <div class="exercise-actions">
-                <button class="info-btn" id="info_${exercise.id}" title="View Instructions">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/>
-                        <path d="M10 14V10M10 6H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-                <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
-            </div>
+            <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
+            <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
         </div>
         <div class="exercise-inputs">
             ${exercise.bilateral ? `
@@ -124,7 +141,10 @@ function createExerciseCard(exercise, _index) {
         </div>
         <div class="input-group">
             <label>Sets Completed:</label>
-            <div id="picker_sets_${exercise.id}"></div>
+            <input type="hidden" id="sets_${exercise.id}" value="${exercise.sets}">
+            <div class="sets-radio-group" data-sets-id="sets_${exercise.id}">
+                ${[1,2,3,4,5].map(n => `<button type="button" class="sets-radio-btn${n === exercise.sets ? ' active' : ''}" data-value="${n}">${n}</button>`).join('')}
+            </div>
         </div>
         <div class="pain-section">
             <label>
@@ -143,8 +163,6 @@ function createExerciseCard(exercise, _index) {
     const repsPickerContainer = card.querySelector(`#picker_reps_${exercise.id}`);
     const leftPickerContainer = card.querySelector(`#picker_left_${exercise.id}`);
     const rightPickerContainer = card.querySelector(`#picker_right_${exercise.id}`);
-    const setsPickerContainer = card.querySelector(`#picker_sets_${exercise.id}`);
-
     if (repsPickerContainer) {
         repsPickerContainer.replaceWith(
             createWheelPicker(`reps_${exercise.id}`, 0, 30, 1, exercise.leftTarget)
@@ -160,10 +178,17 @@ function createExerciseCard(exercise, _index) {
             createWheelPicker(`right_${exercise.id}`, 0, 30, 1, exercise.rightTarget)
         );
     }
-    if (setsPickerContainer) {
-        setsPickerContainer.replaceWith(
-            createWheelPicker(`sets_${exercise.id}`, 1, 5, 1, exercise.sets)
-        );
+
+    // Sets radio button click handler
+    const setsGroup = card.querySelector(`[data-sets-id="sets_${exercise.id}"]`);
+    if (setsGroup) {
+        setsGroup.addEventListener('click', function (e) {
+            const btn = e.target.closest('.sets-radio-btn');
+            if (!btn) return;
+            setsGroup.querySelectorAll('.sets-radio-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`sets_${exercise.id}`).value = btn.dataset.value;
+        });
     }
 
     // Attach pain slider listeners (shared helper to avoid duplication)
@@ -171,12 +196,12 @@ function createExerciseCard(exercise, _index) {
     const painValue = card.querySelector(`#pain_value_${exercise.id}`);
     attachPainSliderListeners(painSlider, painValue);
 
-    // Add info button listener
-    const infoBtn = card.querySelector(`#info_${exercise.id}`);
-    if (exercise.instructions && infoBtn) {
-        infoBtn.addEventListener('click', function (e) {
+    // Exercise name tap → bottom sheet with instructions
+    const exerciseName = card.querySelector('.exercise-name--tappable');
+    if (exercise.instructions && exerciseName) {
+        exerciseName.addEventListener('click', function (e) {
             e.preventDefault();
-            showInstructions(exercise);
+            showInstructionsBottomSheet(exercise);
         });
     }
 
@@ -242,23 +267,6 @@ function attachPainSliderListeners(slider, display) {
     });
 }
 
-// ========== Pain Color Indicator ==========
-
-/**
- * Update the background color of a pain value display based on severity.
- * @param {HTMLElement} element - The pain value span
- * @param {number|string} value - Pain level (0-10)
- */
-function updatePainColor(element, value) {
-    if (value >= 7) {
-        element.style.background = 'var(--danger-color)';
-    } else if (value >= 4) {
-        element.style.background = 'var(--warning-color)';
-    } else {
-        element.style.background = 'var(--primary-color)';
-    }
-}
-
 // ========== Re-attach Listeners (after DOM rebuild) ==========
 
 /**
@@ -272,11 +280,11 @@ function reattachCardListeners(card, exercise) {
     const painValue = card.querySelector(`#pain_value_${exercise.id}`);
     attachPainSliderListeners(painSlider, painValue);
 
-    const infoBtn = card.querySelector(`#info_${exercise.id}`);
-    if (exercise.instructions && infoBtn) {
-        infoBtn.addEventListener('click', function (e) {
+    const exerciseNameEl = card.querySelector('.exercise-name--tappable');
+    if (exercise.instructions && exerciseNameEl) {
+        exerciseNameEl.addEventListener('click', function (e) {
             e.preventDefault();
-            showInstructions(exercise);
+            showInstructionsBottomSheet(exercise);
         });
     }
 
@@ -410,84 +418,88 @@ function scrollToNextIncomplete(currentCard) {
     }
 }
 
-// ========== Instructions Modal ==========
+// ========== Instructions Bottom Sheet ==========
 
 /**
- * Close an open instructions modal and restore background scrolling.
- * @param {HTMLElement} el - Any element inside the modal (used to find parent)
+ * Dismiss a bottom sheet overlay with animation.
+ * @param {HTMLElement} overlay - The overlay element to dismiss
  */
-function closeInstructionsModal(el) {
-    const modal = el.closest('.instructions-modal');
-    if (modal) {
-        modal.remove();
-    }
-    document.body.style.overflow = '';
+function dismissBottomSheet(overlay) {
+    overlay.classList.remove('visible');
+    setTimeout(() => {
+        overlay.remove();
+        document.body.style.overflow = '';
+    }, 300);
 }
 
 /**
- * Show a full-screen modal with detailed exercise instructions.
+ * Show a bottom sheet with detailed exercise instructions.
+ * Slides up from the bottom when exercise name is tapped.
  * @param {Object} exercise - Exercise object with .instructions property
  */
-function showInstructions(exercise) {
+function showInstructionsBottomSheet(exercise) {
     if (!exercise.instructions) {
         showToast('No instructions available', 'info');
         return;
     }
 
-    const instr = exercise.instructions;
+    // Remove existing sheet if any
+    const existing = document.querySelector('.bottom-sheet-overlay');
+    if (existing) existing.remove();
 
-    const modal = document.createElement('div');
-    modal.className = 'instructions-modal';
-    modal.innerHTML = `
-        <div class="instructions-modal-content">
-            <div class="instructions-header">
-                <h2>${instr.title}</h2>
-                <button class="modal-close-btn" data-action="close-modal" aria-label="Close instructions">×</button>
+    const instr = exercise.instructions;
+    const overlay = document.createElement('div');
+    overlay.className = 'bottom-sheet-overlay';
+
+    overlay.innerHTML = `
+        <div class="bottom-sheet">
+            <div class="bottom-sheet-handle"></div>
+            <div class="bottom-sheet-header">
+                <h3>${instr.title}</h3>
             </div>
-            <div class="instructions-body">
+            <div class="bottom-sheet-body">
                 <div class="instructions-section">
-                    <h3>📋 How to Perform:</h3>
+                    <h3>How to Perform</h3>
                     <ol class="steps-list">
                         ${instr.steps.map((step) => `<li>${step}</li>`).join('')}
                     </ol>
                 </div>
-
                 <div class="instructions-section">
-                    <h3>🎯 Target:</h3>
-                    <p><strong>Reps:</strong> ${instr.reps}</p>
-                    <p><strong>Sets:</strong> ${instr.sets}</p>
+                    <h3>Target</h3>
+                    <p><strong>Reps:</strong> ${instr.reps} &middot; <strong>Sets:</strong> ${instr.sets}</p>
                 </div>
-
                 <div class="instructions-section why-section">
-                    <h3>💡 Why This Exercise:</h3>
+                    <h3>Why This Exercise</h3>
                     <p>${instr.why}</p>
                 </div>
-
                 <div class="instructions-section tips-section">
-                    <h3>✅ Pro Tips:</h3>
+                    <h3>Pro Tips</h3>
                     <ul class="tips-list">
                         ${instr.tips.map((tip) => `<li>${tip}</li>`).join('')}
                     </ul>
                 </div>
             </div>
-            <div class="instructions-footer">
-                <button class="btn btn-primary" data-action="close-modal">Got It!</button>
-            </div>
         </div>
     `;
 
-    document.body.appendChild(modal);
-
-    // Prevent background scroll
+    document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
 
-    // Close on backdrop click or close button click
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal || e.target.closest('[data-action="close-modal"]')) {
-            modal.remove();
-            document.body.style.overflow = '';
-        }
+    // Animate in
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+
+    // Close on overlay tap
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) dismissBottomSheet(overlay);
     });
+
+    // Close on handle tap
+    const handle = overlay.querySelector('.bottom-sheet-handle');
+    if (handle) {
+        handle.addEventListener('click', function () {
+            dismissBottomSheet(overlay);
+        });
+    }
 }
 
 // ========== Save Workout ==========
@@ -576,7 +588,7 @@ function saveWorkout() {
     showToast('✓ Workout saved successfully!', 'success');
 
     // Clear daily progress after save
-    dailyProgress = createFreshProgress();
+    setDailyProgress(createFreshProgress());
     saveDailyProgress();
 
     // Hide celebration banner
@@ -588,3 +600,17 @@ function saveWorkout() {
         updateStats();
     }, 1000);
 }
+
+export {
+    loadExercises,
+    createExerciseCard,
+    createCompletedCard,
+    collapseCard,
+    expandCard,
+    scrollToNextIncomplete,
+    attachPainSliderListeners,
+    reattachCardListeners,
+    dismissBottomSheet,
+    showInstructionsBottomSheet,
+    saveWorkout,
+};

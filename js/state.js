@@ -5,6 +5,10 @@
  * and provides functions to load, save, capture, and restore exercise data.
  */
 
+import { safeGetItem, safeSetItem } from './utils.js';
+import { getExercisesForPhase } from '../exercises.js';
+import { getPickerValue, setPickerValue } from './wheel-picker.js';
+
 // ========== Global State Variables ==========
 
 /** @type {number} Currently selected rehab phase (1, 2, or 3) */
@@ -116,7 +120,17 @@ function restoreExerciseData(exercise) {
         if (data.left) setPickerValue(`left_${exercise.id}`, data.left);
         if (data.right) setPickerValue(`right_${exercise.id}`, data.right);
     }
-    if (data.sets) setPickerValue(`sets_${exercise.id}`, data.sets);
+    // Restore sets via radio buttons (hidden input + active class)
+    if (data.sets) {
+        const setsHidden = document.getElementById(`sets_${exercise.id}`);
+        if (setsHidden) setsHidden.value = data.sets;
+        const setsGroup = document.querySelector(`[data-sets-id="sets_${exercise.id}"]`);
+        if (setsGroup) {
+            setsGroup.querySelectorAll('.sets-radio-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.value) === data.sets);
+            });
+        }
+    }
 
     const painEl = document.getElementById(`pain_${exercise.id}`);
     const painValue = document.getElementById(`pain_value_${exercise.id}`);
@@ -171,3 +185,54 @@ function autoSaveDailyProgress() {
     });
     saveDailyProgress();
 }
+
+// ========== Pain Color Helper ==========
+
+/**
+ * Update the background color of a pain value display based on severity.
+ * @param {HTMLElement} element - The pain value span
+ * @param {number|string} value - Pain level (0-10)
+ */
+function updatePainColor(element, value) {
+    if (value >= 7) {
+        element.style.background = 'var(--danger-color)';
+    } else if (value >= 4) {
+        element.style.background = 'var(--warning-color)';
+    } else {
+        element.style.background = 'var(--primary-color)';
+    }
+}
+
+// ========== State Setters (for ES module live binding) ==========
+
+function setCurrentPhase(v) { currentPhase = v; }
+function setWorkoutData(v) { workoutData = v; }
+function setWeeklyData(v) { weeklyData = v; }
+function setMonthlyData(v) { monthlyData = v; }
+function setProgressBarVersion(v) { PROGRESS_BAR_VERSION = v; }
+function setDarkMode(v) { darkMode = v; }
+function setDailyProgress(v) { dailyProgress = v; }
+
+export {
+    currentPhase,
+    workoutData,
+    weeklyData,
+    monthlyData,
+    PROGRESS_BAR_VERSION,
+    darkMode,
+    dailyProgress,
+    loadDailyProgress,
+    createFreshProgress,
+    saveDailyProgress,
+    captureExerciseData,
+    restoreExerciseData,
+    autoSaveDailyProgress,
+    updatePainColor,
+    setCurrentPhase,
+    setWorkoutData,
+    setWeeklyData,
+    setMonthlyData,
+    setProgressBarVersion,
+    setDarkMode,
+    setDailyProgress,
+};

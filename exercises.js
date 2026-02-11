@@ -683,7 +683,4 @@ function getExercisesForPhase(phase) {
     }
 }
 
-// Export for use in main app
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { exercises, getExercisesForPhase };
-}
+export { exercises, getExercisesForPhase };

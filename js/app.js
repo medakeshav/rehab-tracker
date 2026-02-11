@@ -3,11 +3,37 @@
  *
  * This is the entry point that wires everything together.
  * It initializes the app on DOMContentLoaded, sets up global event listeners,
- * registers the service worker, and handles auto-save on page close.
+ * and handles auto-save on page close.
  *
  * All functionality is implemented in the other js/*.js modules;
  * this file just calls into them.
  */
+
+import { openMenu, closeMenu, showScreen, initSwipeBack, setOnHistoryScreen } from './navigation.js';
+import { updateStats, selectPhase, updatePhaseInfo, setupPainSliders, calculateCurrentWeek, setLoadExercises } from './utils.js';
+import { autoSaveDailyProgress } from './state.js';
+import {
+    updateProgressBar,
+    clearDailyProgress,
+    toggleSound,
+    updateSoundToggleBtn,
+    toggleProgressBar,
+    updateProgressBarToggleBtn,
+    toggleDarkMode,
+    applyDarkMode,
+    updateDarkModeToggleBtn,
+    setReloadExercises,
+} from './progress.js';
+import { loadExercises, saveWorkout } from './exercises-ui.js';
+import { showHistoryTab, loadHistory } from './history.js';
+import { saveWeeklyAssessment, saveMonthlyAssessment } from './assessments.js';
+import { exportAllData, clearAllData } from './export.js';
+
+// ========== Wire Up Callbacks (avoid circular imports) ==========
+
+setOnHistoryScreen(() => loadHistory('workouts'));
+setReloadExercises(() => loadExercises());
+setLoadExercises(() => loadExercises());
 
 // ========== DOM Ready ==========
 
@@ -157,14 +183,3 @@ document.addEventListener('visibilitychange', function () {
         autoSaveDailyProgress();
     }
 });
-
-// ========== Service Worker Registration ==========
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker
-            .register('sw.js')
-            .then((_reg) => console.log('Service Worker registered'))
-            .catch((_err) => console.log('Service Worker registration failed'));
-    });
-}

@@ -6,6 +6,27 @@
  * and statistical calculations.
  */
 
+import { exercises, getExercisesForPhase } from '../exercises.js';
+import {
+    currentPhase,
+    setCurrentPhase,
+    workoutData,
+    dailyProgress,
+    saveDailyProgress,
+} from './state.js';
+import { showScreen } from './navigation.js';
+
+/** @type {Function|null} Callback to reload exercises (set by app.js to avoid circular import) */
+let reloadExercisesFromUtils = null;
+
+/**
+ * Register a callback to reload exercises after phase change.
+ * @param {Function} fn
+ */
+function setLoadExercises(fn) {
+    reloadExercisesFromUtils = fn;
+}
+
 // ========== Safe localStorage Helpers ==========
 
 /**
@@ -73,48 +94,29 @@ function showToast(message, type = 'success') {
  * @param {boolean} [isDestructive=false] - If true, confirm button is styled red
  */
 function showConfirmDialog(title, message, confirmText, onConfirm, isDestructive) {
-    // Remove any existing dialog
-    const existing = document.querySelector('.confirm-dialog-overlay');
-    if (existing) existing.remove();
+    const dialog = document.getElementById('confirmDialog');
+    dialog.querySelector('.confirm-dialog-title').textContent = title;
+    dialog.querySelector('.confirm-dialog-message').textContent = message;
 
-    const overlay = document.createElement('div');
-    overlay.className = 'confirm-dialog-overlay';
+    const confirmBtn = dialog.querySelector('.confirm-dialog-confirm');
+    confirmBtn.textContent = confirmText;
+    confirmBtn.classList.toggle('destructive', !!isDestructive);
 
-    const dialog = document.createElement('div');
-    dialog.className = 'confirm-dialog';
-    dialog.innerHTML = `
-        <div class="confirm-dialog-title">${title}</div>
-        <div class="confirm-dialog-message">${message}</div>
-        <div class="confirm-dialog-actions">
-            <button class="confirm-dialog-btn confirm-dialog-cancel">Cancel</button>
-            <button class="confirm-dialog-btn confirm-dialog-confirm ${isDestructive ? 'destructive' : ''}">${confirmText}</button>
-        </div>
-    `;
+    // Clone to remove old listeners
+    const newConfirm = confirmBtn.cloneNode(true);
+    confirmBtn.replaceWith(newConfirm);
 
-    overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
-
-    // Animate in
-    requestAnimationFrame(() => {
-        overlay.classList.add('visible');
-    });
-
-    function dismiss() {
-        overlay.classList.remove('visible');
-        setTimeout(() => overlay.remove(), 200);
-    }
-
-    // Cancel
-    dialog.querySelector('.confirm-dialog-cancel').addEventListener('click', dismiss);
-    overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) dismiss();
-    });
-
-    // Confirm
-    dialog.querySelector('.confirm-dialog-confirm').addEventListener('click', function () {
-        dismiss();
+    newConfirm.addEventListener('click', () => {
+        dialog.close();
         if (onConfirm) onConfirm();
     });
+
+    const cancelBtn = dialog.querySelector('.confirm-dialog-cancel');
+    const newCancel = cancelBtn.cloneNode(true);
+    cancelBtn.replaceWith(newCancel);
+    newCancel.addEventListener('click', () => dialog.close());
+
+    dialog.showModal();
 }
 
 // ========== Date & Stats Helpers ==========
@@ -216,10 +218,10 @@ function updateStats() {
  * @param {number} phase - Phase number (1, 2, or 3)
  */
 function selectPhase(phase) {
-    currentPhase = phase;
+    setCurrentPhase(phase);
     safeSetItem('currentPhase', phase);
     updatePhaseInfo();
-    loadExercises();
+    if (reloadExercisesFromUtils) reloadExercisesFromUtils();
     showScreen('daily');
     showToast('Phase ' + phase + ' selected!', 'success');
 }
@@ -251,3 +253,20 @@ function setupPainSliders() {
         }
     });
 }
+
+export {
+    safeGetItem,
+    safeSetItem,
+    showToast,
+    showConfirmDialog,
+    formatDate,
+    calculateAvgPain,
+    normalizeDate,
+    calculateStreak,
+    calculateCurrentWeek,
+    updateStats,
+    selectPhase,
+    updatePhaseInfo,
+    setupPainSliders,
+    setLoadExercises,
+};

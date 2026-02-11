@@ -1,3 +1,7 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    Rehab Tracker — Stylesheet
 
@@ -965,6 +969,36 @@ body {
     border-radius: var(--radius-sm);
 }
 
+/* Sets Radio Buttons */
+.sets-radio-group {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.sets-radio-btn {
+    flex: 1;
+    padding: var(--space-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-white);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+    color: var(--text-dark);
+}
+
+.sets-radio-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.sets-radio-btn:active {
+    transform: scale(0.95);
+}
+
 /* Pain Slider */
 .pain-slider {
     width: 100%;
@@ -1022,38 +1056,20 @@ body {
    8. MODALS
    ============================================================ */
 
-/* Custom Confirm Dialog */
-.confirm-dialog-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0);
-    z-index: var(--z-dialog);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background var(--transition-base);
-    padding: var(--space-xl);
-}
-
-.confirm-dialog-overlay.visible {
-    background: rgba(0, 0, 0, 0.4);
-}
-
+/* Custom Confirm Dialog (native <dialog>) */
 .confirm-dialog {
     background: white;
     border-radius: var(--radius-lg);
     width: 100%;
     max-width: 300px;
     overflow: hidden;
-    transform: scale(0.95);
-    opacity: 0;
-    transition: transform var(--transition-base), opacity var(--transition-base);
+    border: none;
+    padding: 0;
     box-shadow: var(--shadow-lg);
 }
 
-.confirm-dialog-overlay.visible .confirm-dialog {
-    transform: scale(1);
-    opacity: 1;
+.confirm-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .confirm-dialog-title {
@@ -1297,6 +1313,72 @@ body {
 
 .instructions-footer .btn {
     min-width: 120px;
+}
+
+/* Bottom Sheet */
+.bottom-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: flex-end;
+    transition: background var(--transition-slow);
+}
+
+.bottom-sheet-overlay.visible {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.bottom-sheet {
+    background: white;
+    width: 100%;
+    max-height: 70vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+.bottom-sheet-overlay.visible .bottom-sheet {
+    transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin: 12px auto 8px;
+    cursor: pointer;
+}
+
+.bottom-sheet-header {
+    padding: var(--space-sm) var(--space-2xl) var(--space-md);
+}
+
+.bottom-sheet-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.bottom-sheet-body {
+    padding: 0 var(--space-2xl) var(--space-2xl);
+}
+
+/* Tappable Exercise Name */
+.exercise-name--tappable {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: var(--primary-color);
+    text-underline-offset: 3px;
+}
+
+.exercise-name--tappable:active {
+    opacity: 0.7;
 }
 
 /* ============================================================
@@ -1611,7 +1693,7 @@ body {
    ============================================================ */
 
 /* Override design tokens for dark theme */
-body.dark-mode {
+body.dark {
     --primary-color: #5B8DD9;
     --primary-dark: #4472C4;
     --secondary-color: #85C45E;
@@ -1632,266 +1714,292 @@ body.dark-mode {
 }
 
 /* ---- Navigation ---- */
-body.dark-mode .nav-bar {
+body.dark .nav-bar {
     background: linear-gradient(135deg, #2a3a5c, #1a2744);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* ---- Side Menu ---- */
-body.dark-mode .side-menu {
+body.dark .side-menu {
     background: #1E1E1E;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
 }
 
-body.dark-mode .menu-header {
+body.dark .menu-header {
     background: #2a3a5c;
 }
 
-body.dark-mode .menu-item {
+body.dark .menu-item {
     color: var(--text-dark);
 }
 
-body.dark-mode .menu-item:hover {
+body.dark .menu-item:hover {
     background: #2d2d2d;
 }
 
 /* ---- Cards (generic) ---- */
-body.dark-mode .welcome-card,
-body.dark-mode .stats-card,
-body.dark-mode .phase-selector,
-body.dark-mode .export-card,
-body.dark-mode .instruction-card {
+body.dark .welcome-card,
+body.dark .stats-card,
+body.dark .phase-selector,
+body.dark .export-card,
+body.dark .instruction-card {
     background: #1E1E1E;
 }
 
 /* ---- Phase Cards ---- */
-body.dark-mode .phase-card {
+body.dark .phase-card {
     background: linear-gradient(135deg, #3a5a8c, #2a4470);
 }
 
-body.dark-mode .phase-card:hover {
+body.dark .phase-card:hover {
     box-shadow: 0 5px 15px rgba(68, 114, 196, 0.2);
 }
 
 /* ---- Exercise Cards ---- */
-body.dark-mode .exercise-card {
+body.dark .exercise-card {
     background: #1E1E1E;
 }
 
-body.dark-mode .exercise-card--completed {
+body.dark .exercise-card--completed {
     background: #1a2e1a;
     border-left-color: var(--success-color);
 }
 
 /* ---- Date Selector & Phase Info ---- */
-body.dark-mode .date-input {
+body.dark .date-input {
     background: #2d2d2d;
     color: var(--text-dark);
 }
 
-body.dark-mode .phase-info {
+body.dark .phase-info {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-body.dark-mode .change-phase-btn {
+body.dark .change-phase-btn {
     background: #1E1E1E;
     color: var(--primary-color);
 }
 
 /* ---- Assessment Forms ---- */
-body.dark-mode .assessment-form {
+body.dark .assessment-form {
     background: #1E1E1E;
 }
 
 /* ---- Form Inputs ---- */
-body.dark-mode .form-group input[type='number'],
-body.dark-mode .form-group input[type='date'],
-body.dark-mode .form-group select,
-body.dark-mode .form-group textarea,
-body.dark-mode .input-group input {
+body.dark .form-group input[type='number'],
+body.dark .form-group input[type='date'],
+body.dark .form-group select,
+body.dark .form-group textarea,
+body.dark .input-group input {
     background: #2d2d2d;
     color: var(--text-dark);
     border-color: var(--border-color);
 }
 
-body.dark-mode .form-group input:focus,
-body.dark-mode .input-group input:focus {
+body.dark .form-group input:focus,
+body.dark .input-group input:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(91, 141, 217, 0.2);
 }
 
 /* ---- Buttons ---- */
-body.dark-mode .action-btn.secondary {
+body.dark .action-btn.secondary {
     background: #1E1E1E;
     color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-body.dark-mode .mark-complete-btn {
+body.dark .mark-complete-btn {
     background: linear-gradient(135deg, var(--success-color), #36B37E);
     box-shadow: 0 2px 8px rgba(74, 222, 128, 0.2);
 }
 
-body.dark-mode .save-btn {
+body.dark .save-btn {
     background: linear-gradient(135deg, var(--success-color), #36B37E);
 }
 
 /* ---- Progress Bar Version A ---- */
-body.dark-mode .progress-bar-sticky {
+body.dark .progress-bar-sticky {
     background: #1E1E1E;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-body.dark-mode .progress-bar-track {
+body.dark .progress-bar-track {
     background: #333333;
 }
 
-body.dark-mode .progress-bar-fill {
+body.dark .progress-bar-fill {
     background: linear-gradient(90deg, var(--success-color), #36B37E);
 }
 
 /* ---- Progress Bar Version C (thumbnails) ---- */
-body.dark-mode .progress-thumb {
+body.dark .progress-thumb {
     background: #2d2d2d;
     border-color: var(--border-color);
     color: var(--text-light);
 }
 
-body.dark-mode .progress-thumb.completed {
+body.dark .progress-thumb.completed {
     background: var(--success-color);
     border-color: var(--success-color);
     color: white;
 }
 
 /* ---- Clear Progress Button ---- */
-body.dark-mode .clear-progress-btn {
+body.dark .clear-progress-btn {
     border-color: var(--border-color);
     color: var(--text-light);
 }
 
-body.dark-mode .clear-progress-btn:hover {
+body.dark .clear-progress-btn:hover {
     border-color: var(--danger-color);
     color: var(--danger-color);
 }
 
 /* ---- Wheel Picker ---- */
-body.dark-mode .wheel-picker-highlight {
+body.dark .wheel-picker-highlight {
     background: rgba(255, 255, 255, 0.08);
     border-top: 0.5px solid rgba(255, 255, 255, 0.12);
     border-bottom: 0.5px solid rgba(255, 255, 255, 0.12);
 }
 
-/* ---- Pain Slider ---- */
-body.dark-mode .pain-slider::-webkit-slider-thumb {
+/* ---- Sets Radio Buttons ---- */
+body.dark .sets-radio-btn {
     background: #2d2d2d;
-    border-color: var(--primary-color);
-}
-
-body.dark-mode .pain-slider::-moz-range-thumb {
-    background: #2d2d2d;
-    border-color: var(--primary-color);
-}
-
-/* ---- Toast ---- */
-body.dark-mode .toast {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-/* ---- Completion Toast ---- */
-body.dark-mode .completion-toast {
-    background: linear-gradient(135deg, var(--success-color), #36B37E);
-    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
-}
-
-/* ---- Confirm Dialog ---- */
-body.dark-mode .confirm-dialog {
-    background: #2d2d2d;
-}
-
-body.dark-mode .confirm-dialog-title {
+    border-color: var(--border-color);
     color: var(--text-dark);
 }
 
-body.dark-mode .confirm-dialog-message {
-    color: var(--text-light);
-}
-
-body.dark-mode .confirm-dialog-actions {
-    border-top-color: var(--border-color);
-}
-
-body.dark-mode .confirm-dialog-btn:active {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-body.dark-mode .confirm-dialog-cancel {
-    color: var(--primary-color);
-    border-right-color: var(--border-color);
-}
-
-body.dark-mode .confirm-dialog-confirm {
-    color: var(--primary-color);
-}
-
-body.dark-mode .confirm-dialog-confirm.destructive {
-    color: var(--danger-color);
-}
-
-/* ---- Instructions Modal ---- */
-body.dark-mode .instructions-modal-content {
-    background: #2d2d2d;
-}
-
-body.dark-mode .why-section {
-    background: #1E1E1E;
-}
-
-body.dark-mode .tips-section {
-    background: #1a2e3a;
-}
-
-/* ---- History Page ---- */
-body.dark-mode .tab-btn {
-    background: #1E1E1E;
-    color: var(--text-dark);
-}
-
-body.dark-mode .tab-btn.active {
+body.dark .sets-radio-btn.active {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
 }
 
-body.dark-mode .history-item {
+/* ---- Pain Slider ---- */
+body.dark .pain-slider::-webkit-slider-thumb {
+    background: #2d2d2d;
+    border-color: var(--primary-color);
+}
+
+body.dark .pain-slider::-moz-range-thumb {
+    background: #2d2d2d;
+    border-color: var(--primary-color);
+}
+
+/* ---- Toast ---- */
+body.dark .toast {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- Completion Toast ---- */
+body.dark .completion-toast {
+    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
+}
+
+/* ---- Confirm Dialog ---- */
+body.dark .confirm-dialog {
+    background: #2d2d2d;
+}
+
+body.dark .confirm-dialog-title {
+    color: var(--text-dark);
+}
+
+body.dark .confirm-dialog-message {
+    color: var(--text-light);
+}
+
+body.dark .confirm-dialog-actions {
+    border-top-color: var(--border-color);
+}
+
+body.dark .confirm-dialog-btn:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .confirm-dialog-cancel {
+    color: var(--primary-color);
+    border-right-color: var(--border-color);
+}
+
+body.dark .confirm-dialog-confirm {
+    color: var(--primary-color);
+}
+
+body.dark .confirm-dialog-confirm.destructive {
+    color: var(--danger-color);
+}
+
+/* ---- Instructions Modal ---- */
+body.dark .instructions-modal-content {
+    background: #2d2d2d;
+}
+
+body.dark .why-section {
+    background: #1E1E1E;
+}
+
+body.dark .tips-section {
+    background: #1a2e3a;
+}
+
+/* ---- Bottom Sheet ---- */
+body.dark .bottom-sheet {
+    background: #2d2d2d;
+}
+
+body.dark .bottom-sheet-overlay.visible {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark .bottom-sheet-handle {
+    background: #555;
+}
+
+/* ---- History Page ---- */
+body.dark .tab-btn {
+    background: #1E1E1E;
+    color: var(--text-dark);
+}
+
+body.dark .tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+body.dark .history-item {
     background: #1E1E1E;
 }
 
 /* ---- Celebration Banner ---- */
-body.dark-mode .celebration-banner {
+body.dark .celebration-banner {
     background: linear-gradient(135deg, var(--success-color), #36B37E);
     box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
 }
 
 /* ---- Exercise Target Badge ---- */
-body.dark-mode .exercise-target {
+body.dark .exercise-target {
     background: #2d2d2d;
 }
 
-/* ---- Overlay ---- */
-body.dark-mode .confirm-dialog-overlay.visible {
+/* ---- Dialog Backdrop ---- */
+body.dark .confirm-dialog::backdrop {
     background: rgba(0, 0, 0, 0.6);
 }
 
 /* ---- Focus Visible Overrides ---- */
-body.dark-mode :focus-visible {
+body.dark :focus-visible {
     outline-color: var(--primary-color);
 }
 
-body.dark-mode .action-btn:focus-visible,
-body.dark-mode .menu-item:focus-visible,
-body.dark-mode .tab-btn:focus-visible,
-body.dark-mode .save-btn:focus-visible,
-body.dark-mode .mark-complete-btn:focus-visible {
+body.dark .action-btn:focus-visible,
+body.dark .menu-item:focus-visible,
+body.dark .tab-btn:focus-visible,
+body.dark .save-btn:focus-visible,
+body.dark .mark-complete-btn:focus-visible {
     box-shadow: 0 0 0 4px rgba(91, 141, 217, 0.3);
 }
 

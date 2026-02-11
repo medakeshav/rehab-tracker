@@ -5,6 +5,18 @@
  * as downloadable CSV files, and to clear all stored data.
  */
 
+import { showToast, showConfirmDialog, updateStats } from './utils.js';
+import {
+    workoutData,
+    weeklyData,
+    monthlyData,
+    setWorkoutData,
+    setWeeklyData,
+    setMonthlyData,
+    setCurrentPhase,
+} from './state.js';
+import { showScreen } from './navigation.js';
+
 // ========== Export All Data ==========
 
 /**
@@ -112,10 +124,10 @@ function clearAllData() {
             } catch (_e) {
                 console.error('localStorage.clear() failed:', _e);
             }
-            workoutData = [];
-            weeklyData = [];
-            monthlyData = [];
-            currentPhase = 1;
+            setWorkoutData([]);
+            setWeeklyData([]);
+            setMonthlyData([]);
+            setCurrentPhase(1);
             showToast('All data cleared', 'success');
             updateStats();
             showScreen('home');
@@ -123,3 +135,5 @@ function clearAllData() {
         true // destructive
     );
 }
+
+export { exportAllData, clearAllData };

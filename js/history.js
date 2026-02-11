@@ -5,6 +5,9 @@
  * and renders data cards for each record type.
  */
 
+import { formatDate, calculateAvgPain } from './utils.js';
+import { workoutData, weeklyData, monthlyData } from './state.js';
+
 // ========== Tab Switching ==========
 
 /**
@@ -108,3 +111,5 @@ function createHistoryCard(item, type) {
 
     return card;
 }
+
+export { showHistoryTab, loadHistory, createHistoryCard };

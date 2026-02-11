@@ -5,6 +5,10 @@
  * persisting data to localStorage and resetting the forms.
  */
 
+import { safeSetItem, showToast, calculateCurrentWeek } from './utils.js';
+import { weeklyData, monthlyData } from './state.js';
+import { showScreen } from './navigation.js';
+
 // ========== Weekly Assessment ==========
 
 /**
@@ -79,3 +83,5 @@ function saveMonthlyAssessment(e) {
         showScreen('home');
     }, 1500);
 }
+
+export { saveWeeklyAssessment, saveMonthlyAssessment };

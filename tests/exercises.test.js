@@ -1,26 +1,5 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-/**
- * exercises.js is a browser-global script (not an ES module).
- * We load it by evaluating the source in a scope that provides
- * the `module` object it conditionally uses.
- */
-let exercises;
-let getExercisesForPhase;
-
-const __dirname_ = dirname(fileURLToPath(import.meta.url));
-
-beforeAll(() => {
-    const source = readFileSync(resolve(__dirname_, '..', 'exercises.js'), 'utf-8');
-    const mod = { exports: {} };
-    const fn = new Function('module', 'exports', source);
-    fn(mod, mod.exports);
-    exercises = mod.exports.exercises;
-    getExercisesForPhase = mod.exports.getExercisesForPhase;
-});
+import { describe, it, expect } from 'vitest';
+import { exercises, getExercisesForPhase } from '../exercises.js';
 
 /** Helper to get all exercises across all phases */
 function getAllExercises() {

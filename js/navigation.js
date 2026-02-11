@@ -10,6 +10,17 @@
 /** @type {string[]} Stack of visited screen names for back navigation */
 let screenHistory = ['home'];
 
+/** @type {Function|null} Callback to load history screen data (set by app.js to avoid circular import) */
+let onHistoryScreen = null;
+
+/**
+ * Register a callback to be called when navigating to the history screen.
+ * @param {Function} fn - callback that receives no arguments
+ */
+function setOnHistoryScreen(fn) {
+    onHistoryScreen = fn;
+}
+
 // ========== Side Menu ==========
 
 /** Open the side navigation menu. */
@@ -63,8 +74,8 @@ function showScreen(screenName, useSlideBack) {
     }
 
     // Special actions for certain screens
-    if (screenName === 'history') {
-        loadHistory('workouts');
+    if (screenName === 'history' && onHistoryScreen) {
+        onHistoryScreen();
     }
 
     closeMenu();
@@ -223,3 +234,5 @@ function initSwipeBack() {
         { passive: true }
     );
 }
+
+export { openMenu, closeMenu, showScreen, goBack, initSwipeBack, setOnHistoryScreen };
