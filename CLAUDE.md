@@ -1,42 +1,47 @@
 # Rehab Tracker — Project Reference
 
-PCL reconstruction rehabilitation exercise tracker. Vanilla JS PWA with service worker offline support and localStorage persistence.
+PCL reconstruction rehabilitation exercise tracker. Vite-powered PWA with ES modules, Tailwind CSS, offline support via vite-plugin-pwa, and localStorage persistence.
 
 ## Quick Start
 
 ```bash
-npm install && npm run serve   # http://localhost:8080
-npm run lint                   # ESLint check (0 errors expected)
-npm test                       # Vitest (56 tests)
+npm install && npm run dev    # http://localhost:5173
+npm run lint                  # ESLint check (0 errors expected)
+npm run format:check          # Prettier formatting check
+npm test                      # Vitest (56 tests)
+npm run build                 # Production build → dist/
 ```
 
 ## Module Load Order & Dependencies
 
+All files use ES module `import`/`export`. Entry point is `js/app.js` (loaded as `<script type="module">`).
+
 ```
 exercises.js          — Exercise data for 3 phases (no deps)
-js/utils.js           — Utilities: toast, dialog, localStorage, date helpers (no deps)
-js/state.js           — Global state & localStorage persistence (uses utils, exercises, wheel-picker)
-js/wheel-picker.js    — iOS-style scroll wheel picker component (no deps)
+js/utils.js           — Utilities: toast, dialog, localStorage, date helpers (imports exercises, state)
+js/state.js           — Global state & localStorage persistence (imports utils, wheel-picker)
+js/wheel-picker.js    — iOS-style scroll wheel picker with tap-to-activate guard (no deps)
 js/navigation.js      — Screen nav, side menu, swipe-back gesture (no deps)
-js/export.js          — CSV export & data clearing (uses utils, state globals)
-js/history.js         — History tab rendering (uses utils, state globals)
-js/progress.js        — Progress bar, celebrations, sound/theme toggles (uses utils, state, exercises)
-js/assessments.js     — Weekly/monthly form handlers (uses utils, state globals)
-js/exercises-ui.js    — Exercise card UI: create, collapse, expand, save (uses all above)
+js/export.js          — CSV export & data clearing (imports utils, state)
+js/history.js         — History tab rendering (imports utils, state)
+js/progress.js        — Progress bar, celebrations, contextual messages, toggles (imports utils, state, exercises)
+js/assessments.js     — Weekly/monthly form handlers (imports utils, state)
+js/exercises-ui.js    — Exercise card UI: create, collapse, expand, save (imports all above)
 js/app.js             — Entry point: init, event wiring, delegated actions (orchestrates all)
 ```
 
-All files share browser global scope. Cross-module functions registered in `eslint.config.js` globals.
-
 ## Key Patterns
 
+- **ES modules**: All files use `import`/`export`. No shared global scope.
 - **Delegated actions**: `[data-action]` attributes routed through single click handler in `app.js`
 - **Toggle pattern**: `toggleX()` + `updateXBtn()` + `safeSetItem()` (see sound, progress bar, dark mode)
 - **localStorage**: Always use `safeGetItem(key, fallback)` / `safeSetItem(key, value)` from utils.js
 - **Timezone-safe dates**: Use `normalizeDate(dateStr)` for YYYY-MM-DD → local midnight
 - **Bilateral exercises**: `bilateral: true` flag → single "Reps" picker, stored as both left & right
 - **Auto-save**: `beforeunload` + `visibilitychange` → `autoSaveDailyProgress()`
-- **Dark mode**: `body.dark-mode` class overrides CSS custom properties + explicit hardcoded colors
+- **Dark mode**: `body.dark` class overrides CSS custom properties + explicit hardcoded colors
+- **Tap-to-activate pickers**: Wheel pickers start locked (no scroll). Tap to unlock, tap again or tap outside to re-lock. Prevents accidental value changes during page scroll.
+- **Contextual completion messages**: 35+ non-repeating messages based on exercise name, sets done, remaining count, and progress percentage.
 
 ## File APIs
 
@@ -62,12 +67,15 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `dailyProgress` — Today's completion state (auto-resets on new day)
 - `captureExerciseData(id)` / `restoreExerciseData(exercise)` / `autoSaveDailyProgress()`
 - `loadDailyProgress()` / `createFreshProgress()` / `saveDailyProgress()`
+- `updatePainColor(element, value)` — Green (0-3), warning (4-6), danger (7-10)
 
 ### js/wheel-picker.js
 
-- `createWheelPicker(id, min, max, step, defaultValue)` — Returns DOM element
+- `createWheelPicker(id, min, max, step, defaultValue)` — Returns DOM element (starts locked)
 - `getPickerValue(id)` / `setPickerValue(id, value)` — Read/write picker values
+- `lockPicker(container)` / `unlockPicker(container)` — Control picker active state
 - `WHEEL_PICKER_ITEM_HEIGHT` = 36px
+- Global listeners: `pointerdown` (lock on outside tap), `scroll` capture (lock on page scroll, ignores picker-internal scroll)
 
 ### js/navigation.js
 
@@ -79,7 +87,8 @@ All files share browser global scope. Cross-module functions registered in `esli
 
 - `updateProgressBar()` — Render Version A (sticky bar) or C (thumbnail circles)
 - `checkAllComplete()` / `showCelebration()` / `hideCelebration()`
-- `playCompletionSound()` / `showCompletionToast()` / `getCompletionMessage()`
+- `playCompletionSound()` / `showCompletionToast(exercise)` / `getCompletionMessage(exercise)`
+- `pickFreshMessage(pool)` — Random non-repeating message selection
 - `toggleSound()` / `updateSoundToggleBtn()`
 - `toggleProgressBar()` / `updateProgressBarToggleBtn()`
 - `toggleDarkMode()` / `applyDarkMode()` / `updateDarkModeToggleBtn()`
@@ -91,7 +100,7 @@ All files share browser global scope. Cross-module functions registered in `esli
 - `createExerciseCard(exercise, index)` / `createCompletedCard(exercise)`
 - `collapseCard(card, exercise)` / `expandCard(card, exercise)`
 - `saveWorkout()` — Collect all data and save to localStorage
-- `showInstructions(exercise)` — Full-screen instruction modal
+- `showInstructionsBottomSheet(exercise)` — Bottom sheet with exercise instructions
 
 ### js/app.js — Delegated Actions
 
@@ -117,25 +126,35 @@ Key element IDs: `exerciseList`, `progressBarA`, `progressBarC`, `workoutDate`, 
 
 **Sections**: Design Tokens → Reset → Layout → Navigation → Cards → Forms → Components → Modals → Pages → Animations → Accessibility → Dark Mode → Responsive
 
-**Dark mode**: `body.dark-mode` overrides all CSS custom properties + explicit rules for hardcoded colors (gradients, white backgrounds, etc.)
+**Dark mode**: `body.dark` overrides all CSS custom properties + explicit rules for hardcoded colors (gradients, white backgrounds, etc.)
+
+**Key UI components**:
+
+- `.sets-radio-group` / `.sets-radio-btn` — Horizontal radio buttons (1-5) with green active state
+- `.wheel-picker-container` / `.wheel-picker--active` — Tap-to-activate scroll pickers with locked/unlocked states
+- `.wheel-picker-tap-guard` — Invisible overlay that intercepts taps when picker is locked
+- `.save-section` — Sticky bottom save button (50% width, centered, gradient fade background)
+- `.pain-value` — Color-coded badge: green (0-3), warning (4-6), danger (7-10)
 
 ## Exercise Data Structure
 
 ```js
-{ id, name, targetReps, leftTarget, rightTarget, sets, category,
-  bilateral: false, progressionLevel: 1-5, instructions: { title, steps[], reps, sets, why, tips[] } }
+{
+  id, name, targetReps, leftTarget, rightTarget, sets, category,
+  bilateral: false, progressionLevel: 1-5,
+  instructions: { title, steps[], reps, sets, why, tips[] }
+}
 ```
 
 ## Common Tasks
 
-| Task             | Files to modify                                                                                                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Add new exercise | `exercises.js`                                                                                                                      |
-| Add menu toggle  | `js/state.js` (var), `js/progress.js` (toggle fn), `index.html` (button), `js/app.js` (action + init), `eslint.config.js` (globals) |
-| New screen       | `index.html` (HTML), `styles.css` (styles), `js/navigation.js` or new module                                                        |
-| UI styling       | `styles.css` (+ dark mode overrides in `body.dark-mode` section)                                                                    |
-| New test         | `tests/*.test.js` (inline function copies, jsdom env)                                                                               |
-| Cache update     | `sw.js` (bump version number)                                                                                                       |
+| Task             | Files to modify                                                                                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| Add new exercise | `exercises.js`                                                                                        |
+| Add menu toggle  | `js/state.js` (var), `js/progress.js` (toggle fn), `index.html` (button), `js/app.js` (action + init) |
+| New screen       | `index.html` (HTML), `styles.css` (styles), `js/navigation.js` or new module                          |
+| UI styling       | `styles.css` (+ dark mode overrides in `body.dark` section)                                           |
+| New test         | `tests/*.test.js` (inline function copies, jsdom env)                                                 |
 
 ## Documentation & Maintenance Rules
 
@@ -143,11 +162,14 @@ Key element IDs: `exerciseList`, `progressBarA`, `progressBarC`, `workoutDate`, 
 - **README.md** — Keep minimal. Update rarely.
 - **No release notes or screenshots** — Git commit messages serve as the changelog. The live app is the living demo.
 - **Commit messages** — Descriptive and conventional (`feat:`, `fix:`, `refactor:`, `docs:`). These ARE the release notes.
-- **sw.js cache version** — Bump on every deployment-worthy change.
 
 ## Infrastructure
 
-- **ESLint 9** flat config, script sourceType, cross-module globals registered manually
+- **Vite 5** dev server + build tool, `npm run dev` on port 5173
+- **Tailwind CSS 4** via `@tailwindcss/vite` plugin
+- **vite-plugin-pwa** with Workbox for service worker generation (autoUpdate, CacheFirst for CDN)
+- **ESLint 9** flat config, `sourceType: 'module'`, browser globals registered manually
+- **Prettier** for code formatting (`npm run format` / `npm run format:check`)
 - **Vitest** with jsdom environment, 56 tests across 5 files
-- **Service Worker** v13, network-first strategy, skipWaiting
-- **No build step** — files served directly
+- **GitHub Actions CI** (`.github/workflows/ci.yml`) — lint, format check, tests
+- **GitHub Pages deploy** (`.github/workflows/deploy.yml`) — Vite build + deploy

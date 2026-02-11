@@ -1,216 +1,129 @@
-# 💪 Rehab Exercise Tracker - Progressive Web App
+# Rehab Exercise Tracker
 
-A custom-built mobile-optimized web application for tracking your rehabilitation exercises, assessments, and progress.
+A mobile-optimized Progressive Web App for tracking PCL reconstruction rehabilitation exercises, assessments, and progress.
 
-## ✨ Features
+## Features
 
-- **📝 Daily Workout Logging** - Track exercises with left/right leg reps and pain levels
-- **📊 Weekly Assessments** - Monitor balance, strength, and pain progress
-- **📅 Monthly Assessments** - Track measurements and overall progress
-- **📈 History & Analytics** - View all past workouts and assessments
-- **💾 Data Export** - Export all data as CSV files for backup
-- **📱 Installable** - Add to homescreen and use like a native app
-- **🔒 Offline First** - Works completely offline, data stored locally
-- **🎯 Phase-Based** - Tailored for 3 rehabilitation phases
+- **Daily Workout Logging** — Track exercises with left/right leg reps, sets (1-5 radio buttons), and pain levels (0-10 slider)
+- **iOS-Style Wheel Pickers** — Tap-to-activate number pickers that won't trigger accidentally during page scroll
+- **Contextual Encouragement** — 35+ motivational messages based on exercise name, sets completed, and remaining exercises
+- **Weekly & Monthly Assessments** — Monitor balance, strength, measurements, and pain progress
+- **History & Analytics** — View all past workouts and assessments
+- **Data Export** — Export all data as CSV files for backup
+- **Installable PWA** — Add to homescreen and use like a native app
+- **Offline First** — Works completely offline, data stored locally
+- **Phase-Based** — Tailored for 3 rehabilitation phases (cumulative exercises)
+- **Dark Mode** — Toggle via hamburger menu
 
-## 🚀 Setup Instructions
+## Getting Started
 
-### Option 1: GitHub Pages (Recommended - FREE)
+### Prerequisites
 
-1. **Create GitHub Account** (if you don't have one)
-    - Go to https://github.com
-    - Sign up for free
+- Node.js (v18+)
 
-2. **Create New Repository**
-    - Click "New Repository"
-    - Name it: `rehab-tracker`
-    - Make it Public
-    - Don't add README
-    - Click "Create repository"
-
-3. **Upload Files**
-    - Click "uploading an existing file"
-    - Drag and drop ALL files from this folder:
-        - index.html
-        - styles.css
-        - app.js
-        - exercises.js
-        - manifest.json
-        - sw.js
-        - icon-192.png
-        - icon-512.png
-    - Click "Commit changes"
-
-4. **Enable GitHub Pages**
-    - Go to Settings → Pages
-    - Source: "Deploy from a branch"
-    - Branch: "main" / "master"
-    - Folder: "/ (root)"
-    - Click "Save"
-
-5. **Access Your App**
-    - Wait 2-3 minutes
-    - Your app will be at: `https://[your-username].github.io/rehab-tracker`
-    - Bookmark this URL!
-
-### Option 2: Google Drive (Simple)
-
-1. Go to https://drive.google.com
-2. Create a new folder called "rehab-tracker"
-3. Upload all files
-4. Right-click the folder → Share → Anyone with link can view
-5. Open `index.html` in the folder
-6. Use that link to access
-
-**Note:** Google Drive method may not support PWA features perfectly.
-
-### Option 3: Local Server (For Testing)
-
-If you have Python installed:
+### Development
 
 ```bash
-cd rehab-tracker
-python -m http.server 8000
+npm install          # Install dependencies
+npm run dev          # Start dev server at http://localhost:5173
 ```
 
-Then open: http://localhost:8000
+### Other Commands
 
-## 📱 Installing on Your Phone
+```bash
+npm run build        # Production build → dist/
+npm run preview      # Preview production build
+npm run lint         # ESLint check
+npm run lint:fix     # ESLint auto-fix
+npm run format       # Prettier auto-format
+npm run format:check # Prettier check (used in CI)
+npm test             # Run tests (Vitest, 56 tests)
+npm run test:watch   # Run tests in watch mode
+```
 
-### iPhone (Safari):
+### Deployment
+
+The app deploys automatically via GitHub Actions:
+
+- **CI** (`.github/workflows/ci.yml`) — Runs lint, format check, and tests on every push
+- **Deploy** (`.github/workflows/deploy.yml`) — Builds with Vite and deploys to GitHub Pages
+
+Your app will be available at: `https://[your-username].github.io/rehab-tracker`
+
+## Installing on Your Phone
+
+### iPhone (Safari)
 
 1. Open the app URL in Safari
 2. Tap the Share button (box with arrow)
-3. Scroll down and tap "Add to Home Screen"
+3. Tap "Add to Home Screen"
 4. Tap "Add"
-5. The app icon will appear on your home screen
 
-### Android (Chrome):
+### Android (Chrome)
 
 1. Open the app URL in Chrome
-2. Tap the menu (⋮) in the top right
+2. Tap the menu (three dots) in the top right
 3. Tap "Add to Home screen"
 4. Tap "Add"
-5. The app icon will appear on your home screen
 
-## 📊 Using the App
+## Using the App
 
-### Daily Workout:
+### Daily Workout
 
 1. Select your current phase from home screen
 2. Go to "Daily Workout"
 3. For each exercise:
-    - Enter left leg reps
-    - Enter right leg reps (app shows target 1.5x for right)
-    - Enter sets completed
-    - Set pain level (0-10 slider)
-    - Add notes if needed
+    - Tap the wheel picker to unlock it, scroll to set reps, tap again to lock
+    - Select sets completed (1-5 buttons)
+    - Set pain level (0-10 slider — green for 0-3, warning for 4-6, red for 7+)
+    - Tap "Mark Complete" — get a contextual encouragement message
 4. Click "Save Workout"
 
-### Weekly Assessment (Every Sunday):
+### Weekly Assessment (Every Sunday)
 
 1. Go to "Weekly Assessment"
-2. Complete all tests:
-    - Single-leg balance (eyes closed)
-    - Single-leg bridges (max reps)
-    - Balance reaches
-    - Pain levels
-3. Add notes about progress
-4. Save assessment
+2. Complete all tests: single-leg balance, bridges, reaches, pain levels
+3. Add notes and save
 
-### Monthly Assessment (End of Month):
+### Monthly Assessment (End of Month)
 
 1. Go to "Monthly Assessment"
-2. Measure and record:
-    - Calf circumference (both legs)
-    - Thigh circumference (both legs)
-3. Check off if photos/video taken
-4. Note current phase and readiness
-5. Add progress notes
-6. Save assessment
+2. Measure calf and thigh circumference (both legs)
+3. Check photos/video taken, note phase and readiness
+4. Add progress notes and save
 
-### Exporting Data:
+### Exporting Data
 
 1. Go to Menu → Export Data
 2. Click "Download CSV Files"
-3. Three CSV files will download:
-    - `rehab_workouts.csv`
-    - `rehab_weekly_assessments.csv`
-    - `rehab_monthly_assessments.csv`
-4. Import these into your Google Sheet for backup
+3. Three CSV files will download: workouts, weekly assessments, monthly assessments
 
-## 🔒 Data Privacy
+## Tech Stack
 
-- **All data is stored locally** on your device
-- **Nothing is sent to any server**
-- **No tracking or analytics**
-- **You own your data completely**
+- **Vite 5** — Dev server and build tool
+- **Tailwind CSS 4** — Utility-first CSS
+- **vite-plugin-pwa** — Service worker generation with Workbox
+- **ESLint 9** — Linting (flat config, ES modules)
+- **Prettier** — Code formatting
+- **Vitest** — Unit tests (jsdom environment)
+- **GitHub Actions** — CI/CD pipeline
+
+## Exercise Phases
+
+| Phase | Period     | Focus                                                   |
+| ----- | ---------- | ------------------------------------------------------- |
+| 1     | Weeks 1-8  | 15 exercises: foot/ankle, hip/glute, core, mobility     |
+| 2     | Weeks 9-20 | Phase 1 + 6 new: single-leg strength, dynamic stability |
+| 3     | Week 21+   | Phase 2 + 3 power/plyometric exercises                  |
+
+## Data Privacy
+
+- All data is stored locally on your device
+- Nothing is sent to any server
+- No tracking or analytics
+- You own your data completely
 - Regular exports recommended for backup
-
-## 🆘 Troubleshooting
-
-**App not loading?**
-
-- Clear browser cache
-- Try different browser (Chrome/Safari)
-- Check if files uploaded correctly
-
-**Can't install to homescreen?**
-
-- Make sure using HTTPS (GitHub Pages provides this)
-- Try on different browser
-- Check phone settings allow app installation
-
-**Data not saving?**
-
-- Check browser allows local storage
-- Clear cache and try again
-- Export data before clearing
-
-**Lost data?**
-
-- Check if you have exported CSV backups
-- Data only stored on that specific device/browser
-
-## 📞 Support Contacts
-
-- **Hope Physio (BTM):** +91 89991 68508
-- **Dr. Shetty's Foot Centre:** +91 80 4953 8629
-- **Dr. Akshay Dhanda:** +91 95351 55018
-
-## 🎯 Exercise Phases
-
-### Phase 1: Foundation (Weeks 1-8)
-
-15 exercises focusing on foot/ankle, hip/glute, core, and mobility
-
-### Phase 2: Functional Strength (Weeks 9-20)
-
-Phase 1 + 6 new exercises for single-leg strength and dynamic stability
-
-### Phase 3: Advanced (Week 21+)
-
-Phase 2 + 3 power/plyometric exercises
-
-## 💡 Tips
-
-1. **Backup regularly** - Export data weekly
-2. **Be consistent** - Use the app daily
-3. **Track honestly** - Accurate pain levels matter
-4. **Review history** - Check progress weekly
-5. **Update phase** - Progress when ready
-
-## 🔄 Updates
-
-To update the app with new features:
-
-1. Download updated files
-2. Replace old files in your hosting location
-3. Clear browser cache
-4. Refresh the app
 
 ---
 
-Built specifically for your PCL reconstruction rehabilitation journey 💪
-
-Last Updated: February 2026
+Built for PCL reconstruction rehabilitation recovery.
