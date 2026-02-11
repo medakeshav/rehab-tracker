@@ -426,10 +426,10 @@ function showInstructions(exercise) {
     const modal = document.createElement('div');
     modal.className = 'instructions-modal';
     modal.innerHTML = `
-        <div class="instructions-content">
+        <div class="instructions-modal-content">
             <div class="instructions-header">
                 <h2>${instr.title}</h2>
-                <button class="close-btn" onclick="closeInstructionsModal(this)">×</button>
+                <button class="modal-close-btn" onclick="closeInstructionsModal(this)">×</button>
             </div>
             <div class="instructions-body">
                 <div class="instructions-section">
