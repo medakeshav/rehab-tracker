@@ -892,7 +892,7 @@ body {
     height: 180px;
     overflow: hidden;
     border-radius: var(--radius-lg);
-    background: #f2f2f7;
+    background: transparent;
 }
 
 .wheel-picker-scroll {
@@ -926,7 +926,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-xl);
-    color: #1c1c1e;
+    color: var(--text-dark);
     opacity: 0.2;
     scroll-snap-align: center;
     cursor: pointer;
