@@ -55,6 +55,7 @@ export default [
                 autoSaveDailyProgress: 'readonly',
 
                 // utils.js
+                normalizeDate: 'readonly',
                 safeGetItem: 'readonly',
                 safeSetItem: 'readonly',
                 showToast: 'readonly',

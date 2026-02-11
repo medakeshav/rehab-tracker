@@ -142,29 +142,39 @@ function calculateAvgPain(exercisesList) {
 }
 
 /**
+ * Parse a YYYY-MM-DD date string into a Date at local midnight.
+ * Avoids the timezone pitfall of `new Date("YYYY-MM-DD")` which creates UTC midnight.
+ * @param {string} dateStr - ISO date string (e.g. "2025-01-15")
+ * @returns {Date} Date at local midnight
+ */
+function normalizeDate(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+}
+
+/**
  * Calculate the current workout streak (consecutive days with a logged workout).
  * @returns {number} Number of consecutive days
  */
 function calculateStreak() {
     if (workoutData.length === 0) return 0;
 
-    const sortedDates = workoutData.map((w) => new Date(w.date)).sort((a, b) => b - a);
+    const sortedDates = workoutData.map((w) => normalizeDate(w.date)).sort((a, b) => b - a);
 
     let streak = 1;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const lastWorkout = sortedDates[0];
-    lastWorkout.setHours(0, 0, 0, 0);
 
-    const daysDiff = Math.floor((today - lastWorkout) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.round((today - lastWorkout) / (1000 * 60 * 60 * 24));
 
     if (daysDiff > 1) return 0;
 
     for (let i = 1; i < sortedDates.length; i++) {
         const prevDate = sortedDates[i - 1];
         const currDate = sortedDates[i];
-        const diff = Math.floor((prevDate - currDate) / (1000 * 60 * 60 * 24));
+        const diff = Math.round((prevDate - currDate) / (1000 * 60 * 60 * 24));
 
         if (diff === 1) {
             streak++;
@@ -183,9 +193,10 @@ function calculateStreak() {
 function calculateCurrentWeek() {
     if (workoutData.length === 0) return 1;
 
-    const firstWorkout = new Date(workoutData[0].date);
+    const firstWorkout = normalizeDate(workoutData[0].date);
     const today = new Date();
-    const daysDiff = Math.floor((today - firstWorkout) / (1000 * 60 * 60 * 24));
+    today.setHours(0, 0, 0, 0);
+    const daysDiff = Math.round((today - firstWorkout) / (1000 * 60 * 60 * 24));
     return Math.floor(daysDiff / 7) + 1;
 }
 
