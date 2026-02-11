@@ -1,16 +1,18 @@
 // Service Worker for Rehab Tracker
-const CACHE_NAME = 'rehab-tracker-v2';
+const CACHE_NAME = 'rehab-tracker-v9';
 const urlsToCache = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './exercises.js',
-  './manifest.json'
+  './manifest.json',
+  'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js'
 ];
 
-// Install Service Worker
+// Install Service Worker — skipWaiting ensures immediate activation
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -20,22 +22,28 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch from Cache
+// Network-first strategy: try network, fall back to cache
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
+        // Update cache with fresh response
+        if (response.ok) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
         }
-        return fetch(event.request);
-      }
-    )
+        return response;
+      })
+      .catch(() => {
+        // Network failed, fall back to cache (offline support)
+        return caches.match(event.request);
+      })
   );
 });
 
-// Update Service Worker
+// Update Service Worker — claim clients so new SW controls existing tabs
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -47,6 +55,6 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });

@@ -33,6 +33,8 @@
             <button class="menu-item" onclick="showScreen('history')">📈 History</button>
             <button class="menu-item" onclick="showScreen('export')">💾 Export Data</button>
             <button class="menu-item" onclick="showScreen('instructions')">ℹ️ Instructions</button>
+            <hr style="margin: 8px 20px; border: none; border-top: 1px solid #e0e0e0;">
+            <button class="menu-item" id="soundToggleBtn" onclick="toggleSound()">🔊 Sound: ON</button>
         </div>
     </div>
 
@@ -114,6 +116,22 @@
                 <span id="currentPhaseText">Phase 1: Foundation</span>
                 <button class="change-phase-btn" onclick="showScreen('home')">Change Phase</button>
             </div>
+
+            <!-- Progress Bar Version A: Sticky Top Bar -->
+            <div id="progressBarA" class="progress-bar-sticky" style="display:none">
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-bar-text">0/0 completed (0%)</div>
+            </div>
+
+            <!-- Progress Bar Version C: Mini Thumbnail Circles -->
+            <div id="progressBarC" class="progress-thumbnails" style="display:none">
+                <!-- Thumbnails rendered dynamically -->
+            </div>
+
+            <!-- Clear Progress Button -->
+            <button id="clearProgressBtn" class="clear-progress-btn" style="display:none" onclick="clearDailyProgress()">🔄 Clear Progress</button>
 
             <div id="exerciseList" class="exercise-list">
                 <!-- Exercises will be loaded dynamically -->
@@ -392,6 +410,7 @@
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="exercises.js"></script>
     <script src="app.js"></script>
 </body>

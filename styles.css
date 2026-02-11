@@ -133,6 +133,36 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
+/* iOS-style swipe-back: the leaving screen slides out right */
+.screen.swipe-leaving {
+    display: block;
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+/* iOS-style swipe-back: the entering (home) screen slides in from left */
+.screen.swipe-entering {
+    display: block;
+    animation: slideInFromLeft 0.3s ease forwards;
+}
+
+/* Live drag preview — positioned absolutely while dragging */
+.screen.swipe-dragging {
+    display: block;
+    position: relative;
+    will-change: transform;
+    transition: none;
+}
+
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes slideInFromLeft {
+    from { opacity: 0.6; transform: translateX(-80px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -348,6 +378,422 @@ body {
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin-bottom: 5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Completed card — shrunken state */
+.exercise-card--completed {
+    height: 50px;
+    padding: 0 20px;
+    overflow: hidden;
+    cursor: pointer;
+    border-left: 4px solid var(--success-color);
+    background: #f0faf0;
+}
+
+/* Completing animation */
+.exercise-card--completing {
+    transform: scale(0.95);
+    opacity: 0.7;
+}
+
+/* Expanding animation */
+.exercise-card--expanding {
+    animation: cardExpand 0.3s ease forwards;
+}
+
+@keyframes cardExpand {
+    from { opacity: 0.7; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.completed-card-inner {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    gap: 12px;
+}
+
+.completed-checkmark {
+    color: var(--success-color);
+    font-size: 20px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.completed-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.completed-expand-hint {
+    font-size: 11px;
+    color: var(--text-light);
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* Mark Complete Button */
+.mark-complete-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--success-color), #229954);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.25);
+}
+
+.mark-complete-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 4px rgba(39, 174, 96, 0.2);
+}
+
+/* Completion Toast (top of screen) */
+.completion-toast {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--success-color), #229954);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: toastSlideDown 0.3s ease;
+    font-weight: 500;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.completion-toast--hiding {
+    animation: toastSlideUp 0.3s ease forwards;
+}
+
+.completion-toast-msg {
+    font-size: 15px;
+}
+
+.completion-toast-count {
+    font-size: 13px;
+    opacity: 0.85;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+@keyframes toastSlideDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes toastSlideUp {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Progress Bar Version A: Sticky Top Bar */
+.progress-bar-sticky {
+    position: sticky;
+    top: 56px;
+    z-index: 50;
+    background: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.progress-bar-track {
+    height: 8px;
+    background: #e8e8e8;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), #2ecc71);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.progress-bar-text {
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Progress Bar Version C: Thumbnail Circles */
+.progress-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px 4px;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.progress-thumb {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: white;
+    color: var(--text-light);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.progress-thumb:active {
+    transform: scale(0.9);
+}
+
+.progress-thumb.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    font-size: 13px;
+    box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
+}
+
+/* Clear Progress Button */
+.clear-progress-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    background: none;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-progress-btn:hover {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+/* iOS-Style Wheel Picker */
+.wheel-picker-container {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f2f2f7;
+}
+
+.wheel-picker-scroll {
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* iOS fade gradient on top and bottom edges */
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 25%,
+        black 75%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 25%,
+        black 75%,
+        transparent 100%
+    );
+}
+
+.wheel-picker-spacer {
+    height: 72px;
+    flex-shrink: 0;
+}
+
+.wheel-picker-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.wheel-picker-item {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #1c1c1e;
+    opacity: 0.2;
+    scroll-snap-align: center;
+    cursor: pointer;
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
+.wheel-picker-item.near {
+    opacity: 0.45;
+}
+
+.wheel-picker-item.selected {
+    opacity: 1;
+    font-weight: 600;
+    font-size: 22px;
+}
+
+.wheel-picker-highlight {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 36px;
+    transform: translateY(-50%);
+    background: rgba(120, 120, 128, 0.12);
+    border-top: 0.5px solid rgba(60, 60, 67, 0.18);
+    border-bottom: 0.5px solid rgba(60, 60, 67, 0.18);
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+/* Custom Confirm Dialog */
+.confirm-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    padding: 20px;
+}
+
+.confirm-dialog-overlay.visible {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.confirm-dialog {
+    background: white;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 300px;
+    overflow: hidden;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-dialog-overlay.visible .confirm-dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.confirm-dialog-title {
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px 16px 4px;
+    color: #1c1c1e;
+}
+
+.confirm-dialog-message {
+    font-size: 13px;
+    text-align: center;
+    padding: 4px 16px 20px;
+    color: #3c3c43;
+    line-height: 1.4;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    border-top: 0.5px solid rgba(60, 60, 67, 0.18);
+}
+
+.confirm-dialog-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: none;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.confirm-dialog-btn:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.confirm-dialog-cancel {
+    color: #007aff;
+    font-weight: 400;
+    border-right: 0.5px solid rgba(60, 60, 67, 0.18);
+}
+
+.confirm-dialog-confirm {
+    color: #007aff;
+    font-weight: 600;
+}
+
+.confirm-dialog-confirm.destructive {
+    color: #ff3b30;
+}
+
+/* Celebration Banner */
+.celebration-banner {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+    animation: celebrationPulse 2s ease infinite;
+}
+
+.celebration-emoji {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.celebration-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.celebration-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+@keyframes celebrationPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
 }
 
 .exercise-header {
