@@ -23,6 +23,9 @@ let monthlyData = safeGetItem('monthlyData', []);
 /** Progress Bar Version: 'A' = sticky top bar, 'C' = mini thumbnail circles */
 let PROGRESS_BAR_VERSION = safeGetItem('progressBarVersion', 'C');
 
+/** Dark mode state: true = dark, false = light (default) */
+let darkMode = safeGetItem('darkMode', false);
+
 // ========== Daily Progress (completion tracking + input values) ==========
 
 /** @type {Object} Today's progress — resets automatically on new day */

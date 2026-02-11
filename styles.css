@@ -244,6 +244,12 @@ body {
     background: var(--bg-light);
 }
 
+.menu-items hr {
+    margin: 8px 20px;
+    border: none;
+    border-top: 1px solid var(--border-color);
+}
+
 /* ============================================================
    5. CARDS
    ============================================================ */
@@ -1598,6 +1604,295 @@ body {
 .pain-slider:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 4px;
+}
+
+/* ============================================================
+   11b. DARK MODE
+   ============================================================ */
+
+/* Override design tokens for dark theme */
+body.dark-mode {
+    --primary-color: #5B8DD9;
+    --primary-dark: #4472C4;
+    --secondary-color: #85C45E;
+    --danger-color: #FF6B6B;
+    --text-dark: #E8E8E8;
+    --text-light: #A0A0A0;
+    --bg-light: #121212;
+    --bg-white: #1E1E1E;
+    --border-color: #333333;
+    --success-color: #4ADE80;
+    --warning-color: #FBBF24;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.6);
+
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+}
+
+/* ---- Navigation ---- */
+body.dark-mode .nav-bar {
+    background: linear-gradient(135deg, #2a3a5c, #1a2744);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- Side Menu ---- */
+body.dark-mode .side-menu {
+    background: #1E1E1E;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .menu-header {
+    background: #2a3a5c;
+}
+
+body.dark-mode .menu-item {
+    color: var(--text-dark);
+}
+
+body.dark-mode .menu-item:hover {
+    background: #2d2d2d;
+}
+
+/* ---- Cards (generic) ---- */
+body.dark-mode .welcome-card,
+body.dark-mode .stats-card,
+body.dark-mode .phase-selector,
+body.dark-mode .export-card,
+body.dark-mode .instruction-card {
+    background: #1E1E1E;
+}
+
+/* ---- Phase Cards ---- */
+body.dark-mode .phase-card {
+    background: linear-gradient(135deg, #3a5a8c, #2a4470);
+}
+
+body.dark-mode .phase-card:hover {
+    box-shadow: 0 5px 15px rgba(68, 114, 196, 0.2);
+}
+
+/* ---- Exercise Cards ---- */
+body.dark-mode .exercise-card {
+    background: #1E1E1E;
+}
+
+body.dark-mode .exercise-card--completed {
+    background: #1a2e1a;
+    border-left-color: var(--success-color);
+}
+
+/* ---- Date Selector & Phase Info ---- */
+body.dark-mode .date-input {
+    background: #2d2d2d;
+    color: var(--text-dark);
+}
+
+body.dark-mode .phase-info {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .change-phase-btn {
+    background: #1E1E1E;
+    color: var(--primary-color);
+}
+
+/* ---- Assessment Forms ---- */
+body.dark-mode .assessment-form {
+    background: #1E1E1E;
+}
+
+/* ---- Form Inputs ---- */
+body.dark-mode .form-group input[type='number'],
+body.dark-mode .form-group input[type='date'],
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea,
+body.dark-mode .input-group input {
+    background: #2d2d2d;
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .input-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(91, 141, 217, 0.2);
+}
+
+/* ---- Buttons ---- */
+body.dark-mode .action-btn.secondary {
+    background: #1E1E1E;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .mark-complete-btn {
+    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.2);
+}
+
+body.dark-mode .save-btn {
+    background: linear-gradient(135deg, var(--success-color), #36B37E);
+}
+
+/* ---- Progress Bar Version A ---- */
+body.dark-mode .progress-bar-sticky {
+    background: #1E1E1E;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .progress-bar-track {
+    background: #333333;
+}
+
+body.dark-mode .progress-bar-fill {
+    background: linear-gradient(90deg, var(--success-color), #36B37E);
+}
+
+/* ---- Progress Bar Version C (thumbnails) ---- */
+body.dark-mode .progress-thumb {
+    background: #2d2d2d;
+    border-color: var(--border-color);
+    color: var(--text-light);
+}
+
+body.dark-mode .progress-thumb.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* ---- Clear Progress Button ---- */
+body.dark-mode .clear-progress-btn {
+    border-color: var(--border-color);
+    color: var(--text-light);
+}
+
+body.dark-mode .clear-progress-btn:hover {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+/* ---- Wheel Picker ---- */
+body.dark-mode .wheel-picker-highlight {
+    background: rgba(255, 255, 255, 0.08);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Pain Slider ---- */
+body.dark-mode .pain-slider::-webkit-slider-thumb {
+    background: #2d2d2d;
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .pain-slider::-moz-range-thumb {
+    background: #2d2d2d;
+    border-color: var(--primary-color);
+}
+
+/* ---- Toast ---- */
+body.dark-mode .toast {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- Completion Toast ---- */
+body.dark-mode .completion-toast {
+    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
+}
+
+/* ---- Confirm Dialog ---- */
+body.dark-mode .confirm-dialog {
+    background: #2d2d2d;
+}
+
+body.dark-mode .confirm-dialog-title {
+    color: var(--text-dark);
+}
+
+body.dark-mode .confirm-dialog-message {
+    color: var(--text-light);
+}
+
+body.dark-mode .confirm-dialog-actions {
+    border-top-color: var(--border-color);
+}
+
+body.dark-mode .confirm-dialog-btn:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .confirm-dialog-cancel {
+    color: var(--primary-color);
+    border-right-color: var(--border-color);
+}
+
+body.dark-mode .confirm-dialog-confirm {
+    color: var(--primary-color);
+}
+
+body.dark-mode .confirm-dialog-confirm.destructive {
+    color: var(--danger-color);
+}
+
+/* ---- Instructions Modal ---- */
+body.dark-mode .instructions-modal-content {
+    background: #2d2d2d;
+}
+
+body.dark-mode .why-section {
+    background: #1E1E1E;
+}
+
+body.dark-mode .tips-section {
+    background: #1a2e3a;
+}
+
+/* ---- History Page ---- */
+body.dark-mode .tab-btn {
+    background: #1E1E1E;
+    color: var(--text-dark);
+}
+
+body.dark-mode .tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .history-item {
+    background: #1E1E1E;
+}
+
+/* ---- Celebration Banner ---- */
+body.dark-mode .celebration-banner {
+    background: linear-gradient(135deg, var(--success-color), #36B37E);
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
+}
+
+/* ---- Exercise Target Badge ---- */
+body.dark-mode .exercise-target {
+    background: #2d2d2d;
+}
+
+/* ---- Overlay ---- */
+body.dark-mode .confirm-dialog-overlay.visible {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Focus Visible Overrides ---- */
+body.dark-mode :focus-visible {
+    outline-color: var(--primary-color);
+}
+
+body.dark-mode .action-btn:focus-visible,
+body.dark-mode .menu-item:focus-visible,
+body.dark-mode .tab-btn:focus-visible,
+body.dark-mode .save-btn:focus-visible,
+body.dark-mode .mark-complete-btn:focus-visible {
+    box-shadow: 0 0 0 4px rgba(91, 141, 217, 0.3);
 }
 
 /* ============================================================

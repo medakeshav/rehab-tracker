@@ -44,6 +44,8 @@ function initializeApp() {
     // Update toggle button states
     updateSoundToggleBtn();
     updateProgressBarToggleBtn();
+    applyDarkMode();
+    updateDarkModeToggleBtn();
 }
 
 // ========== Global Event Listeners ==========
@@ -113,6 +115,9 @@ function setupDelegatedActions() {
                 break;
             case 'toggle-progress-bar':
                 toggleProgressBar();
+                break;
+            case 'toggle-dark-mode':
+                toggleDarkMode();
                 break;
             case 'clear-progress':
                 clearDailyProgress();

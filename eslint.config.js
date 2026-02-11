@@ -46,6 +46,7 @@ export default [
                 weeklyData: 'writable',
                 monthlyData: 'writable',
                 PROGRESS_BAR_VERSION: 'writable',
+                darkMode: 'writable',
                 dailyProgress: 'writable',
                 loadDailyProgress: 'readonly',
                 createFreshProgress: 'readonly',
@@ -110,6 +111,9 @@ export default [
                 updateSoundToggleBtn: 'readonly',
                 toggleProgressBar: 'readonly',
                 updateProgressBarToggleBtn: 'readonly',
+                toggleDarkMode: 'readonly',
+                applyDarkMode: 'readonly',
+                updateDarkModeToggleBtn: 'readonly',
 
                 // assessments.js
                 saveWeeklyAssessment: 'readonly',

@@ -294,3 +294,40 @@ function updateProgressBarToggleBtn() {
             PROGRESS_BAR_VERSION === 'A' ? '📊 Progress: Bar' : '📊 Progress: Circles';
     }
 }
+
+// ========== Dark Mode Toggle ==========
+
+/**
+ * Toggle dark mode on/off, persist to localStorage, and update the UI.
+ */
+function toggleDarkMode() {
+    darkMode = !darkMode;
+    safeSetItem('darkMode', darkMode);
+    applyDarkMode();
+    updateDarkModeToggleBtn();
+    showToast(darkMode ? '🌙 Dark Mode ON' : '☀️ Light Mode ON', 'success');
+}
+
+/**
+ * Apply or remove the dark-mode class on the body element.
+ * Also updates the meta theme-color for the browser chrome.
+ */
+function applyDarkMode() {
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#1a1a2e');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#4472C4');
+    }
+}
+
+/**
+ * Update the dark mode toggle button label to reflect current state.
+ */
+function updateDarkModeToggleBtn() {
+    const btn = document.getElementById('darkModeToggleBtn');
+    if (btn) {
+        btn.textContent = darkMode ? '☀️ Theme: Dark' : '🌙 Theme: Light';
+    }
+}
