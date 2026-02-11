@@ -21,7 +21,7 @@ let weeklyData = safeGetItem('weeklyData', []);
 let monthlyData = safeGetItem('monthlyData', []);
 
 /** Progress Bar Version: 'A' = sticky top bar, 'C' = mini thumbnail circles */
-const PROGRESS_BAR_VERSION = 'C';
+let PROGRESS_BAR_VERSION = safeGetItem('progressBarVersion', 'C');
 
 // ========== Daily Progress (completion tracking + input values) ==========
 

@@ -41,8 +41,9 @@ function initializeApp() {
     updatePhaseInfo();
     loadExercises();
 
-    // Update sound toggle button state
+    // Update toggle button states
     updateSoundToggleBtn();
+    updateProgressBarToggleBtn();
 }
 
 // ========== Global Event Listeners ==========
@@ -109,6 +110,9 @@ function setupDelegatedActions() {
                 break;
             case 'toggle-sound':
                 toggleSound();
+                break;
+            case 'toggle-progress-bar':
+                toggleProgressBar();
                 break;
             case 'clear-progress':
                 clearDailyProgress();

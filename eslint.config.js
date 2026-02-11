@@ -45,7 +45,7 @@ export default [
                 workoutData: 'writable',
                 weeklyData: 'writable',
                 monthlyData: 'writable',
-                PROGRESS_BAR_VERSION: 'readonly',
+                PROGRESS_BAR_VERSION: 'writable',
                 dailyProgress: 'writable',
                 loadDailyProgress: 'readonly',
                 createFreshProgress: 'readonly',
@@ -108,6 +108,8 @@ export default [
                 showCompletionToast: 'readonly',
                 toggleSound: 'readonly',
                 updateSoundToggleBtn: 'readonly',
+                toggleProgressBar: 'readonly',
+                updateProgressBarToggleBtn: 'readonly',
 
                 // assessments.js
                 saveWeeklyAssessment: 'readonly',

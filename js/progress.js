@@ -268,3 +268,29 @@ function updateSoundToggleBtn() {
         btn.textContent = dailyProgress.soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
     }
 }
+
+// ========== Progress Bar Toggle ==========
+
+/**
+ * Toggle progress bar display between sticky bar (A) and thumbnail circles (C).
+ * Persists the choice to localStorage.
+ */
+function toggleProgressBar() {
+    PROGRESS_BAR_VERSION = PROGRESS_BAR_VERSION === 'C' ? 'A' : 'C';
+    safeSetItem('progressBarVersion', PROGRESS_BAR_VERSION);
+    updateProgressBar();
+    updateProgressBarToggleBtn();
+    const label = PROGRESS_BAR_VERSION === 'A' ? '📊 Progress Bar' : '⊙ Progress Circles';
+    showToast(label, 'success');
+}
+
+/**
+ * Update the progress bar toggle button label to reflect current version.
+ */
+function updateProgressBarToggleBtn() {
+    const btn = document.getElementById('progressBarToggleBtn');
+    if (btn) {
+        btn.textContent =
+            PROGRESS_BAR_VERSION === 'A' ? '📊 Progress: Bar' : '📊 Progress: Circles';
+    }
+}
