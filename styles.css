@@ -829,6 +829,12 @@ body {
     padding: var(--space-md) var(--space-xs);
     margin-bottom: var(--space-md);
     justify-content: center;
+    position: sticky;
+    top: 56px;
+    z-index: var(--z-sticky);
+    background: var(--bg-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
 }
 
 .progress-thumb {
