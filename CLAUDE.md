@@ -129,6 +129,14 @@ Key element IDs: `exerciseList`, `progressBarA`, `progressBarC`, `workoutDate`, 
 | New test | `tests/*.test.js` (inline function copies, jsdom env) |
 | Cache update | `sw.js` (bump version number) |
 
+## Documentation & Maintenance Rules
+
+- **CLAUDE.md** — Update only when structure changes (new module, new screen, new pattern). Skip for bug fixes, CSS tweaks, or changes following existing patterns.
+- **README.md** — Keep minimal. Update rarely.
+- **No release notes or screenshots** — Git commit messages serve as the changelog. The live app is the living demo.
+- **Commit messages** — Descriptive and conventional (`feat:`, `fix:`, `refactor:`, `docs:`). These ARE the release notes.
+- **sw.js cache version** — Bump on every deployment-worthy change.
+
 ## Infrastructure
 
 - **ESLint 9** flat config, script sourceType, cross-module globals registered manually
