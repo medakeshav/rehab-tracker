@@ -298,7 +298,7 @@ function getCompletionMessage(exercise) {
     // High sets (4-5) — acknowledge the effort
     if (sets >= 4) {
         return pickFreshMessage([
-            `${sets} sets of ${name}! That\'s serious work! 🔥`,
+            `${sets} sets of ${name}! That's serious work! 🔥`,
             `Maxing out at ${sets} sets — beast mode! 💪`,
             `${sets} sets done! Your dedication shows! 🏋️`,
             `Pushing through ${sets} sets — incredible effort! ⚡`,
@@ -336,9 +336,9 @@ function getCompletionMessage(exercise) {
         `Nice work on ${name}! Keep the chain going! 🔗`,
         `${done} done already — building momentum! 🚂`,
         `${name} complete! Every rep counts! 💪`,
-        `That\'s ${done} in the bag — stay locked in! 🎯`,
+        `That's ${done} in the bag — stay locked in! 🎯`,
         'Steady progress! One at a time! 🪜',
-        `${remaining} left — you\'re making it happen! 👊`,
+        `${remaining} left — you're making it happen! 👊`,
         `Another one down! ${name} is history! 📝`,
     ]);
 }

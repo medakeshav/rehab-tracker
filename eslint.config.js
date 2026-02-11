@@ -2,12 +2,12 @@ import js from '@eslint/js';
 
 export default [
     js.configs.recommended,
-    // Config for all app scripts (js/*.js files share a global scope)
+    // Config for all app scripts (ES modules)
     {
         files: ['js/**/*.js'],
         languageOptions: {
             ecmaVersion: 2022,
-            sourceType: 'script',
+            sourceType: 'module',
             globals: {
                 // Browser globals
                 window: 'readonly',
@@ -145,12 +145,12 @@ export default [
             'prefer-const': 'warn',
         },
     },
-    // Config for exercises.js (defines globals, uses module.exports)
+    // Config for exercises.js (ES module)
     {
         files: ['exercises.js'],
         languageOptions: {
             ecmaVersion: 2022,
-            sourceType: 'script',
+            sourceType: 'module',
             globals: {
                 window: 'readonly',
                 document: 'readonly',
@@ -169,10 +169,12 @@ export default [
     {
         ignores: [
             'node_modules/',
+            'dist/',
             'sw.js',
             'app.js', // Old monolithic file — no longer used, kept for reference
             'eslint.config.js',
             'vitest.config.js',
+            'vite.config.js',
             'tests/',
         ],
     },
