@@ -16,8 +16,8 @@ function showHistoryTab(tab) {
     document.querySelectorAll('.tab-btn').forEach((btn) => {
         btn.classList.remove('active');
     });
-    // Find the button whose onclick contains this tab name and mark it active
-    const activeBtn = document.querySelector(`.tab-btn[onclick*="${tab}"]`);
+    // Find the button whose data-tab matches the selected tab and mark it active
+    const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 
     loadHistory(tab);

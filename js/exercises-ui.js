@@ -429,7 +429,7 @@ function showInstructions(exercise) {
         <div class="instructions-modal-content">
             <div class="instructions-header">
                 <h2>${instr.title}</h2>
-                <button class="modal-close-btn" onclick="closeInstructionsModal(this)">×</button>
+                <button class="modal-close-btn" data-action="close-modal" aria-label="Close instructions">×</button>
             </div>
             <div class="instructions-body">
                 <div class="instructions-section">
@@ -458,7 +458,7 @@ function showInstructions(exercise) {
                 </div>
             </div>
             <div class="instructions-footer">
-                <button class="btn btn-primary" onclick="closeInstructionsModal(this)">Got It!</button>
+                <button class="btn btn-primary" data-action="close-modal">Got It!</button>
             </div>
         </div>
     `;
@@ -468,9 +468,9 @@ function showInstructions(exercise) {
     // Prevent background scroll
     document.body.style.overflow = 'hidden';
 
-    // Close on backdrop click
+    // Close on backdrop click or close button click
     modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
+        if (e.target === modal || e.target.closest('[data-action="close-modal"]')) {
             modal.remove();
             document.body.style.overflow = '';
         }

@@ -14,33 +14,33 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="nav-bar">
+    <nav class="nav-bar" role="navigation" aria-label="Main navigation">
         <h1 class="app-title">💪 Rehab Tracker</h1>
-        <button class="menu-btn" id="menuBtn">☰</button>
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
     </nav>
 
     <!-- Side Menu -->
-    <div class="side-menu" id="sideMenu">
+    <div class="side-menu" id="sideMenu" role="navigation" aria-label="Side menu">
         <div class="menu-header">
             <h2>Menu</h2>
-            <button class="menu-close-btn" id="closeMenuBtn">✕</button>
+            <button class="menu-close-btn" id="closeMenuBtn" aria-label="Close menu">✕</button>
         </div>
         <div class="menu-items">
-            <button class="menu-item" onclick="showScreen('home')">🏠 Home</button>
-            <button class="menu-item" onclick="showScreen('daily')">📝 Daily Workout</button>
-            <button class="menu-item" onclick="showScreen('weekly')">📊 Weekly Assessment</button>
-            <button class="menu-item" onclick="showScreen('monthly')">📅 Monthly Assessment</button>
-            <button class="menu-item" onclick="showScreen('history')">📈 History</button>
-            <button class="menu-item" onclick="showScreen('export')">💾 Export Data</button>
-            <button class="menu-item" onclick="showScreen('instructions')">ℹ️ Instructions</button>
+            <button class="menu-item" data-action="navigate" data-screen="home">🏠 Home</button>
+            <button class="menu-item" data-action="navigate" data-screen="daily">📝 Daily Workout</button>
+            <button class="menu-item" data-action="navigate" data-screen="weekly">📊 Weekly Assessment</button>
+            <button class="menu-item" data-action="navigate" data-screen="monthly">📅 Monthly Assessment</button>
+            <button class="menu-item" data-action="navigate" data-screen="history">📈 History</button>
+            <button class="menu-item" data-action="navigate" data-screen="export">💾 Export Data</button>
+            <button class="menu-item" data-action="navigate" data-screen="instructions">ℹ️ Instructions</button>
             <hr style="margin: 8px 20px; border: none; border-top: 1px solid #e0e0e0;">
-            <button class="menu-item" id="soundToggleBtn" onclick="toggleSound()">🔊 Sound: ON</button>
+            <button class="menu-item" id="soundToggleBtn" data-action="toggle-sound">🔊 Sound: ON</button>
         </div>
     </div>
 
     <!-- Main Container -->
-    <div class="container" id="mainContainer">
-        
+    <div class="container" id="mainContainer" role="main">
+
         <!-- HOME SCREEN -->
         <div class="screen active" id="homeScreen">
             <div class="welcome-card">
@@ -51,17 +51,17 @@
             <div class="phase-selector">
                 <h3>Select Your Current Phase</h3>
                 <div class="phase-cards">
-                    <div class="phase-card" onclick="selectPhase(1)">
+                    <div class="phase-card" tabindex="0" role="button" data-action="select-phase" data-phase="1" aria-label="Select Phase 1: Foundation">
                         <div class="phase-number">1</div>
                         <h4>Foundation</h4>
                         <p>Weeks 1-8</p>
                     </div>
-                    <div class="phase-card" onclick="selectPhase(2)">
+                    <div class="phase-card" tabindex="0" role="button" data-action="select-phase" data-phase="2" aria-label="Select Phase 2: Functional Strength">
                         <div class="phase-number">2</div>
                         <h4>Functional Strength</h4>
                         <p>Weeks 9-20</p>
                     </div>
-                    <div class="phase-card" onclick="selectPhase(3)">
+                    <div class="phase-card" tabindex="0" role="button" data-action="select-phase" data-phase="3" aria-label="Select Phase 3: Advanced">
                         <div class="phase-number">3</div>
                         <h4>Advanced</h4>
                         <p>Week 21+</p>
@@ -70,13 +70,13 @@
             </div>
 
             <div class="quick-actions">
-                <button class="action-btn primary" onclick="showScreen('daily')">
+                <button class="action-btn primary" data-action="navigate" data-screen="daily">
                     📝 Start Today's Workout
                 </button>
-                <button class="action-btn secondary" onclick="showScreen('weekly')">
+                <button class="action-btn secondary" data-action="navigate" data-screen="weekly">
                     📊 Weekly Assessment
                 </button>
-                <button class="action-btn secondary" onclick="showScreen('monthly')">
+                <button class="action-btn secondary" data-action="navigate" data-screen="monthly">
                     📅 Monthly Assessment
                 </button>
             </div>
@@ -103,7 +103,7 @@
         <!-- DAILY WORKOUT SCREEN -->
         <div class="screen" id="dailyScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>Daily Workout</h2>
             </div>
 
@@ -114,7 +114,7 @@
 
             <div class="phase-info" id="phaseInfo">
                 <span id="currentPhaseText">Phase 1: Foundation</span>
-                <button class="change-phase-btn" onclick="showScreen('home')">Change Phase</button>
+                <button class="change-phase-btn" data-action="navigate" data-screen="home">Change Phase</button>
             </div>
 
             <!-- Progress Bar Version A: Sticky Top Bar -->
@@ -131,21 +131,21 @@
             </div>
 
             <!-- Clear Progress Button -->
-            <button id="clearProgressBtn" class="clear-progress-btn" style="display:none" onclick="clearDailyProgress()">🔄 Clear Progress</button>
+            <button id="clearProgressBtn" class="clear-progress-btn" style="display:none" data-action="clear-progress">🔄 Clear Progress</button>
 
-            <div id="exerciseList" class="exercise-list">
+            <div id="exerciseList" class="exercise-list" aria-label="Exercise list">
                 <!-- Exercises will be loaded dynamically -->
             </div>
 
             <div class="save-section">
-                <button class="save-btn" onclick="saveWorkout()">💾 Save Workout</button>
+                <button class="save-btn" data-action="save-workout">💾 Save Workout</button>
             </div>
         </div>
 
         <!-- WEEKLY ASSESSMENT SCREEN -->
         <div class="screen" id="weeklyScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>Weekly Assessment</h2>
             </div>
 
@@ -201,15 +201,15 @@
                 <h3>Pain Levels (0-10)</h3>
                 <div class="form-group">
                     <label>Knee Pain: <span id="kneePainValue">0</span></label>
-                    <input type="range" id="kneePain" min="0" max="10" value="0" class="pain-slider">
+                    <input type="range" id="kneePain" min="0" max="10" value="0" class="pain-slider" aria-label="Knee pain level">
                 </div>
                 <div class="form-group">
                     <label>Back Pain: <span id="backPainValue">0</span></label>
-                    <input type="range" id="backPain" min="0" max="10" value="0" class="pain-slider">
+                    <input type="range" id="backPain" min="0" max="10" value="0" class="pain-slider" aria-label="Back pain level">
                 </div>
                 <div class="form-group">
                     <label>Foot Pain: <span id="footPainValue">0</span></label>
-                    <input type="range" id="footPain" min="0" max="10" value="0" class="pain-slider">
+                    <input type="range" id="footPain" min="0" max="10" value="0" class="pain-slider" aria-label="Foot pain level">
                 </div>
 
                 <div class="form-group">
@@ -224,7 +224,7 @@
         <!-- MONTHLY ASSESSMENT SCREEN -->
         <div class="screen" id="monthlyScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>Monthly Assessment</h2>
             </div>
 
@@ -306,14 +306,14 @@
         <!-- HISTORY SCREEN -->
         <div class="screen" id="historyScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>History</h2>
             </div>
 
             <div class="history-tabs">
-                <button class="tab-btn active" onclick="showHistoryTab('workouts')">Workouts</button>
-                <button class="tab-btn" onclick="showHistoryTab('weekly')">Weekly</button>
-                <button class="tab-btn" onclick="showHistoryTab('monthly')">Monthly</button>
+                <button class="tab-btn active" data-action="history-tab" data-tab="workouts">Workouts</button>
+                <button class="tab-btn" data-action="history-tab" data-tab="weekly">Weekly</button>
+                <button class="tab-btn" data-action="history-tab" data-tab="monthly">Monthly</button>
             </div>
 
             <div class="history-content" id="historyContent">
@@ -324,7 +324,7 @@
         <!-- EXPORT SCREEN -->
         <div class="screen" id="exportScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>Export Data</h2>
             </div>
 
@@ -332,13 +332,13 @@
                 <div class="export-card">
                     <h3>📊 Export All Data</h3>
                     <p>Download all your workout data as CSV files</p>
-                    <button class="action-btn primary" onclick="exportAllData()">Download CSV Files</button>
+                    <button class="action-btn primary" data-action="export-data">Download CSV Files</button>
                 </div>
 
                 <div class="export-card">
                     <h3>🗑️ Clear All Data</h3>
                     <p>⚠️ This will delete all stored data. Cannot be undone!</p>
-                    <button class="action-btn danger" onclick="clearAllData()">Clear All Data</button>
+                    <button class="action-btn danger" data-action="clear-all-data">Clear All Data</button>
                 </div>
             </div>
         </div>
@@ -346,7 +346,7 @@
         <!-- INSTRUCTIONS SCREEN -->
         <div class="screen" id="instructionsScreen">
             <div class="screen-header">
-                <button class="back-btn" onclick="showScreen('home')">← Back</button>
+                <button class="back-btn" data-action="navigate" data-screen="home">← Back</button>
                 <h2>Instructions</h2>
             </div>
 
@@ -409,6 +409,9 @@
         </div>
 
     </div>
+
+    <!-- Toast region for screen readers -->
+    <div id="toastRegion" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="exercises.js"></script>

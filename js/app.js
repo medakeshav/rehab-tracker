@@ -49,7 +49,7 @@ function initializeApp() {
 
 /**
  * Wire up all non-inline event listeners.
- * Menu buttons, form submissions, pain sliders, etc.
+ * Menu buttons, form submissions, pain sliders, delegated actions, etc.
  */
 function setupEventListeners() {
     // Menu functionality
@@ -64,6 +64,9 @@ function setupEventListeners() {
             closeMenu();
         }
     });
+
+    // Delegated click handler for all data-action buttons
+    setupDelegatedActions();
 
     // Pain slider listeners for assessment forms
     setupPainSliders();
@@ -81,6 +84,60 @@ function setupEventListeners() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('weeklyDate').value = today;
     document.getElementById('monthlyDate').value = today;
+}
+
+// ========== Delegated Action Handler ==========
+
+/**
+ * Single delegated event listener for all [data-action] elements.
+ * Replaces inline onclick handlers with a centralized action router.
+ * Also handles keyboard activation (Enter/Space) on non-button elements.
+ */
+function setupDelegatedActions() {
+    document.addEventListener('click', function (e) {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.dataset.action;
+
+        switch (action) {
+            case 'navigate':
+                showScreen(target.dataset.screen);
+                break;
+            case 'select-phase':
+                selectPhase(Number(target.dataset.phase));
+                break;
+            case 'toggle-sound':
+                toggleSound();
+                break;
+            case 'clear-progress':
+                clearDailyProgress();
+                break;
+            case 'save-workout':
+                saveWorkout();
+                break;
+            case 'history-tab':
+                showHistoryTab(target.dataset.tab);
+                break;
+            case 'export-data':
+                exportAllData();
+                break;
+            case 'clear-all-data':
+                clearAllData();
+                break;
+        }
+    });
+
+    // Allow keyboard activation (Enter/Space) on non-button elements with data-action
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+
+        const target = e.target.closest('[data-action]');
+        if (!target || target.tagName === 'BUTTON') return;
+
+        e.preventDefault();
+        target.click();
+    });
 }
 
 // ========== Auto-Save on Page Close ==========
