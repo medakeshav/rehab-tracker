@@ -46,7 +46,9 @@ npm run test:watch   # Run tests in watch mode
 The app deploys automatically via GitHub Actions:
 
 - **CI** (`.github/workflows/ci.yml`) — Runs lint, format check, and tests on every push
-- **Deploy** (`.github/workflows/deploy.yml`) — Builds with Vite and deploys to GitHub Pages
+- **Deploy** (`.github/workflows/deploy.yml`) — Runs `npm run build` and deploys the `dist/` output to GitHub Pages
+
+**Required:** In your repo, go to **Settings → Pages** and set **Source** to **GitHub Actions** (not "Deploy from a branch"). The workflow builds with Vite using base path `/rehab-tracker/`.
 
 Your app will be available at: `https://[your-username].github.io/rehab-tracker`
 
