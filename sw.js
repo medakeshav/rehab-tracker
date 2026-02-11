@@ -1,5 +1,5 @@
 // Service Worker for Rehab Tracker
-const CACHE_NAME = 'rehab-tracker-v10';
+const CACHE_NAME = 'rehab-tracker-v11';
 const urlsToCache = [
   './',
   './index.html',

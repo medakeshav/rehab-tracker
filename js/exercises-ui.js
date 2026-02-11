@@ -550,7 +550,7 @@ function saveWorkout() {
 
     // Save to storage
     workoutData.push(workout);
-    localStorage.setItem('workoutData', JSON.stringify(workoutData));
+    safeSetItem('workoutData', workoutData);
 
     showToast('✓ Workout saved successfully!', 'success');
 

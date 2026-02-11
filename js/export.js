@@ -17,17 +17,22 @@ function exportAllData() {
         return;
     }
 
-    if (workoutData.length > 0) {
-        exportWorkoutsCSV();
-    }
-    if (weeklyData.length > 0) {
-        exportWeeklyCSV();
-    }
-    if (monthlyData.length > 0) {
-        exportMonthlyCSV();
-    }
+    try {
+        if (workoutData.length > 0) {
+            exportWorkoutsCSV();
+        }
+        if (weeklyData.length > 0) {
+            exportWeeklyCSV();
+        }
+        if (monthlyData.length > 0) {
+            exportMonthlyCSV();
+        }
 
-    showToast('✓ Data exported successfully!', 'success');
+        showToast('✓ Data exported successfully!', 'success');
+    } catch (_e) {
+        console.error('CSV export failed:', _e);
+        showToast('⚠️ Export failed — please try again', 'error');
+    }
 }
 
 // ========== Individual CSV Exporters ==========
@@ -102,7 +107,11 @@ function clearAllData() {
         '⚠️ This will permanently delete all workouts, assessments, and progress. This cannot be undone.',
         'Delete Everything',
         function () {
-            localStorage.clear();
+            try {
+                localStorage.clear();
+            } catch (_e) {
+                console.error('localStorage.clear() failed:', _e);
+            }
             workoutData = [];
             weeklyData = [];
             monthlyData = [];

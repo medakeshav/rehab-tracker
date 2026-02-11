@@ -8,16 +8,17 @@
 // ========== Global State Variables ==========
 
 /** @type {number} Currently selected rehab phase (1, 2, or 3) */
-let currentPhase = parseInt(localStorage.getItem('currentPhase')) || 1;
+let currentPhase = safeGetItem('currentPhase', 1);
+if (typeof currentPhase === 'string') currentPhase = parseInt(currentPhase) || 1;
 
 /** @type {Array<Object>} All saved daily workout records */
-let workoutData = JSON.parse(localStorage.getItem('workoutData')) || [];
+let workoutData = safeGetItem('workoutData', []);
 
 /** @type {Array<Object>} All saved weekly assessment records */
-let weeklyData = JSON.parse(localStorage.getItem('weeklyData')) || [];
+let weeklyData = safeGetItem('weeklyData', []);
 
 /** @type {Array<Object>} All saved monthly assessment records */
-let monthlyData = JSON.parse(localStorage.getItem('monthlyData')) || [];
+let monthlyData = safeGetItem('monthlyData', []);
 
 /** Progress Bar Version: 'A' = sticky top bar, 'C' = mini thumbnail circles */
 const PROGRESS_BAR_VERSION = 'C';
@@ -33,9 +34,8 @@ let dailyProgress = loadDailyProgress();
  * @returns {Object} Daily progress data
  */
 function loadDailyProgress() {
-    const stored = localStorage.getItem('rehabDailyProgress');
-    if (stored) {
-        const data = JSON.parse(stored);
+    const data = safeGetItem('rehabDailyProgress', null);
+    if (data) {
         const today = new Date().toISOString().split('T')[0];
         if (data.date === today) {
             return data;
@@ -61,7 +61,7 @@ function createFreshProgress() {
  * Persist the current dailyProgress object to localStorage.
  */
 function saveDailyProgress() {
-    localStorage.setItem('rehabDailyProgress', JSON.stringify(dailyProgress));
+    safeSetItem('rehabDailyProgress', dailyProgress);
 }
 
 // ========== Exercise Data Capture & Restore ==========

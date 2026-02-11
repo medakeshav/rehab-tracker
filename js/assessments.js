@@ -32,7 +32,7 @@ function saveWeeklyAssessment(e) {
     };
 
     weeklyData.push(assessment);
-    localStorage.setItem('weeklyData', JSON.stringify(weeklyData));
+    safeSetItem('weeklyData', weeklyData);
 
     showToast('✓ Weekly assessment saved!', 'success');
 
@@ -69,7 +69,7 @@ function saveMonthlyAssessment(e) {
     };
 
     monthlyData.push(assessment);
-    localStorage.setItem('monthlyData', JSON.stringify(monthlyData));
+    safeSetItem('monthlyData', monthlyData);
 
     showToast('✓ Monthly assessment saved!', 'success');
 

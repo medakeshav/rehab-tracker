@@ -6,6 +6,44 @@
  * and statistical calculations.
  */
 
+// ========== Safe localStorage Helpers ==========
+
+/**
+ * Safely read a value from localStorage with JSON parsing.
+ * Returns the fallback value if storage is unavailable, empty, or corrupt.
+ * @param {string} key - localStorage key
+ * @param {*} fallback - Value to return on failure
+ * @returns {*} Parsed value or fallback
+ */
+function safeGetItem(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (raw === null) return fallback;
+        return JSON.parse(raw);
+    } catch (_e) {
+        console.warn('localStorage read failed for key:', key);
+        return fallback;
+    }
+}
+
+/**
+ * Safely write a JSON-serializable value to localStorage.
+ * Shows a user-visible toast on failure (e.g. quota exceeded).
+ * @param {string} key - localStorage key
+ * @param {*} value - Value to serialize and store
+ * @returns {boolean} true on success, false on failure
+ */
+function safeSetItem(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (_e) {
+        console.error('localStorage write failed for key:', key);
+        showToast('⚠️ Storage full — data may not be saved', 'error');
+        return false;
+    }
+}
+
 // ========== Toast Notifications ==========
 
 /**
@@ -168,7 +206,7 @@ function updateStats() {
  */
 function selectPhase(phase) {
     currentPhase = phase;
-    localStorage.setItem('currentPhase', phase);
+    safeSetItem('currentPhase', phase);
     updatePhaseInfo();
     loadExercises();
     showScreen('daily');
