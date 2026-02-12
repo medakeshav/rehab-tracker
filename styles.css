@@ -499,7 +499,7 @@ body {
 .streak-flame {
     position: relative;
     display: inline-block;
-    font-size: 0;             /* hide emoji text */
+    font-size: 0; /* hide emoji text */
     width: 28px;
     height: 36px;
     flex-shrink: 0;
@@ -514,7 +514,8 @@ body {
     transform: translateX(-50%);
     width: 18px;
     height: 28px;
-    background: radial-gradient(ellipse at 50% 90%,
+    background: radial-gradient(
+        ellipse at 50% 90%,
         #ffeb3b 0%,
         #ff9800 30%,
         #ff5722 55%,
@@ -534,7 +535,8 @@ body {
     transform: translateX(-50%);
     width: 10px;
     height: 16px;
-    background: radial-gradient(ellipse at 50% 85%,
+    background: radial-gradient(
+        ellipse at 50% 85%,
         #fff9c4 0%,
         #ffeb3b 35%,
         #ff9800 65%,
@@ -597,7 +599,9 @@ body {
 .streak-flame--none::after {
     animation: none;
 }
-.streak-flame--none .ember { display: none; }
+.streak-flame--none .ember {
+    display: none;
+}
 
 /* Small: gentle small flame */
 .streak-flame--small {
@@ -617,7 +621,9 @@ body {
 }
 /* fewer embers for small */
 .streak-flame--small .ember:nth-child(3),
-.streak-flame--small .ember:nth-child(4) { display: none; }
+.streak-flame--small .ember:nth-child(4) {
+    display: none;
+}
 
 /* Medium: fuller flame with glow */
 .streak-flame--medium {
@@ -628,8 +634,7 @@ body {
     width: 22px;
     height: 32px;
     animation: flameBody 0.4s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 6px rgba(255, 100, 0, 0.5))
-            drop-shadow(0 0 12px rgba(255, 60, 0, 0.2));
+    filter: drop-shadow(0 0 6px rgba(255, 100, 0, 0.5)) drop-shadow(0 0 12px rgba(255, 60, 0, 0.2));
 }
 .streak-flame--medium::after {
     width: 12px;
@@ -647,8 +652,7 @@ body {
     animation:
         flameBody 0.35s ease-in-out infinite alternate,
         flameSway 1.5s ease-in-out infinite;
-    filter: drop-shadow(0 0 8px rgba(255, 80, 0, 0.6))
-            drop-shadow(0 0 18px rgba(255, 40, 0, 0.3));
+    filter: drop-shadow(0 0 8px rgba(255, 80, 0, 0.6)) drop-shadow(0 0 18px rgba(255, 40, 0, 0.3));
 }
 .streak-flame--large::after {
     width: 14px;
@@ -669,9 +673,8 @@ body {
     animation:
         flameBodyEpic 0.25s ease-in-out infinite alternate,
         flameSway 0.8s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px rgba(255, 60, 0, 0.7))
-            drop-shadow(0 0 22px rgba(255, 20, 0, 0.4))
-            drop-shadow(0 -6px 28px rgba(255, 160, 0, 0.25));
+    filter: drop-shadow(0 0 10px rgba(255, 60, 0, 0.7)) drop-shadow(0 0 22px rgba(255, 20, 0, 0.4))
+        drop-shadow(0 -6px 28px rgba(255, 160, 0, 0.25));
 }
 .streak-flame--epic::after {
     width: 16px;
@@ -693,7 +696,8 @@ body {
 .streak-flame--recovery::before {
     width: 20px;
     height: 30px;
-    background: radial-gradient(ellipse at 50% 90%,
+    background: radial-gradient(
+        ellipse at 50% 90%,
         #bbdefb 0%,
         #64b5f6 30%,
         #1e88e5 55%,
@@ -701,12 +705,13 @@ body {
     );
     animation: flameBody 0.8s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 6px rgba(100, 160, 255, 0.5))
-            drop-shadow(0 0 14px rgba(66, 133, 244, 0.25));
+        drop-shadow(0 0 14px rgba(66, 133, 244, 0.25));
 }
 .streak-flame--recovery::after {
     width: 10px;
     height: 16px;
-    background: radial-gradient(ellipse at 50% 85%,
+    background: radial-gradient(
+        ellipse at 50% 85%,
         #e3f2fd 0%,
         #90caf9 35%,
         #42a5f5 65%,
@@ -717,8 +722,12 @@ body {
 .streak-flame--recovery .ember {
     background: #64b5f6;
 }
-.streak-flame--recovery .ember:nth-child(1) { background: #90caf9; }
-.streak-flame--recovery .ember:nth-child(2) { background: #42a5f5; }
+.streak-flame--recovery .ember:nth-child(1) {
+    background: #90caf9;
+}
+.streak-flame--recovery .ember:nth-child(2) {
+    background: #42a5f5;
+}
 
 /* ===== Flame Keyframes ===== */
 
@@ -820,9 +829,16 @@ body {
 
 /* Side sway for flame */
 @keyframes flameSway {
-    0%, 100% { margin-left: 0; }
-    25% { margin-left: -1.5px; }
-    75% { margin-left: 1.5px; }
+    0%,
+    100% {
+        margin-left: 0;
+    }
+    25% {
+        margin-left: -1.5px;
+    }
+    75% {
+        margin-left: 1.5px;
+    }
 }
 
 /* Embers: rise, drift, and fade */
@@ -982,8 +998,14 @@ body {
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .streak-warning--alert {
@@ -1054,10 +1076,18 @@ body {
 }
 
 @keyframes badgeBounce {
-    0% { transform: scale(0.5); }
-    50% { transform: scale(1.3); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0.5);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .badge-unlock-title {

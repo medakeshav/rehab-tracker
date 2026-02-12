@@ -142,9 +142,7 @@ function calculateStreakFromData() {
     const lastWorkoutDate = normalizeDate(mostRecentDate);
 
     // If last workout was more than 2 days ago (and no injury grace), streak is 0
-    const daysSinceLast = Math.round(
-        (todayDate - lastWorkoutDate) / (1000 * 60 * 60 * 24)
-    );
+    const daysSinceLast = Math.round((todayDate - lastWorkoutDate) / (1000 * 60 * 60 * 24));
     if (daysSinceLast > 2 && mostRecentPain < 6) {
         return {
             current: 0,
@@ -215,8 +213,7 @@ function calculateLongestStreak(workoutDates) {
 
     const firstD = normalizeDate(firstDate);
     const lastD = normalizeDate(lastDate);
-    const totalDays =
-        Math.round((lastD - firstD) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDays = Math.round((lastD - firstD) / (1000 * 60 * 60 * 24)) + 1;
 
     let longestStreak = 0;
     let currentRun = 0;
@@ -286,19 +283,13 @@ function checkBadges(data, previousStreak) {
     });
 
     // Comeback Kid: restarted after 7+ day break
-    if (
-        !achievements.includes('comeback_kid') &&
-        previousStreak === 0 &&
-        data.current >= 1
-    ) {
+    if (!achievements.includes('comeback_kid') && previousStreak === 0 && data.current >= 1) {
         const workoutDates = getWorkoutDateSet();
         const sortedDates = [...workoutDates].sort().reverse();
         if (sortedDates.length >= 2) {
             const latest = normalizeDate(sortedDates[0]);
             const secondLatest = normalizeDate(sortedDates[1]);
-            const gap = Math.round(
-                (latest - secondLatest) / (1000 * 60 * 60 * 24)
-            );
+            const gap = Math.round((latest - secondLatest) / (1000 * 60 * 60 * 24));
             if (gap >= 7) {
                 achievements.push('comeback_kid');
                 achievementDates['comeback_kid'] = todayStr();
@@ -308,10 +299,7 @@ function checkBadges(data, previousStreak) {
     }
 
     // Pain-Free Week: 7 consecutive days with avg pain <= 2
-    if (
-        !achievements.includes('pain_free_week') &&
-        workoutData.length >= 7
-    ) {
+    if (!achievements.includes('pain_free_week') && workoutData.length >= 7) {
         const recentWorkouts = [...workoutData]
             .sort((a, b) => b.date.localeCompare(a.date))
             .slice(0, 7);
@@ -319,8 +307,7 @@ function checkBadges(data, previousStreak) {
             const allLowPain = recentWorkouts.every((w) => {
                 if (!w.exercises || w.exercises.length === 0) return false;
                 const avgPain =
-                    w.exercises.reduce((s, e) => s + (e.pain || 0), 0) /
-                    w.exercises.length;
+                    w.exercises.reduce((s, e) => s + (e.pain || 0), 0) / w.exercises.length;
                 return avgPain <= 2;
             });
             if (allLowPain) {
@@ -366,8 +353,7 @@ function getStreakWarning() {
     const yesterday = subtractDays(today, 1);
     if (!workoutDates.has(yesterday)) {
         return {
-            message:
-                'Last rest day this week — work out tomorrow to keep your streak!',
+            message: 'Last rest day this week — work out tomorrow to keep your streak!',
             urgency: 'alert',
         };
     }
@@ -443,9 +429,7 @@ function renderStreakCard() {
     const flameClass = getFlameClass(current, isRecovery);
     const flameInner = getFlameInnerHTML();
     const nextBadge = getNextBadge();
-    const earnedBadges = BADGES.filter((b) =>
-        streakData.achievements.includes(b.id)
-    );
+    const earnedBadges = BADGES.filter((b) => streakData.achievements.includes(b.id));
 
     // Progress bar to next badge
     let progressHTML = '';
@@ -565,9 +549,7 @@ function renderWarningBanner() {
     }
 
     const colorClass =
-        warning.urgency === 'recovery'
-            ? 'streak-warning--recovery'
-            : 'streak-warning--alert';
+        warning.urgency === 'recovery' ? 'streak-warning--recovery' : 'streak-warning--alert';
 
     banner.style.display = 'flex';
     banner.className = `streak-warning ${colorClass}`;
