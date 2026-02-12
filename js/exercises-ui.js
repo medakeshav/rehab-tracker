@@ -484,29 +484,47 @@ function collapseGroupCard(card, groupItem, activeExercise) {
     }
     saveDailyProgress();
 
-    // Animate collapse
-    card.classList.add('exercise-card--completing');
+    // --- Step 1: Lock height ---
+    const startHeight = card.offsetHeight;
+    card.style.height = startHeight + 'px';
+    card.classList.add('exercise-card--completing-flash');
 
-    setTimeout(() => {
-        card.classList.remove('exercise-card--completing');
-        card.classList.add('exercise-card--completed');
-        card.removeAttribute('data-group');
+    requestAnimationFrame(() => {
+        card.classList.add('exercise-card--collapsing');
 
-        card.innerHTML = `
-            <div class="completed-card-inner">
-                <span class="completed-checkmark">&#10003;</span>
-                <span class="completed-title">${groupItem.groupLabel}</span>
-                <span class="completed-expand-hint">tap to edit</span>
-            </div>
-        `;
+        // --- Step 2: Replace content after brief pause ---
+        setTimeout(() => {
+            card.removeAttribute('data-group');
+            card.innerHTML = `
+                <div class="completed-card-inner">
+                    <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="completed-title">${groupItem.groupLabel}</span>
+                    <span class="completed-expand-hint">tap to edit</span>
+                </div>
+            `;
 
-        card.setAttribute('data-group', groupItem.group);
+            card.style.height = '50px';
+            card.style.padding = '0 var(--space-xl)';
+            card.style.borderLeft = '4px solid var(--success-color)';
+            card.style.background = '#f0faf0';
+        }, 200);
 
-        card.addEventListener('click', function onExpand(_e) {
-            card.removeEventListener('click', onExpand);
-            expandGroupCard(card, groupItem);
-        });
-    }, 300);
+        // --- Step 3: Finalize ---
+        setTimeout(() => {
+            card.classList.remove('exercise-card--collapsing', 'exercise-card--completing-flash');
+            card.classList.add('exercise-card--completed');
+            card.style.height = '';
+            card.style.padding = '';
+            card.style.borderLeft = '';
+            card.style.background = '';
+            card.setAttribute('data-group', groupItem.group);
+
+            card.addEventListener('click', function onExpand(_e) {
+                card.removeEventListener('click', onExpand);
+                expandGroupCard(card, groupItem);
+            });
+        }, 700);
+    });
 
     playCompletionSound();
     showCompletionToast(activeExercise);
@@ -515,7 +533,7 @@ function collapseGroupCard(card, groupItem, activeExercise) {
 
     setTimeout(() => {
         scrollToNextIncomplete(card);
-    }, 450);
+    }, 800);
 }
 
 /**
@@ -542,14 +560,39 @@ function expandGroupCard(card, groupItem) {
         safeSetItem('balanceLevel', completedExercise.progressionLevel);
     }
 
-    // Rebuild card
+    // --- Step 1: Lock collapsed height ---
+    const collapsedHeight = card.offsetHeight;
+    card.style.height = collapsedHeight + 'px';
+    card.style.overflow = 'hidden';
+
+    // --- Step 2: Measure target height off-screen ---
+    const measureCard = createGroupedExerciseCard(groupItem);
+    measureCard.style.position = 'absolute';
+    measureCard.style.visibility = 'hidden';
+    measureCard.style.width = card.offsetWidth + 'px';
+    document.body.appendChild(measureCard);
+    const targetHeight = measureCard.offsetHeight;
+    document.body.removeChild(measureCard);
+
+    // --- Step 3: Replace with full card, start at collapsed height ---
     const newCard = createGroupedExerciseCard(groupItem);
     newCard.classList.add('exercise-card--expanding');
+    newCard.style.height = collapsedHeight + 'px';
+    newCard.style.overflow = 'hidden';
     card.replaceWith(newCard);
 
+    // --- Step 4: Animate to full height ---
+    requestAnimationFrame(() => {
+        newCard.style.height = targetHeight + 'px';
+        newCard.classList.add('exercise-card--expand-reveal');
+    });
+
+    // --- Step 5: Finalize ---
     setTimeout(() => {
-        newCard.classList.remove('exercise-card--expanding');
-    }, 300);
+        newCard.classList.remove('exercise-card--expanding', 'exercise-card--expand-reveal');
+        newCard.style.height = '';
+        newCard.style.overflow = '';
+    }, 500);
 
     // Restore saved input values
     const activeExercise = groupItem.exercises[balanceLevel - 1];
@@ -657,39 +700,62 @@ function collapseCard(card, exercise) {
     }
     saveDailyProgress();
 
-    // Animate collapse
-    card.classList.add('exercise-card--completing');
+    // --- Step 1: Lock the current height so CSS transition has a start value ---
+    const startHeight = card.offsetHeight;
+    card.style.height = startHeight + 'px';
 
-    setTimeout(() => {
-        card.classList.remove('exercise-card--completing');
-        card.classList.add('exercise-card--completed');
+    // Flash green briefly
+    card.classList.add('exercise-card--completing-flash');
 
-        const exerciseName = exercise.name;
-        const data = dailyProgress.exerciseData[exercise.id];
-        let repSummary = '';
-        if (data) {
-            if (exercise.bilateral) {
-                repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
-            } else {
-                repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+    // --- Step 2: After a brief pause (flash visible), begin the height collapse ---
+    requestAnimationFrame(() => {
+        card.classList.add('exercise-card--collapsing');
+
+        // Replace content with completed state while collapsing
+        setTimeout(() => {
+            const exerciseName = exercise.name;
+            const data = dailyProgress.exerciseData[exercise.id];
+            let repSummary = '';
+            if (data) {
+                if (exercise.bilateral) {
+                    repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
+                } else {
+                    repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+                }
             }
-        }
 
-        card.innerHTML = `
-            <div class="completed-card-inner">
-                <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                <span class="completed-title">${exerciseName}</span>
-                ${repSummary}
-                <span class="completed-expand-hint">tap to edit</span>
-            </div>
-        `;
+            card.innerHTML = `
+                <div class="completed-card-inner">
+                    <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="completed-title">${exerciseName}</span>
+                    ${repSummary}
+                    <span class="completed-expand-hint">tap to edit</span>
+                </div>
+            `;
 
-        // Add click-to-expand handler on the collapsed card
-        card.addEventListener('click', function onExpand(_e) {
-            card.removeEventListener('click', onExpand);
-            expandCard(card, exercise);
-        });
-    }, 300);
+            // Animate to completed height
+            card.style.height = '50px';
+            card.style.padding = '0 var(--space-xl)';
+            card.style.borderLeft = '4px solid var(--success-color)';
+            card.style.background = '#f0faf0';
+        }, 200);
+
+        // --- Step 3: After transition completes, finalize ---
+        setTimeout(() => {
+            card.classList.remove('exercise-card--collapsing', 'exercise-card--completing-flash');
+            card.classList.add('exercise-card--completed');
+            card.style.height = '';
+            card.style.padding = '';
+            card.style.borderLeft = '';
+            card.style.background = '';
+
+            // Add click-to-expand handler on the collapsed card
+            card.addEventListener('click', function onExpand(_e) {
+                card.removeEventListener('click', onExpand);
+                expandCard(card, exercise);
+            });
+        }, 700);
+    });
 
     // Play sound and show toast
     playCompletionSound();
@@ -704,7 +770,7 @@ function collapseCard(card, exercise) {
     // Auto-scroll to next incomplete card
     setTimeout(() => {
         scrollToNextIncomplete(card);
-    }, 450);
+    }, 800);
 }
 
 // ========== Card Expand (Undo Complete) ==========
@@ -722,14 +788,41 @@ function expandCard(card, exercise) {
     );
     saveDailyProgress();
 
-    // Rebuild the card completely from scratch (guarantees pickers + listeners work)
-    const newCard = createExerciseCard(exercise, 0);
-    newCard.classList.add('exercise-card--expanding');
-    card.replaceWith(newCard);
+    // --- Step 1: Lock collapsed height ---
+    const collapsedHeight = card.offsetHeight;
+    card.style.height = collapsedHeight + 'px';
+    card.style.overflow = 'hidden';
 
+    // --- Step 2: Build the new full card off-screen to measure its height ---
+    const newCard = createExerciseCard(exercise, 0);
+    newCard.style.position = 'absolute';
+    newCard.style.visibility = 'hidden';
+    newCard.style.width = card.offsetWidth + 'px';
+    document.body.appendChild(newCard);
+    const targetHeight = newCard.offsetHeight;
+    document.body.removeChild(newCard);
+
+    // --- Step 3: Replace the card content in-place ---
+    const fullCard = createExerciseCard(exercise, 0);
+    fullCard.classList.add('exercise-card--expanding');
+    fullCard.style.height = collapsedHeight + 'px';
+    fullCard.style.overflow = 'hidden';
+    card.replaceWith(fullCard);
+
+    // --- Step 4: Animate to full height ---
+    requestAnimationFrame(() => {
+        fullCard.style.height = targetHeight + 'px';
+
+        // Content reveal animation
+        fullCard.classList.add('exercise-card--expand-reveal');
+    });
+
+    // --- Step 5: Finalize after transition ---
     setTimeout(() => {
-        newCard.classList.remove('exercise-card--expanding');
-    }, 300);
+        fullCard.classList.remove('exercise-card--expanding', 'exercise-card--expand-reveal');
+        fullCard.style.height = '';
+        fullCard.style.overflow = '';
+    }, 500);
 
     // Restore saved input values (pickers, pain, notes)
     restoreExerciseData(exercise);

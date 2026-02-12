@@ -359,15 +359,40 @@ body {
     background: #f0faf0;
 }
 
-/* Completing animation */
-.exercise-card--completing {
-    transform: scale(0.95);
-    opacity: 0.7;
+/* ---- Card Collapse Animation (Mark Complete) ---- */
+.exercise-card--collapsing {
+    overflow: hidden;
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s ease,
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.5s ease,
+                border-left 0.3s ease;
 }
 
-/* Expanding animation */
+/* Flash green on completion */
+.exercise-card--completing-flash {
+    background-color: rgba(39, 174, 96, 0.12) !important;
+    border-left: 4px solid var(--success-color);
+}
+
+/* ---- Card Expand Animation (Tap to Edit) ---- */
 .exercise-card--expanding {
-    animation: cardExpand var(--transition-slow) forwards;
+    overflow: hidden;
+    transition: height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.45s ease,
+                border-left 0.3s ease;
+}
+
+/* Fade-in for new content after expand */
+.exercise-card--expand-reveal .exercise-header,
+.exercise-card--expand-reveal .exercise-inputs,
+.exercise-card--expand-reveal .exercise-actions,
+.exercise-card--expand-reveal .progression-note {
+    animation: contentFadeUp 0.35s ease 0.15s both;
 }
 
 .completed-card-inner {
@@ -375,6 +400,7 @@ body {
     align-items: center;
     height: 50px;
     gap: var(--space-md);
+    animation: completedSlideIn 0.35s ease 0.1s both;
 }
 
 .completed-checkmark {
@@ -2595,6 +2621,30 @@ body {
     }
 }
 
+/* Content items fade up into view after card expands */
+@keyframes contentFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Completed card inner slides in */
+@keyframes completedSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 @keyframes celebrationPulse {
     0%,
     100% {
@@ -2856,6 +2906,10 @@ body.dark .exercise-card {
 body.dark .exercise-card--completed {
     background: #1a2e1a;
     border-left-color: var(--success-color);
+}
+
+body.dark .exercise-card--completing-flash {
+    background-color: rgba(39, 174, 96, 0.15) !important;
 }
 
 /* ---- Date Selector & Phase Info ---- */
