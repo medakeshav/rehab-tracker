@@ -67,15 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
  * load exercises, and update UI to reflect current state.
  */
 function initializeApp() {
-    // Set current date display on home screen
-    const today = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-    document.getElementById('currentDate').textContent = today;
-
     // Set workout date input to today
     document.getElementById('workoutDate').valueAsDate = new Date();
 
@@ -203,8 +194,14 @@ function setupScrollToTop() {
     const scrollBtn = document.getElementById('scrollToTopBtn');
     if (!scrollBtn) return;
 
-    // Show/hide button based on scroll position
+    // Show/hide button based on scroll position (hidden on home screen)
     window.addEventListener('scroll', function () {
+        const homeScreen = document.getElementById('homeScreen');
+        if (homeScreen && homeScreen.classList.contains('active')) {
+            scrollBtn.classList.remove('visible');
+            return;
+        }
+
         const scrollThreshold = document.documentElement.scrollHeight * 0.25;
         const scrollPosition = window.scrollY;
 

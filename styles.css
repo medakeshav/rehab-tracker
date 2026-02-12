@@ -259,7 +259,6 @@ body {
    ============================================================ */
 
 /* Generic card styles */
-.welcome-card,
 .stats-card,
 .phase-selector,
 .export-card,
@@ -269,16 +268,6 @@ body {
     padding: var(--space-xl);
     margin-bottom: var(--space-xl);
     box-shadow: var(--shadow-sm);
-}
-
-.welcome-card h2 {
-    color: var(--primary-color);
-    margin-bottom: var(--space-md);
-}
-
-.current-date {
-    color: var(--text-light);
-    font-size: var(--font-size-base);
 }
 
 /* Phase Cards */
@@ -2183,7 +2172,6 @@ body.dark .menu-item:hover {
 }
 
 /* ---- Cards (generic) ---- */
-body.dark .welcome-card,
 body.dark .stats-card,
 body.dark .phase-selector,
 body.dark .export-card,
@@ -2365,6 +2353,25 @@ body.dark .sets-radio-btn.active {
     background: #4caf50;
     color: white;
     border-color: #43a047;
+}
+
+/* ---- Balance Level Buttons ---- */
+body.dark .balance-level-btn {
+    background: #2d2d2d;
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+body.dark .balance-level-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* ---- Progression Note ---- */
+body.dark .progression-note {
+    background: #2d2d2d;
+    color: var(--text-dark);
 }
 
 /* ---- Pain Slider ---- */

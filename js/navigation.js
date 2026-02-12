@@ -73,6 +73,12 @@ function showScreen(screenName, useSlideBack) {
         screenHistory.push(screenName);
     }
 
+    // Hide scroll-to-top button on home screen
+    const scrollBtn = document.getElementById('scrollToTopBtn');
+    if (scrollBtn && screenName === 'home') {
+        scrollBtn.classList.remove('visible');
+    }
+
     // Special actions for certain screens
     if (screenName === 'history' && onHistoryScreen) {
         onHistoryScreen();

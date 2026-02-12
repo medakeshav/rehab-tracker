@@ -69,9 +69,30 @@
         <div class="container" id="mainContainer" role="main">
             <!-- HOME SCREEN -->
             <div class="screen active" id="homeScreen">
-                <div class="welcome-card">
-                    <h2>Welcome Back! 👋</h2>
-                    <p class="current-date" id="currentDate"></p>
+                <!-- Streak Warning Banner -->
+                <div id="streakWarning" class="streak-warning" style="display: none"></div>
+
+                <!-- Streak Card -->
+                <div class="streak-card" id="streakCard">
+                    <!-- Rendered dynamically by streak.js -->
+                </div>
+
+                <!-- Quick Stats (compact) -->
+                <div class="stats-card stats-card--compact">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalWorkouts">0</div>
+                            <div class="stat-label">Workouts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="currentStreak">0</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="currentWeek">1</div>
+                            <div class="stat-label">Current Week</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="phase-selector">
@@ -134,32 +155,6 @@
                     >
                         📅 Monthly Assessment
                     </button>
-                </div>
-
-                <!-- Streak Warning Banner -->
-                <div id="streakWarning" class="streak-warning" style="display: none"></div>
-
-                <!-- Streak Card -->
-                <div class="streak-card" id="streakCard">
-                    <!-- Rendered dynamically by streak.js -->
-                </div>
-
-                <!-- Quick Stats (compact) -->
-                <div class="stats-card stats-card--compact">
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalWorkouts">0</div>
-                            <div class="stat-label">Workouts</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="currentStreak">0</div>
-                            <div class="stat-label">Day Streak</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="currentWeek">1</div>
-                            <div class="stat-label">Current Week</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
