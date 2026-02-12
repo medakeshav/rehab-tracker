@@ -11,7 +11,6 @@
 
 import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
 import { showToast } from './utils.js';
-import { getCategoryIcon } from './icons.js';
 import { createWheelPicker, getPickerValue } from './wheel-picker.js';
 import {
     currentPhase,
@@ -122,7 +121,6 @@ function createCompletedCard(exercise, index, total) {
 
     card.innerHTML = `
         <div class="completed-card-inner">
-            <span class="exercise-number-badge">${index + 1}</span>
             <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             <span class="completed-title">${exercise.name}</span>
             ${repSummary}
@@ -158,14 +156,9 @@ function createExerciseCard(exercise, index, total) {
         progressionNote = `<div class="progression-note">${PROGRESSION_TEXTS[exercise.progressionLevel]}</div>`;
     }
 
-    // Category icon
-    const catIcon = exercise.category ? `<span class="exercise-card-category-icon">${getCategoryIcon(exercise.category, 16)}</span>` : '';
-
     card.innerHTML = `
         ${progressionNote}
         <div class="exercise-header">
-            <span class="exercise-number-badge">${(index || 0) + 1}</span>
-            ${catIcon}
             <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
             <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
         </div>
@@ -436,7 +429,6 @@ function createCompletedGroupCard(groupItem, index, total) {
 
     card.innerHTML = `
         <div class="completed-card-inner">
-            <span class="exercise-number-badge">${(index || 0) + 1}</span>
             <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             <span class="completed-title">${groupItem.groupLabel}</span>
             ${repSummary}

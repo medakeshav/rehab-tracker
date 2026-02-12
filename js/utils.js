@@ -87,7 +87,7 @@ function showToast(message, type = 'success') {
 // ========== Custom Confirm Dialog ==========
 
 /**
- * Show an iOS-style confirmation dialog (replaces window.confirm).
+ * Show a custom overlay confirmation dialog (no native <dialog>).
  * @param {string} title - Dialog heading
  * @param {string} message - Body text / warning
  * @param {string} confirmText - Label for the confirm button
@@ -95,29 +95,46 @@ function showToast(message, type = 'success') {
  * @param {boolean} [isDestructive=false] - If true, confirm button is styled red
  */
 function showConfirmDialog(title, message, confirmText, onConfirm, isDestructive) {
-    const dialog = document.getElementById('confirmDialog');
-    dialog.querySelector('.confirm-dialog-title').textContent = title;
-    dialog.querySelector('.confirm-dialog-message').textContent = message;
+    // Remove any existing overlay
+    const existing = document.querySelector('.confirm-overlay');
+    if (existing) existing.remove();
 
-    const confirmBtn = dialog.querySelector('.confirm-dialog-confirm');
-    confirmBtn.textContent = confirmText;
-    confirmBtn.classList.toggle('destructive', !!isDestructive);
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
 
-    // Clone to remove old listeners
-    const newConfirm = confirmBtn.cloneNode(true);
-    confirmBtn.replaceWith(newConfirm);
+    const confirmClass = isDestructive ? 'confirm-dialog-confirm destructive' : 'confirm-dialog-confirm';
 
-    newConfirm.addEventListener('click', () => {
-        dialog.close();
+    overlay.innerHTML = `
+        <div class="confirm-dialog-box">
+            <div class="confirm-dialog-title">${title}</div>
+            <div class="confirm-dialog-message">${message}</div>
+            <div class="confirm-dialog-actions">
+                <button class="confirm-dialog-btn confirm-dialog-cancel">Cancel</button>
+                <button class="confirm-dialog-btn ${confirmClass}">${confirmText}</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Animate in
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+
+    function dismiss() {
+        overlay.classList.remove('visible');
+        setTimeout(() => overlay.remove(), 200);
+    }
+
+    overlay.querySelector('.confirm-dialog-cancel').addEventListener('click', dismiss);
+    overlay.querySelector('.confirm-dialog-confirm').addEventListener('click', () => {
+        dismiss();
         if (onConfirm) onConfirm();
     });
 
-    const cancelBtn = dialog.querySelector('.confirm-dialog-cancel');
-    const newCancel = cancelBtn.cloneNode(true);
-    cancelBtn.replaceWith(newCancel);
-    newCancel.addEventListener('click', () => dialog.close());
-
-    dialog.showModal();
+    // Close on backdrop click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) dismiss();
+    });
 }
 
 // ========== Date & Stats Helpers ==========
@@ -199,7 +216,6 @@ function selectPhase(phase) {
     updatePhaseInfo();
     if (reloadExercisesFromUtils) reloadExercisesFromUtils();
     showScreen('daily');
-    showToast('Phase ' + phase + ' selected!', 'success');
 }
 
 /**

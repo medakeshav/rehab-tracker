@@ -2059,8 +2059,25 @@ body {
    8. MODALS
    ============================================================ */
 
-/* Custom Confirm Dialog (native <dialog>) */
-.confirm-dialog {
+/* Custom Confirm Dialog (overlay-based) */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-dialog);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    padding: var(--space-xl);
+}
+
+.confirm-overlay.visible {
+    opacity: 1;
+}
+
+.confirm-dialog-box {
     background: white;
     border-radius: var(--radius-lg);
     width: 100%;
@@ -2069,10 +2086,6 @@ body {
     border: none;
     padding: 0;
     box-shadow: var(--shadow-lg);
-}
-
-.confirm-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.4);
 }
 
 .confirm-dialog-title {
@@ -3002,7 +3015,7 @@ body.dark .completion-toast {
 }
 
 /* ---- Confirm Dialog ---- */
-body.dark .confirm-dialog {
+body.dark .confirm-dialog-box {
     background: #2d2d2d;
 }
 
@@ -3088,8 +3101,8 @@ body.dark .exercise-target {
     background: #2d2d2d;
 }
 
-/* ---- Dialog Backdrop ---- */
-body.dark .confirm-dialog::backdrop {
+/* ---- Dialog Overlay ---- */
+body.dark .confirm-overlay {
     background: rgba(0, 0, 0, 0.6);
 }
 
