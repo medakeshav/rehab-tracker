@@ -95,8 +95,8 @@ function goBack() {
 // ========== Swipe-Back Gesture (iOS-style) ==========
 
 /**
- * Initialize edge-swipe-to-go-back gesture on the main container.
- * Detects a right-swipe starting near the left edge of the screen
+ * Initialize swipe-to-go-back gesture on the main container.
+ * Detects a right-swipe from anywhere on the screen
  * and triggers goBack() when the swipe exceeds a threshold.
  */
 function initSwipeBack() {
@@ -109,20 +109,31 @@ function initSwipeBack() {
     let isSwiping = false;
     let swipeLocked = false; // once we decide swipe vs scroll, lock it
 
-    const EDGE_ZONE = 40; // px from left edge to start swipe
-    const SWIPE_THRESHOLD = 80; // px to trigger back navigation
-    const ANGLE_THRESHOLD = 30; // max degrees from horizontal
+    const SWIPE_THRESHOLD = 100; // px to trigger back navigation
+    const ANGLE_THRESHOLD = 35; // max degrees from horizontal
 
     container.addEventListener(
         'touchstart',
         function (e) {
             const touch = e.touches[0];
-            // Only start if touch begins near left edge
-            if (touch.clientX > EDGE_ZONE) return;
 
             // Don't swipe on home screen
             const activeScreen = document.querySelector('.screen.active');
             if (!activeScreen || activeScreen.id === 'homeScreen') return;
+
+            // Don't swipe if touch started on an interactive element
+            const target = e.target;
+            const isInteractive =
+                target.closest('button') ||
+                target.closest('input') ||
+                target.closest('textarea') ||
+                target.closest('select') ||
+                target.closest('.wheel-picker') ||
+                target.closest('.pain-slider') ||
+                target.closest('.sets-radio-btn') ||
+                target.closest('.balance-level-btn');
+
+            if (isInteractive) return;
 
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
@@ -145,20 +156,24 @@ function initSwipeBack() {
             // Once locked, don't re-evaluate
             if (!swipeLocked) {
                 // Need some movement before deciding
-                if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+                if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
 
+                // Calculate angle to distinguish horizontal from vertical swipe
                 const angle = Math.abs(Math.atan2(dy, dx) * (180 / Math.PI));
+
+                // If mostly vertical, it's a scroll — abort swipe
                 if (angle > ANGLE_THRESHOLD && angle < 180 - ANGLE_THRESHOLD) {
-                    // Vertical scroll — abort swipe
                     touchStartX = 0;
                     swipeLocked = true;
                     return;
                 }
-                // Horizontal and going right — it's a swipe
-                if (dx > 0) {
+
+                // Horizontal and going right — it's a swipe back
+                if (dx > 15) {
                     isSwiping = true;
                     swipeLocked = true;
                 } else {
+                    // Swipe left or not enough movement
                     touchStartX = 0;
                     swipeLocked = true;
                     return;
@@ -176,7 +191,7 @@ function initSwipeBack() {
                 activeScreen.style.transform = `translateX(${offset}px)`;
                 activeScreen.style.transition = 'none';
                 // Dim slightly as it drags
-                activeScreen.style.opacity = Math.max(0.5, 1 - (offset / window.innerWidth) * 0.5);
+                activeScreen.style.opacity = Math.max(0.7, 1 - (offset / window.innerWidth) * 0.3);
             }
         },
         { passive: true }

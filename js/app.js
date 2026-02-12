@@ -126,6 +126,9 @@ function setupEventListeners() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('weeklyDate').value = today;
     document.getElementById('monthlyDate').value = today;
+
+    // Scroll to top button
+    setupScrollToTop();
 }
 
 // ========== Delegated Action Handler ==========
@@ -185,6 +188,36 @@ function setupDelegatedActions() {
 
         e.preventDefault();
         target.click();
+    });
+}
+
+// ========== Scroll to Top Button ==========
+
+/**
+ * Set up scroll-to-top button that appears after scrolling 25% of page height.
+ */
+function setupScrollToTop() {
+    const scrollBtn = document.getElementById('scrollToTopBtn');
+    if (!scrollBtn) return;
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', function () {
+        const scrollThreshold = document.documentElement.scrollHeight * 0.25;
+        const scrollPosition = window.scrollY;
+
+        if (scrollPosition > scrollThreshold) {
+            scrollBtn.classList.add('visible');
+        } else {
+            scrollBtn.classList.remove('visible');
+        }
+    });
+
+    // Scroll to top on click
+    scrollBtn.addEventListener('click', function () {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
     });
 }
 
