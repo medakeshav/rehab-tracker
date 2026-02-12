@@ -5,7 +5,7 @@
  * confetti celebrations, completion sounds, and toast messages.
  */
 
-import { getExercisesForPhase } from '../exercises.js';
+import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
 import { safeSetItem, showToast, showConfirmDialog } from './utils.js';
 import {
     currentPhase,
@@ -28,6 +28,30 @@ function setReloadExercises(fn) {
     reloadExercises = fn;
 }
 
+// ========== Progress Counting (group-aware) ==========
+
+/**
+ * Count completed vs total exercises, treating each group as a single exercise.
+ * @returns {{ total: number, done: number }}
+ */
+function getCompletionCount() {
+    const visibleExercises = getVisibleExercisesForPhase(currentPhase);
+    const total = visibleExercises.length;
+    let done = 0;
+    visibleExercises.forEach((item) => {
+        if (item.isGroup) {
+            if (item.exercises.some((ex) => dailyProgress.completedExercises.includes(ex.id))) {
+                done++;
+            }
+        } else {
+            if (dailyProgress.completedExercises.includes(item.id)) {
+                done++;
+            }
+        }
+    });
+    return { total, done };
+}
+
 // ========== Progress Bar ==========
 
 /**
@@ -37,9 +61,7 @@ function setReloadExercises(fn) {
  *   'C' = mini thumbnail circles for each exercise
  */
 function updateProgressBar() {
-    const phaseExercises = getExercisesForPhase(currentPhase);
-    const total = phaseExercises.length;
-    const done = dailyProgress.completedExercises.length;
+    const { total, done } = getCompletionCount();
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
     // Version A — Sticky Top Bar
@@ -62,20 +84,46 @@ function updateProgressBar() {
         }
     }
 
-    // Version C — Thumbnail Circles
+    // Version C — Thumbnail Circles (group-aware)
+    const visibleExercises = getVisibleExercisesForPhase(currentPhase);
     const barC = document.getElementById('progressBarC');
     if (barC) {
         if (PROGRESS_BAR_VERSION === 'C') {
             barC.style.display = 'flex';
             barC.innerHTML = '';
-            phaseExercises.forEach((exercise, index) => {
-                const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
+            visibleExercises.forEach((item, index) => {
+                let isCompleted, name;
+
+                if (item.isGroup) {
+                    isCompleted = item.exercises.some((ex) =>
+                        dailyProgress.completedExercises.includes(ex.id)
+                    );
+                    name = item.groupLabel;
+                } else {
+                    isCompleted = dailyProgress.completedExercises.includes(item.id);
+                    name = item.name;
+                }
+
                 const thumb = document.createElement('button');
                 thumb.className = 'progress-thumb' + (isCompleted ? ' completed' : '');
                 thumb.textContent = isCompleted ? '✓' : index + 1;
-                thumb.title = exercise.name;
+                thumb.title = name;
                 thumb.addEventListener('click', function () {
-                    scrollToExercise(exercise.id);
+                    if (item.isGroup) {
+                        // Scroll to the grouped card via data-group attribute
+                        const card = document.querySelector(
+                            `.exercise-card[data-group="${item.group}"]`
+                        );
+                        if (card) {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            card.style.boxShadow = '0 0 0 3px var(--primary-color)';
+                            setTimeout(() => {
+                                card.style.boxShadow = '';
+                            }, 1000);
+                        }
+                    } else {
+                        scrollToExercise(item.id);
+                    }
                 });
                 barC.appendChild(thumb);
             });
@@ -132,8 +180,7 @@ function clearDailyProgress() {
  * Check if all exercises are completed and trigger/hide celebration.
  */
 function checkAllComplete() {
-    const total = getExercisesForPhase(currentPhase).length;
-    const done = dailyProgress.completedExercises.length;
+    const { total, done } = getCompletionCount();
 
     if (done >= total && total > 0) {
         showCelebration();
@@ -262,8 +309,7 @@ function pickFreshMessage(pool) {
  * @returns {string} Encouraging message with emoji
  */
 function getCompletionMessage(exercise) {
-    const total = getExercisesForPhase(currentPhase).length;
-    const done = dailyProgress.completedExercises.length;
+    const { total, done } = getCompletionCount();
     const remaining = total - done;
     const pct = done / total;
     const data = exercise ? dailyProgress.exerciseData[exercise.id] : null;
@@ -355,8 +401,7 @@ function showCompletionToast(exercise) {
     const toast = document.createElement('div');
     toast.className = 'completion-toast';
 
-    const total = getExercisesForPhase(currentPhase).length;
-    const done = dailyProgress.completedExercises.length;
+    const { total, done } = getCompletionCount();
     toast.innerHTML = `<span class="completion-toast-msg">${getCompletionMessage(exercise)}</span><span class="completion-toast-count">${done}/${total}</span>`;
 
     document.body.appendChild(toast);

@@ -96,6 +96,8 @@ const exercises = {
             rightTarget: 45,
             sets: 3,
             category: 'Balance',
+            group: 'balance',
+            groupLabel: '4. Single-Leg Balance',
             progressionLevel: 1,
             instructions: {
                 title: 'Single-Leg Balance: Level 1 (Easiest)',
@@ -127,6 +129,8 @@ const exercises = {
             rightTarget: 45,
             sets: 3,
             category: 'Balance',
+            group: 'balance',
+            groupLabel: '4. Single-Leg Balance',
             progressionLevel: 2,
             instructions: {
                 title: 'Single-Leg Balance: Level 2',
@@ -157,6 +161,8 @@ const exercises = {
             rightTarget: 30,
             sets: 3,
             category: 'Balance',
+            group: 'balance',
+            groupLabel: '4. Single-Leg Balance',
             progressionLevel: 3,
             instructions: {
                 title: 'Single-Leg Balance: Level 3 (Intermediate)',
@@ -187,6 +193,8 @@ const exercises = {
             rightTarget: 22,
             sets: 3,
             category: 'Balance',
+            group: 'balance',
+            groupLabel: '4. Single-Leg Balance',
             progressionLevel: 4,
             instructions: {
                 title: 'Single-Leg Balance: Level 4 (Advanced)',
@@ -218,6 +226,8 @@ const exercises = {
             rightTarget: 22,
             sets: 3,
             category: 'Balance',
+            group: 'balance',
+            groupLabel: '4. Single-Leg Balance',
             progressionLevel: 5,
             instructions: {
                 title: 'Single-Leg Balance: Level 5 (Expert)',
@@ -683,4 +693,34 @@ function getExercisesForPhase(phase) {
     }
 }
 
-export { exercises, getExercisesForPhase };
+/**
+ * Return exercises for a phase with grouped exercises collapsed into
+ * a single descriptor object.  Non-grouped exercises pass through unchanged.
+ * Each group descriptor has the shape:
+ *   { isGroup: true, group: string, groupLabel: string, exercises: Exercise[] }
+ */
+function getVisibleExercisesForPhase(phase) {
+    const all = getExercisesForPhase(phase);
+    const result = [];
+    const seenGroups = new Set();
+
+    for (const ex of all) {
+        if (ex.group) {
+            if (!seenGroups.has(ex.group)) {
+                seenGroups.add(ex.group);
+                const groupMembers = all.filter((e) => e.group === ex.group);
+                result.push({
+                    isGroup: true,
+                    group: ex.group,
+                    groupLabel: ex.groupLabel,
+                    exercises: groupMembers,
+                });
+            }
+        } else {
+            result.push(ex);
+        }
+    }
+    return result;
+}
+
+export { exercises, getExercisesForPhase, getVisibleExercisesForPhase };

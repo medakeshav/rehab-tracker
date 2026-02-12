@@ -1037,6 +1037,64 @@ body {
     transform: scale(0.95);
 }
 
+/* Balance Level Selector */
+.balance-level-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.balance-level-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.balance-level-buttons {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.balance-level-btn {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-white);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-level-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.balance-level-btn:active {
+    transform: scale(0.95);
+}
+
+/* Progression Note (used by grouped balance card) */
+.progression-note {
+    background: var(--bg-light);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
 /* Pain Slider */
 .pain-slider {
     width: 100%;

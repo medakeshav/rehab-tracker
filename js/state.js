@@ -30,6 +30,10 @@ let PROGRESS_BAR_VERSION = safeGetItem('progressBarVersion', 'C');
 /** Dark mode state: true = dark, false = light (default) */
 let darkMode = safeGetItem('darkMode', false);
 
+/** @type {number} Currently selected balance progression level (1-5) */
+let balanceLevel = safeGetItem('balanceLevel', 1);
+if (typeof balanceLevel === 'string') balanceLevel = parseInt(balanceLevel) || 1;
+
 // ========== Daily Progress (completion tracking + input values) ==========
 
 /** @type {Object} Today's progress — resets automatically on new day */
@@ -223,6 +227,9 @@ function setProgressBarVersion(v) {
 function setDarkMode(v) {
     darkMode = v;
 }
+function setBalanceLevel(v) {
+    balanceLevel = v;
+}
 function setDailyProgress(v) {
     dailyProgress = v;
 }
@@ -234,6 +241,7 @@ export {
     monthlyData,
     PROGRESS_BAR_VERSION,
     darkMode,
+    balanceLevel,
     dailyProgress,
     loadDailyProgress,
     createFreshProgress,
@@ -248,5 +256,6 @@ export {
     setMonthlyData,
     setProgressBarVersion,
     setDarkMode,
+    setBalanceLevel,
     setDailyProgress,
 };
