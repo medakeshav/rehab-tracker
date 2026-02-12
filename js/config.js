@@ -170,4 +170,19 @@ export const CONFIG = {
     },
 };
 
+/**
+ * Category color mapping for exercise cards.
+ * Used by exercises-ui.js for visual differentiation.
+ */
+export const CATEGORY_COLORS = {
+    'Foot & Ankle': '#4472c4',
+    'Hip & Glute': '#e67e22',
+    Core: '#8e44ad',
+    Mobility: '#3498db',
+    'Balance & Stability': '#f1c40f',
+    Balance: '#f1c40f',
+    Strength: '#e74c3c',
+    Power: '#ff6b6b',
+};
+
 export default CONFIG;

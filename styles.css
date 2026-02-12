@@ -37,6 +37,26 @@
     --success-color: #27ae60;
     --warning-color: #f39c12;
 
+    /* App accent — consistent blue */
+    --phase-accent: #4472c4;
+    --phase-accent-dark: #2e5090;
+    --phase-accent-light: rgba(68, 114, 196, 0.1);
+
+    /* Data-type accent colors */
+    --color-reps: #27ae60;
+    --color-balance: #3498db;
+    --color-pain: #e67e22;
+    --color-analytics: #8e44ad;
+
+    /* Category colors */
+    --cat-foot: #4472c4;
+    --cat-hip: #e67e22;
+    --cat-core: #8e44ad;
+    --cat-mobility: #3498db;
+    --cat-balance: #f1c40f;
+    --cat-strength: #e74c3c;
+    --cat-power: #ff6b6b;
+
     /* Spacing */
     --space-xs: 4px;
     --space-sm: 8px;
@@ -65,23 +85,31 @@
     --z-toast: 1001;
     --z-completion-toast: 1002;
     --z-dialog: 2000;
+    --z-tabs: 110;
     --z-modal: 9999;
 
     /* Typography */
     --font-size-xs: 11px;
     --font-size-sm: 13px;
-    --font-size-base: 14px;
-    --font-size-md: 16px;
+    --font-size-base: 15px;
+    --font-size-md: 17px;
     --font-size-lg: 18px;
     --font-size-xl: 20px;
     --font-size-2xl: 24px;
     --font-size-3xl: 28px;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --letter-spacing-caps: 0.5px;
 
     /* Transitions */
     --transition-fast: 0.15s ease;
     --transition-base: 0.2s ease;
     --transition-slow: 0.3s ease;
 }
+
+/* Phase accent is a single consistent color across all phases */
 
 /* ============================================================
    2. RESET & BASE
@@ -163,7 +191,7 @@ body {
 
 /* Nav Bar */
 .nav-bar {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, var(--phase-accent), var(--phase-accent-dark));
     color: white;
     padding: 15px var(--space-xl);
     display: flex;
@@ -173,6 +201,7 @@ body {
     top: 0;
     z-index: var(--z-nav);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.4s ease;
 }
 
 .app-title {
@@ -459,10 +488,14 @@ body {
     font-size: var(--font-size-sm);
     color: var(--text-light);
     margin-top: 5px;
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
 }
 
 .stats-card--compact {
     padding: var(--space-md) var(--space-xl);
+    border-left: 4px solid var(--phase-accent);
 }
 
 .stats-card--compact .stats-grid {
@@ -511,7 +544,7 @@ body {
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
-    margin-bottom: 5px;
+    margin-bottom: var(--space-md);
 }
 
 /* Streak Header: Flame + Count | Best */
@@ -906,7 +939,9 @@ body {
 .streak-best {
     font-size: var(--font-size-sm);
     color: var(--text-light);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
 }
 
 /* Progress bar to next badge */
@@ -1697,7 +1732,7 @@ body {
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--success-color), #2ecc71);
+    background: linear-gradient(90deg, var(--phase-accent), var(--phase-accent-dark));
     border-radius: var(--space-xs);
     transition: width 0.4s ease;
 }
@@ -2660,7 +2695,7 @@ body {
    11b. DARK MODE
    ============================================================ */
 
-/* Override design tokens for dark theme */
+/* Override design tokens for dark theme — blue-tinted surfaces */
 body.dark {
     --primary-color: #5b8dd9;
     --primary-dark: #4472c4;
@@ -2668,9 +2703,9 @@ body.dark {
     --danger-color: #ff6b6b;
     --text-dark: #e8e8e8;
     --text-light: #a0a0a0;
-    --bg-light: #121212;
-    --bg-white: #1e1e1e;
-    --border-color: #333333;
+    --bg-light: #0f1218;
+    --bg-white: #1a1d24;
+    --border-color: #3a3d45;
     --success-color: #4ade80;
     --warning-color: #fbbf24;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -3194,6 +3229,9 @@ body.dark .mark-complete-btn:focus-visible {
     font-size: var(--font-size-xs);
     color: var(--text-secondary);
     margin-top: 2px;
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
     line-height: 1.2;
 }
 
@@ -3358,7 +3396,877 @@ body.dark-mode .analytics-dropdown {
 
 /* Responsive: stack summary cards on very small screens */
 @media (max-width: 360px) {
-    .analytics-summary-row {
+    .analytics-summary-row:not(.analytics-summary-row--2x2) {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* ============================================================
+   NEW: Bottom Tab Bar
+   ============================================================ */
+.bottom-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: var(--z-tabs);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0;
+    color: var(--text-light);
+    transition: color var(--transition-fast);
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-tab.active {
+    color: var(--phase-accent);
+}
+
+.bottom-tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
+}
+
+.bottom-tab-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.bottom-tab-label {
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.2px;
+}
+
+.bottom-tab.active .bottom-tab-icon {
+    transform: scale(1.1);
+    transition: transform var(--transition-fast);
+}
+
+/* Add padding to container so content doesn't hide behind tab bar */
+.container {
+    padding-bottom: 76px !important;
+}
+
+/* ============================================================
+   NEW: Greeting Banner
+   ============================================================ */
+.greeting-banner {
+    background: linear-gradient(135deg, var(--phase-accent), var(--phase-accent-dark));
+    color: white;
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl)) var(--space-lg);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    transition: background 0.4s ease;
+}
+
+.greeting-text {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 4px;
+}
+
+.greeting-sub {
+    font-size: var(--font-size-base);
+    opacity: 0.85;
+}
+
+/* ============================================================
+   NEW: Section Headings
+   ============================================================ */
+.section-heading {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-caps);
+    margin: var(--space-xl) 0 var(--space-sm);
+}
+
+/* ============================================================
+   NEW: Icon-Forward Action Cards
+   ============================================================ */
+.action-card-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl) var(--space-lg);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card-btn:active {
+    transform: scale(0.97);
+}
+
+.action-card-btn--primary {
+    background: linear-gradient(135deg, var(--phase-accent-light), rgba(255, 255, 255, 0.9));
+    border-color: var(--phase-accent);
+    margin-bottom: var(--space-md);
+}
+
+.action-card-btn--primary .action-card-icon {
+    color: var(--phase-accent);
+}
+
+.action-card-btn--secondary {
+    padding: var(--space-lg) var(--space-md);
+}
+
+.action-card-btn--secondary .action-card-icon {
+    color: var(--text-light);
+}
+
+.action-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-card-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.action-card-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+}
+
+.quick-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+/* ============================================================
+   NEW: Assessments Hub
+   ============================================================ */
+.assess-hub-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.assess-hub-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    text-align: left;
+    width: 100%;
+}
+
+.assess-hub-card:active {
+    transform: scale(0.98);
+    box-shadow: var(--shadow-md);
+}
+
+.assess-hub-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: var(--radius-md);
+    background: var(--phase-accent-light);
+    color: var(--phase-accent);
+}
+
+.assess-hub-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.assess-hub-info {
+    flex: 1;
+}
+
+.assess-hub-info h3 {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+.assess-hub-info p {
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.assess-hub-hint {
+    font-size: var(--font-size-xs);
+    color: var(--phase-accent);
+    font-weight: var(--font-weight-medium);
+}
+
+.assess-hub-arrow {
+    color: var(--text-light);
+}
+
+.assess-hub-arrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+.assess-hub-previous {
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+}
+
+/* ============================================================
+   NEW: Segmented Control (History Tabs)
+   ============================================================ */
+.history-tabs {
+    position: relative;
+    display: flex;
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    margin-bottom: var(--space-lg);
+    overflow: hidden;
+}
+
+.history-tabs .tab-btn {
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    background: transparent;
+    border-radius: calc(var(--radius-md) - 2px);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    z-index: 1;
+    position: relative;
+}
+
+.history-tabs .tab-btn.active {
+    background: var(--bg-white);
+    color: var(--phase-accent);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   NEW: History Date Headers & Summary Stats
+   ============================================================ */
+.history-date-header {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-caps);
+    padding: var(--space-lg) 0 var(--space-sm);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--space-sm);
+}
+
+.history-summary-stats {
+    display: flex;
+    gap: var(--space-lg);
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+}
+
+.history-summary-stats strong {
+    color: var(--phase-accent);
+    font-weight: var(--font-weight-semibold);
+}
+
+.history-empty-state {
+    text-align: center;
+    padding: 60px var(--space-xl);
+    color: var(--text-light);
+}
+
+.history-empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: var(--space-lg);
+    opacity: 0.4;
+}
+
+.history-empty-state p {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--space-sm);
+}
+
+.history-empty-state span {
+    font-size: var(--font-size-sm);
+}
+
+/* Phase color dot on history cards */
+.history-phase-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    margin-right: 4px;
+}
+
+/* ============================================================
+   NEW: Pain Slider Labels
+   ============================================================ */
+.pain-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+    margin-top: 2px;
+    padding: 0 2px;
+}
+
+/* ============================================================
+   NEW: Instruction Accordions
+   ============================================================ */
+.instruction-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    user-select: none;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    padding: 0;
+    margin: 0;
+}
+
+.instruction-card-icon {
+    display: flex;
+    align-items: center;
+    color: var(--phase-accent);
+}
+
+.instruction-card-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.instruction-card-arrow {
+    margin-left: auto;
+    color: var(--text-light);
+    transition: transform var(--transition-base);
+}
+
+.instruction-card-arrow svg {
+    width: 18px;
+    height: 18px;
+}
+
+.instruction-card.collapsed .instruction-card-body {
+    display: none;
+}
+
+.instruction-card.collapsed .instruction-card-arrow {
+    transform: rotate(-90deg);
+}
+
+.instruction-card-body {
+    margin-top: var(--space-md);
+}
+
+/* Color-coded left borders for instruction cards */
+.instruction-card--howto {
+    border-left: 4px solid var(--success-color);
+}
+
+.instruction-card--pain {
+    border-left: 4px solid var(--warning-color);
+}
+
+.instruction-card--danger {
+    border-left: 4px solid var(--danger-color);
+}
+
+.instruction-card--contact {
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Contact links */
+.contact-list li {
+    margin-bottom: var(--space-md);
+}
+
+.contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--phase-accent);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    padding: 4px 0;
+}
+
+.contact-link:hover {
+    text-decoration: underline;
+}
+
+.contact-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ============================================================
+   NEW: Export Data Preview
+   ============================================================ */
+.export-data-preview {
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    text-align: center;
+}
+
+.export-card-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+    color: var(--phase-accent);
+}
+
+.export-card-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.export-card--danger .export-card-icon {
+    color: var(--danger-color);
+}
+
+/* ============================================================
+   NEW: Exercise Card Category Color Strip
+   ============================================================ */
+.exercise-card[data-category="Foot & Ankle"] {
+    border-left: 4px solid var(--cat-foot);
+}
+
+.exercise-card[data-category="Hip & Glute"] {
+    border-left: 4px solid var(--cat-hip);
+}
+
+.exercise-card[data-category="Core"] {
+    border-left: 4px solid var(--cat-core);
+}
+
+.exercise-card[data-category="Mobility"] {
+    border-left: 4px solid var(--cat-mobility);
+}
+
+.exercise-card[data-category="Balance"],
+.exercise-card[data-category="Balance & Stability"] {
+    border-left: 4px solid var(--cat-balance);
+}
+
+.exercise-card[data-category="Strength"] {
+    border-left: 4px solid var(--cat-strength);
+}
+
+.exercise-card[data-category="Power"] {
+    border-left: 4px solid var(--cat-power);
+}
+
+.exercise-card-category-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.exercise-card-category-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.exercise-number-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    background: var(--bg-light);
+    color: var(--text-light);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.exercise-rep-summary {
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+    background: var(--bg-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+/* ============================================================
+   NEW: Analytics 2x2 Grid
+   ============================================================ */
+.analytics-summary-row--2x2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-md);
+}
+
+.analytics-summary-row--2x2 .analytics-stat-card {
+    min-height: 80px;
+}
+
+/* Trend pills */
+.analytics-stat-trend.positive {
+    background: rgba(39, 174, 96, 0.12);
+    color: var(--success-color);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.analytics-stat-trend.negative {
+    background: rgba(231, 76, 60, 0.12);
+    color: var(--danger-color);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.analytics-stat-trend.neutral {
+    color: var(--text-light);
+}
+
+/* ============================================================
+   NEW: Button Ripple Effect
+   ============================================================ */
+.action-btn,
+.save-btn,
+.mark-complete-btn,
+.bottom-tab,
+.action-card-btn,
+.assess-hub-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::after,
+.save-btn::after,
+.mark-complete-btn::after,
+.action-card-btn::after,
+.assess-hub-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.action-btn:active::after,
+.save-btn:active::after,
+.mark-complete-btn:active::after,
+.action-card-btn:active::after,
+.assess-hub-card:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+}
+
+/* ============================================================
+   NEW: Screen Transitions
+   ============================================================ */
+.screen.fade-in {
+    animation: screenFadeIn 0.2s ease-out;
+}
+
+@keyframes screenFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   NEW: Skeleton Loading
+   ============================================================ */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-light) 25%, #e8e8e8 50%, var(--bg-light) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   NEW: Checkmark Draw Animation
+   ============================================================ */
+.check-draw svg {
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: checkDraw 0.4s ease forwards;
+}
+
+@keyframes checkDraw {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ============================================================
+   NEW: Glassmorphism Stats Card
+   ============================================================ */
+.stats-card--compact {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* ============================================================
+   NEW: Subtle Background Gradient
+   ============================================================ */
+body {
+    background: linear-gradient(180deg, var(--phase-accent-light) 0%, var(--bg-light) 15%, var(--bg-light) 100%);
+    transition: background 0.4s ease;
+}
+
+/* ============================================================
+   NEW: Menu Item Icons
+   ============================================================ */
+.menu-item-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.menu-item-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ============================================================
+   NEW: Assessment Previous Values
+   ============================================================ */
+.previous-value {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+    margin-top: 2px;
+    font-style: italic;
+}
+
+/* ============================================================
+   NEW: Assessment Section Progress Dots
+   ============================================================ */
+.assessment-progress-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-md);
+}
+
+.assessment-progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--border-color);
+    transition: background var(--transition-base);
+}
+
+.assessment-progress-dot.filled {
+    background: var(--phase-accent);
+}
+
+/* ============================================================
+   DARK MODE — New Components
+   ============================================================ */
+body.dark .bottom-tabs {
+    background: #1a1d24;
+    border-color: #3a3d45;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .bottom-tab {
+    color: #888;
+}
+
+body.dark .bottom-tab.active {
+    color: var(--phase-accent);
+}
+
+body.dark .greeting-banner {
+    background: linear-gradient(135deg, var(--phase-accent-dark), rgba(0, 0, 0, 0.4));
+}
+
+body.dark .section-heading {
+    color: #888;
+}
+
+body.dark .action-card-btn {
+    background: #1a1d24;
+    border-color: #3a3d45;
+}
+
+body.dark .action-card-btn--primary {
+    background: linear-gradient(135deg, rgba(var(--phase-accent), 0.1), #1a1d24);
+    border-color: var(--phase-accent-dark);
+}
+
+body.dark .action-card-label {
+    color: #e0e0e0;
+}
+
+body.dark .assess-hub-card {
+    background: #1a1d24;
+    border-color: #3a3d45;
+}
+
+body.dark .assess-hub-info h3 {
+    color: #e0e0e0;
+}
+
+body.dark .assess-hub-icon {
+    background: var(--phase-accent-light);
+}
+
+body.dark .assess-hub-previous {
+    background: #252830;
+}
+
+body.dark .history-tabs {
+    background: #252830;
+}
+
+body.dark .history-tabs .tab-btn.active {
+    background: #1a1d24;
+}
+
+body.dark .history-date-header {
+    border-color: #3a3d45;
+}
+
+body.dark .instruction-card-header {
+    color: #e0e0e0;
+}
+
+body.dark .contact-link {
+    color: var(--phase-accent);
+}
+
+body.dark .export-data-preview {
+    background: #252830;
+}
+
+body.dark .stats-card--compact {
+    background: rgba(26, 29, 36, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+body.dark .exercise-number-badge {
+    background: #252830;
+    color: #888;
+}
+
+body.dark .exercise-rep-summary {
+    background: #252830;
+}
+
+body.dark .skeleton {
+    background: linear-gradient(90deg, #252830 25%, #3a3d45 50%, #252830 75%);
+    background-size: 200% 100%;
+}
+
+body.dark .pain-labels {
+    color: #888;
+}
+
+body.dark .previous-value {
+    color: #888;
+}
+
+body.dark .assessment-progress-dot {
+    background: #3a3d45;
+}
+
+/* ============================================================
+   DARK MODE — Refined Surfaces (Phase 11)
+   ============================================================ */
+body.dark {
+    background: linear-gradient(180deg, rgba(68, 114, 196, 0.05) 0%, #0f1218 15%, #0f1218 100%);
+}
+
+body.dark .nav-bar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Slightly brighter blue accent for dark mode */
+body.dark {
+    --phase-accent: #5b8dd9;
+    --phase-accent-dark: #4472c4;
+    --phase-accent-light: rgba(91, 141, 217, 0.12);
+}
+
+/* Accent glow on interactive elements in dark mode */
+body.dark .wheel-picker.active {
+    box-shadow: 0 0 0 2px var(--phase-accent), 0 0 12px rgba(68, 114, 196, 0.25);
+}
+
+body.dark .analytics-stat-trend.positive {
+    background: rgba(39, 174, 96, 0.2);
+}
+
+body.dark .analytics-stat-trend.negative {
+    background: rgba(231, 76, 60, 0.2);
+}
+
+/* History card phase dot colors in dark */
+body.dark .history-phase-dot {
+    opacity: 0.9;
 }

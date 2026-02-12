@@ -29,38 +29,28 @@
                 <button class="menu-close-btn" id="closeMenuBtn" aria-label="Close menu">✕</button>
             </div>
             <div class="menu-items">
-                <button class="menu-item" data-action="navigate" data-screen="home">🏠 Home</button>
                 <button class="menu-item" data-action="navigate" data-screen="daily">
-                    📝 Daily Workout
-                </button>
-                <button class="menu-item" data-action="navigate" data-screen="weekly">
-                    📊 Weekly Assessment
-                </button>
-                <button class="menu-item" data-action="navigate" data-screen="monthly">
-                    📅 Monthly Assessment
-                </button>
-                <button class="menu-item" data-action="navigate" data-screen="history">
-                    📈 History
+                    <span class="menu-item-icon" data-icon="dumbbell"></span> Daily Workout
                 </button>
                 <button class="menu-item" data-action="navigate" data-screen="export">
-                    💾 Export Data
+                    <span class="menu-item-icon" data-icon="download"></span> Export Data
                 </button>
                 <button class="menu-item" data-action="navigate" data-screen="instructions">
-                    ℹ️ Instructions
+                    <span class="menu-item-icon" data-icon="info"></span> Instructions
                 </button>
                 <hr />
                 <button class="menu-item" id="soundToggleBtn" data-action="toggle-sound">
-                    🔊 Sound: ON
+                    <span class="menu-item-icon" data-icon="settings"></span> Sound: ON
                 </button>
                 <button
                     class="menu-item"
                     id="progressBarToggleBtn"
                     data-action="toggle-progress-bar"
                 >
-                    📊 Progress: Circles
+                    <span class="menu-item-icon" data-icon="target"></span> Progress: Circles
                 </button>
                 <button class="menu-item" id="darkModeToggleBtn" data-action="toggle-dark-mode">
-                    🌙 Theme: Light
+                    <span class="menu-item-icon" data-icon="moon"></span> Theme: Light
                 </button>
             </div>
         </div>
@@ -69,6 +59,12 @@
         <div class="container" id="mainContainer" role="main">
             <!-- HOME SCREEN -->
             <div class="screen active" id="homeScreen">
+                <!-- Greeting Banner -->
+                <div class="greeting-banner" id="greetingBanner">
+                    <div class="greeting-text" id="greetingText">Welcome Back!</div>
+                    <div class="greeting-sub" id="greetingSub">Ready to keep building strength?</div>
+                </div>
+
                 <!-- Streak Warning Banner -->
                 <div id="streakWarning" class="streak-warning" style="display: none"></div>
 
@@ -77,10 +73,13 @@
                     <!-- Rendered dynamically by streak.js -->
                 </div>
 
+                <!-- Section Heading: Progress -->
+                <h3 class="section-heading">Your Progress</h3>
+
                 <!-- Quick Stats (compact) — tap to open analytics -->
                 <div
                     class="stats-card stats-card--compact stats-card--tappable"
-                    data-action="navigate"
+                    data-action="tab-navigate"
                     data-screen="analytics"
                     role="button"
                     tabindex="0"
@@ -146,26 +145,6 @@
                             <p>Week 21+</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="quick-actions">
-                    <button class="action-btn primary" data-action="navigate" data-screen="daily">
-                        📝 Start Today's Workout
-                    </button>
-                    <button
-                        class="action-btn secondary"
-                        data-action="navigate"
-                        data-screen="weekly"
-                    >
-                        📊 Weekly Assessment
-                    </button>
-                    <button
-                        class="action-btn secondary"
-                        data-action="navigate"
-                        data-screen="monthly"
-                    >
-                        📅 Monthly Assessment
-                    </button>
                 </div>
             </div>
 
@@ -292,6 +271,7 @@
                             class="pain-slider"
                             aria-label="Knee pain level"
                         />
+                        <div class="pain-labels"><span>None</span><span>Mild</span><span>Moderate</span><span>Severe</span><span>Worst</span></div>
                     </div>
                     <div class="form-group">
                         <label>Back Pain: <span id="backPainValue">0</span></label>
@@ -304,6 +284,7 @@
                             class="pain-slider"
                             aria-label="Back pain level"
                         />
+                        <div class="pain-labels"><span>None</span><span>Mild</span><span>Moderate</span><span>Severe</span><span>Worst</span></div>
                     </div>
                     <div class="form-group">
                         <label>Foot Pain: <span id="footPainValue">0</span></label>
@@ -316,6 +297,7 @@
                             class="pain-slider"
                             aria-label="Foot pain level"
                         />
+                        <div class="pain-labels"><span>None</span><span>Mild</span><span>Moderate</span><span>Severe</span><span>Worst</span></div>
                     </div>
 
                     <div class="form-group">
@@ -420,12 +402,43 @@
                 </form>
             </div>
 
+            <!-- ASSESSMENTS HUB SCREEN -->
+            <div class="screen" id="assessmentsScreen">
+                <div class="screen-header">
+                    <h2>Assessments</h2>
+                </div>
+
+                <p class="assessment-note">Track your recovery progress with regular assessments</p>
+
+                <div class="assess-hub-cards">
+                    <button class="assess-hub-card" data-action="navigate" data-screen="weekly">
+                        <span class="assess-hub-icon" data-icon="clipboard"></span>
+                        <div class="assess-hub-info">
+                            <h3>Weekly Assessment</h3>
+                            <p>Balance, strength, and pain tracking</p>
+                            <span class="assess-hub-hint">Complete every Sunday</span>
+                        </div>
+                        <span class="assess-hub-arrow" data-icon="chevronRight"></span>
+                    </button>
+                    <button class="assess-hub-card" data-action="navigate" data-screen="monthly">
+                        <span class="assess-hub-icon" data-icon="calendar"></span>
+                        <div class="assess-hub-info">
+                            <h3>Monthly Assessment</h3>
+                            <p>Measurements and progress documentation</p>
+                            <span class="assess-hub-hint">Complete at end of each month</span>
+                        </div>
+                        <span class="assess-hub-arrow" data-icon="chevronRight"></span>
+                    </button>
+                </div>
+
+                <div id="assessmentsPrevious" class="assess-hub-previous">
+                    <!-- Populated by JS with last assessment dates -->
+                </div>
+            </div>
+
             <!-- HISTORY SCREEN -->
             <div class="screen" id="historyScreen">
                 <div class="screen-header">
-                    <button class="back-btn" data-action="navigate" data-screen="home">
-                        ← Back
-                    </button>
                     <h2>History</h2>
                 </div>
 
@@ -449,9 +462,6 @@
             <!-- ANALYTICS SCREEN -->
             <div class="screen" id="analyticsScreen">
                 <div class="screen-header">
-                    <button class="back-btn" data-action="navigate" data-screen="home">
-                        ← Back
-                    </button>
                     <h2>Analytics</h2>
                 </div>
 
@@ -462,8 +472,8 @@
                     <button class="analytics-range-btn" data-range="all">All time</button>
                 </div>
 
-                <!-- Summary Cards Row -->
-                <div class="analytics-summary-row" id="analyticsSummary">
+                <!-- Summary Cards Row (2x2) -->
+                <div class="analytics-summary-row analytics-summary-row--2x2" id="analyticsSummary">
                     <div class="analytics-stat-card">
                         <div class="analytics-stat-value" id="summaryAvgPain">--</div>
                         <div class="analytics-stat-label">Avg Pain</div>
@@ -605,18 +615,24 @@
                     <h2>Export Data</h2>
                 </div>
 
+                <div class="export-data-preview" id="exportDataPreview">
+                    <!-- Populated by JS with data counts -->
+                </div>
+
                 <div class="export-options">
                     <div class="export-card">
-                        <h3>📊 Export All Data</h3>
+                        <div class="export-card-icon" data-icon="download"></div>
+                        <h3>Export All Data</h3>
                         <p>Download all your workout data as CSV files</p>
                         <button class="action-btn primary" data-action="export-data">
                             Download CSV Files
                         </button>
                     </div>
 
-                    <div class="export-card">
-                        <h3>🗑️ Clear All Data</h3>
-                        <p>⚠️ This will delete all stored data. Cannot be undone!</p>
+                    <div class="export-card export-card--danger">
+                        <div class="export-card-icon" data-icon="trash"></div>
+                        <h3>Clear All Data</h3>
+                        <p>This will delete all stored data. Cannot be undone!</p>
                         <button class="action-btn danger" data-action="clear-all-data">
                             Clear All Data
                         </button>
@@ -634,63 +650,131 @@
                 </div>
 
                 <div class="instructions-page-content">
-                    <div class="instruction-card">
-                        <h3>🎯 How to Use</h3>
-                        <ol>
-                            <li>Select your current phase from the home screen</li>
-                            <li>Log daily workouts with left/right reps and pain levels</li>
-                            <li>Complete weekly assessments every Sunday</li>
-                            <li>Complete monthly assessments at end of each month</li>
-                            <li>Export data regularly to backup</li>
-                        </ol>
+                    <div class="instruction-card instruction-card--howto" data-action="toggle-instruction">
+                        <h3 class="instruction-card-header">
+                            <span class="instruction-card-icon" data-icon="target"></span>
+                            How to Use
+                            <span class="instruction-card-arrow" data-icon="chevronDown"></span>
+                        </h3>
+                        <div class="instruction-card-body">
+                            <ol>
+                                <li>Select your current phase from the home screen</li>
+                                <li>Log daily workouts with left/right reps and pain levels</li>
+                                <li>Complete weekly assessments every Sunday</li>
+                                <li>Complete monthly assessments at end of each month</li>
+                                <li>Export data regularly to backup</li>
+                            </ol>
+                        </div>
                     </div>
 
-                    <div class="instruction-card">
-                        <h3>⚠️ Pain Scale Guide</h3>
-                        <ul>
-                            <li><strong>0-3/10:</strong> Normal discomfort - CONTINUE</li>
-                            <li><strong>4-6/10:</strong> Significant pain - REDUCE intensity</li>
-                            <li><strong>7-10/10:</strong> STOP immediately - consult physio</li>
-                        </ul>
+                    <div class="instruction-card instruction-card--pain" data-action="toggle-instruction">
+                        <h3 class="instruction-card-header">
+                            <span class="instruction-card-icon" data-icon="alertTriangle"></span>
+                            Pain Scale Guide
+                            <span class="instruction-card-arrow" data-icon="chevronDown"></span>
+                        </h3>
+                        <div class="instruction-card-body">
+                            <ul>
+                                <li><strong>0-3/10:</strong> Normal discomfort - CONTINUE</li>
+                                <li><strong>4-6/10:</strong> Significant pain - REDUCE intensity</li>
+                                <li><strong>7-10/10:</strong> STOP immediately - consult physio</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="instruction-card">
-                        <h3>📱 Install This App</h3>
-                        <p><strong>iPhone:</strong></p>
-                        <ol>
-                            <li>Tap the Share button in Safari</li>
-                            <li>Scroll down and tap "Add to Home Screen"</li>
-                            <li>Tap "Add"</li>
-                        </ol>
-                        <p><strong>Android:</strong></p>
-                        <ol>
-                            <li>Tap the menu (⋮) in Chrome</li>
-                            <li>Tap "Add to Home Screen"</li>
-                            <li>Tap "Add"</li>
-                        </ol>
+                    <div class="instruction-card instruction-card--howto" data-action="toggle-instruction">
+                        <h3 class="instruction-card-header">
+                            <span class="instruction-card-icon" data-icon="download"></span>
+                            Install This App
+                            <span class="instruction-card-arrow" data-icon="chevronDown"></span>
+                        </h3>
+                        <div class="instruction-card-body">
+                            <p><strong>iPhone:</strong></p>
+                            <ol>
+                                <li>Tap the Share button in Safari</li>
+                                <li>Scroll down and tap "Add to Home Screen"</li>
+                                <li>Tap "Add"</li>
+                            </ol>
+                            <p><strong>Android:</strong></p>
+                            <ol>
+                                <li>Tap the menu in Chrome</li>
+                                <li>Tap "Add to Home Screen"</li>
+                                <li>Tap "Add"</li>
+                            </ol>
+                        </div>
                     </div>
 
-                    <div class="instruction-card">
-                        <h3>📞 Contact Information</h3>
-                        <ul>
-                            <li><strong>Hope Physio (BTM):</strong> +91 89991 68508</li>
-                            <li><strong>Dr. Shetty's Foot Centre:</strong> +91 80 4953 8629</li>
-                            <li><strong>Dr. Akshay Dhanda:</strong> +91 95351 55018</li>
-                        </ul>
+                    <div class="instruction-card instruction-card--contact" data-action="toggle-instruction">
+                        <h3 class="instruction-card-header">
+                            <span class="instruction-card-icon" data-icon="phone"></span>
+                            Contact Information
+                            <span class="instruction-card-arrow" data-icon="chevronDown"></span>
+                        </h3>
+                        <div class="instruction-card-body">
+                            <ul class="contact-list">
+                                <li>
+                                    <strong>Hope Physio (BTM):</strong>
+                                    <a href="tel:+918999168508" class="contact-link">
+                                        <span class="contact-icon" data-icon="phone"></span>
+                                        +91 89991 68508
+                                    </a>
+                                </li>
+                                <li>
+                                    <strong>Dr. Shetty's Foot Centre:</strong>
+                                    <a href="tel:+918049538629" class="contact-link">
+                                        <span class="contact-icon" data-icon="phone"></span>
+                                        +91 80 4953 8629
+                                    </a>
+                                </li>
+                                <li>
+                                    <strong>Dr. Akshay Dhanda:</strong>
+                                    <a href="tel:+919535155018" class="contact-link">
+                                        <span class="contact-icon" data-icon="phone"></span>
+                                        +91 95351 55018
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="instruction-card">
-                        <h3>🚨 Red Flags - See Doctor</h3>
-                        <ul>
-                            <li>Sharp pain in knee</li>
-                            <li>Increasing back pain</li>
-                            <li>Swelling in knee or ankle</li>
-                            <li>Numbness/tingling in leg</li>
-                        </ul>
+                    <div class="instruction-card instruction-card--danger" data-action="toggle-instruction">
+                        <h3 class="instruction-card-header">
+                            <span class="instruction-card-icon" data-icon="alertTriangle"></span>
+                            Red Flags - See Doctor
+                            <span class="instruction-card-arrow" data-icon="chevronDown"></span>
+                        </h3>
+                        <div class="instruction-card-body">
+                            <ul>
+                                <li>Sharp pain in knee</li>
+                                <li>Increasing back pain</li>
+                                <li>Swelling in knee or ankle</li>
+                                <li>Numbness/tingling in leg</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tabs" id="bottomTabs" role="navigation" aria-label="Main tabs">
+            <button class="bottom-tab active" data-action="tab-navigate" data-screen="home">
+                <span class="bottom-tab-icon" data-icon="home"></span>
+                <span class="bottom-tab-label">Home</span>
+            </button>
+            <button class="bottom-tab" data-action="tab-navigate" data-screen="assessments">
+                <span class="bottom-tab-icon" data-icon="clipboard"></span>
+                <span class="bottom-tab-label">Assess</span>
+            </button>
+            <button class="bottom-tab" data-action="tab-navigate" data-screen="history">
+                <span class="bottom-tab-icon" data-icon="clock"></span>
+                <span class="bottom-tab-label">History</span>
+            </button>
+            <button class="bottom-tab" data-action="tab-navigate" data-screen="analytics">
+                <span class="bottom-tab-icon" data-icon="barChart"></span>
+                <span class="bottom-tab-label">Analytics</span>
+            </button>
+        </nav>
 
         <!-- Confirm Dialog (native <dialog>) -->
         <dialog id="confirmDialog" class="confirm-dialog">

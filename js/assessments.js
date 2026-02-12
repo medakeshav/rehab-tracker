@@ -3,11 +3,69 @@
  *
  * Handles form submission for the weekly and monthly assessment screens,
  * persisting data to localStorage and resetting the forms.
+ * Also shows previous assessment values for reference.
  */
 
 import { safeSetItem, showToast, calculateCurrentWeek } from './utils.js';
 import { weeklyData, monthlyData } from './state.js';
 import { showScreen } from './navigation.js';
+
+// ========== Previous Value Display ==========
+
+/**
+ * Show previous assessment values next to input fields for reference.
+ * Called when navigating to the weekly/monthly assessment screens.
+ */
+function showPreviousWeeklyValues() {
+    if (weeklyData.length === 0) return;
+    const prev = weeklyData[weeklyData.length - 1];
+
+    const fields = {
+        standLeft: prev.standLeft ? `Previous: ${prev.standLeft}s` : '',
+        standRight: prev.standRight ? `Previous: ${prev.standRight}s` : '',
+        bridgeLeft: prev.bridgeLeft ? `Previous: ${prev.bridgeLeft}` : '',
+        bridgeRight: prev.bridgeRight ? `Previous: ${prev.bridgeRight}` : '',
+        reachLeft: prev.reachLeft ? `Previous: ${prev.reachLeft}s` : '',
+        reachRight: prev.reachRight ? `Previous: ${prev.reachRight}s` : '',
+    };
+
+    Object.entries(fields).forEach(([id, text]) => {
+        if (!text) return;
+        const input = document.getElementById(id);
+        if (!input) return;
+        // Remove any existing previous-value span
+        const existing = input.parentElement.querySelector('.previous-value');
+        if (existing) existing.remove();
+        const span = document.createElement('span');
+        span.className = 'previous-value';
+        span.textContent = text;
+        input.parentElement.appendChild(span);
+    });
+}
+
+function showPreviousMonthlyValues() {
+    if (monthlyData.length === 0) return;
+    const prev = monthlyData[monthlyData.length - 1];
+
+    const fields = {
+        calfRight: prev.calfRight ? `Previous: ${prev.calfRight}cm` : '',
+        calfLeft: prev.calfLeft ? `Previous: ${prev.calfLeft}cm` : '',
+        thighRight: prev.thighRight ? `Previous: ${prev.thighRight}cm` : '',
+        thighLeft: prev.thighLeft ? `Previous: ${prev.thighLeft}cm` : '',
+    };
+
+    Object.entries(fields).forEach(([id, text]) => {
+        if (!text) return;
+        const input = document.getElementById(id);
+        if (!input) return;
+        const existing = input.parentElement.querySelector('.previous-value');
+        if (existing) existing.remove();
+        const span = document.createElement('span');
+        span.className = 'previous-value';
+        span.textContent = text;
+        input.parentElement.appendChild(span);
+    });
+}
 
 // ========== Weekly Assessment ==========
 
@@ -84,4 +142,4 @@ function saveMonthlyAssessment(e) {
     }, 1500);
 }
 
-export { saveWeeklyAssessment, saveMonthlyAssessment };
+export { saveWeeklyAssessment, saveMonthlyAssessment, showPreviousWeeklyValues, showPreviousMonthlyValues };

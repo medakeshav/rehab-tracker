@@ -63,6 +63,9 @@ function exportAllData() {
             exportMonthlyCSV();
         }
 
+        // Store export timestamp
+        localStorage.setItem('lastExportTimestamp', new Date().toISOString());
+
         showToast('✓ Data exported successfully!', 'success');
     } catch (_e) {
         console.error('CSV export failed:', _e);

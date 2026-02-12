@@ -25,7 +25,7 @@ import {
     calculateCurrentWeek,
     setLoadExercises,
 } from './utils.js';
-import { autoSaveDailyProgress } from './state.js';
+import { autoSaveDailyProgress, workoutData, weeklyData, monthlyData } from './state.js';
 import {
     updateProgressBar,
     clearDailyProgress,
@@ -40,10 +40,11 @@ import {
 } from './progress.js';
 import { loadExercises, saveWorkout } from './exercises-ui.js';
 import { showHistoryTab, loadHistory } from './history.js';
-import { saveWeeklyAssessment, saveMonthlyAssessment } from './assessments.js';
+import { saveWeeklyAssessment, saveMonthlyAssessment, showPreviousWeeklyValues, showPreviousMonthlyValues } from './assessments.js';
 import { exportAllData, clearAllData } from './export.js';
 import { initStreak, checkStreakReminder } from './streak.js';
 import { initAnalytics, renderAllAnalytics, toggleAnalyticsSection } from './analytics.js';
+import icons from './icons.js';
 
 // ========== Wire Up Callbacks (avoid circular imports) ==========
 
@@ -85,6 +86,15 @@ function initializeApp() {
 
     // Init analytics date range buttons
     initAnalytics();
+
+    // Render greeting banner
+    renderGreetingBanner();
+
+    // Inject SVG icons into tab bar and menus
+    injectIcons();
+
+    // Update export preview
+    updateExportPreview();
 }
 
 // ========== Global Event Listeners ==========
@@ -146,8 +156,16 @@ function setupDelegatedActions() {
         const action = target.dataset.action;
 
         switch (action) {
-            case 'navigate':
-                showScreen(target.dataset.screen);
+            case 'navigate': {
+                const screen = target.dataset.screen;
+                showScreen(screen);
+                if (screen === 'weekly') showPreviousWeeklyValues();
+                if (screen === 'monthly') showPreviousMonthlyValues();
+                if (screen === 'export') updateExportPreview();
+                break;
+            }
+            case 'tab-navigate':
+                showScreen(target.dataset.screen, false, true);
                 break;
             case 'select-phase':
                 selectPhase(Number(target.dataset.phase));
@@ -172,12 +190,16 @@ function setupDelegatedActions() {
                 break;
             case 'export-data':
                 exportAllData();
+                updateExportPreview();
                 break;
             case 'clear-all-data':
                 clearAllData();
                 break;
             case 'toggle-analytics-section':
                 toggleAnalyticsSection(target.dataset.section);
+                break;
+            case 'toggle-instruction':
+                target.closest('.instruction-card').classList.toggle('collapsed');
                 break;
         }
     });
@@ -228,6 +250,70 @@ function setupScrollToTop() {
             behavior: 'smooth',
         });
     });
+}
+
+// ========== Greeting Banner ==========
+
+/**
+ * Render a time-of-day greeting on the home screen.
+ */
+function renderGreetingBanner() {
+    const textEl = document.getElementById('greetingText');
+    const subEl = document.getElementById('greetingSub');
+    if (!textEl || !subEl) return;
+
+    const hour = new Date().getHours();
+    let greeting, sub;
+    if (hour < 12) {
+        greeting = 'Good Morning';
+        sub = 'Start your day with some exercises!';
+    } else if (hour < 17) {
+        greeting = 'Good Afternoon';
+        sub = 'Ready to keep building strength?';
+    } else {
+        greeting = 'Good Evening';
+        sub = 'Keep going — every rep counts!';
+    }
+
+    textEl.textContent = greeting;
+    subEl.textContent = sub;
+}
+
+// ========== SVG Icon Injection ==========
+
+/**
+ * Inject SVG icons into all elements with [data-icon] attributes.
+ */
+function injectIcons() {
+    document.querySelectorAll('[data-icon]').forEach((el) => {
+        const iconName = el.dataset.icon;
+        const iconFn = icons[iconName];
+        if (iconFn) {
+            const size = el.classList.contains('bottom-tab-icon') ? 22 :
+                         el.classList.contains('assess-hub-icon') ? 24 :
+                         el.classList.contains('export-card-icon') ? 32 :
+                         el.classList.contains('action-card-icon') ? 28 : 18;
+            el.innerHTML = iconFn(size);
+        }
+    });
+}
+
+// ========== Export Preview ==========
+
+/**
+ * Update the export data preview with current data counts.
+ */
+function updateExportPreview() {
+    const preview = document.getElementById('exportDataPreview');
+    if (!preview) return;
+
+    const w = workoutData.length;
+    const wk = weeklyData.length;
+    const mo = monthlyData.length;
+    const lastExport = localStorage.getItem('lastExportTimestamp');
+    const lastExportStr = lastExport ? `Last exported: ${new Date(lastExport).toLocaleDateString()}` : 'Never exported';
+
+    preview.innerHTML = `<strong>${w}</strong> workouts, <strong>${wk}</strong> weekly, <strong>${mo}</strong> monthly assessments available<br><span style="font-size:11px">${lastExportStr}</span>`;
 }
 
 // ========== Auto-Save on Page Close ==========

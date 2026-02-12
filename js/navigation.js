@@ -16,6 +16,9 @@ let onHistoryScreen = null;
 /** @type {Function|null} Callback to render analytics (set by app.js to avoid circular import) */
 let onAnalyticsScreen = null;
 
+/** Screens that are top-level tab screens (don't push to history) */
+const TAB_SCREENS = ['home', 'assessments', 'history', 'analytics'];
+
 /**
  * Register a callback to be called when navigating to the history screen.
  * @param {Function} fn - callback that receives no arguments
@@ -51,8 +54,9 @@ function closeMenu() {
  *
  * @param {string} screenName - Screen identifier (matches `id` without "Screen" suffix)
  * @param {boolean} [useSlideBack=false] - If true, use iOS-style slide-back animation
+ * @param {boolean} [isTabNav=false] - If true, this is a tab-bar navigation (cross-fade, no history push)
  */
-function showScreen(screenName, useSlideBack) {
+function showScreen(screenName, useSlideBack, isTabNav) {
     const currentScreen = document.querySelector('.screen.active');
     const targetScreen = document.getElementById(screenName + 'Screen');
     if (!targetScreen || targetScreen === currentScreen) return;
@@ -70,16 +74,20 @@ function showScreen(screenName, useSlideBack) {
             targetScreen.classList.add('active');
         }, 300);
     } else {
-        // Normal instant switch
+        // Normal instant switch with optional fade
         document.querySelectorAll('.screen').forEach((screen) => {
-            screen.classList.remove('active', 'swipe-leaving', 'swipe-entering');
+            screen.classList.remove('active', 'swipe-leaving', 'swipe-entering', 'fade-in');
         });
         targetScreen.classList.add('active');
+        if (isTabNav) {
+            targetScreen.classList.add('fade-in');
+        }
     }
 
     // Track navigation history
-    if (screenName === 'home') {
-        screenHistory = ['home'];
+    const isTopLevel = TAB_SCREENS.includes(screenName);
+    if (isTopLevel) {
+        screenHistory = [screenName];
     } else {
         screenHistory.push(screenName);
     }
@@ -90,6 +98,9 @@ function showScreen(screenName, useSlideBack) {
         scrollBtn.classList.remove('visible');
     }
 
+    // Scroll to top on screen switch
+    window.scrollTo(0, 0);
+
     // Special actions for certain screens
     if (screenName === 'history' && onHistoryScreen) {
         onHistoryScreen();
@@ -98,7 +109,22 @@ function showScreen(screenName, useSlideBack) {
         onAnalyticsScreen();
     }
 
+    // Update the bottom tab active state
+    updateActiveTab(screenName);
+
     closeMenu();
+}
+
+/**
+ * Update the bottom tab bar active state to match the given screen.
+ * @param {string} screenName - The current screen name
+ */
+function updateActiveTab(screenName) {
+    const tabs = document.querySelectorAll('.bottom-tab');
+    tabs.forEach((tab) => {
+        const tabScreen = tab.dataset.screen;
+        tab.classList.toggle('active', tabScreen === screenName);
+    });
 }
 
 /**
@@ -275,4 +301,5 @@ export {
     initSwipeBack,
     setOnHistoryScreen,
     setOnAnalyticsScreen,
+    updateActiveTab,
 };

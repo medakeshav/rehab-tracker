@@ -855,14 +855,22 @@ function renderSummaryCards() {
         }
     }
 
-    // Pain trend arrow
+    // Pain trend arrow with color coding
     const painTrendEl = document.getElementById('summaryPainTrend');
     if (painTrendEl && trend.length >= 14) {
         const recent = trend.slice(-7).reduce((s, d) => s + d.avgPain, 0) / 7;
         const prior = trend.slice(-14, -7).reduce((s, d) => s + d.avgPain, 0) / 7;
-        if (recent < prior - 0.3) painTrendEl.textContent = '↓';
-        else if (recent > prior + 0.3) painTrendEl.textContent = '↑';
-        else painTrendEl.textContent = '→';
+        painTrendEl.classList.remove('positive', 'negative', 'neutral');
+        if (recent < prior - 0.3) {
+            painTrendEl.textContent = '↓ Improving';
+            painTrendEl.classList.add('positive');
+        } else if (recent > prior + 0.3) {
+            painTrendEl.textContent = '↑ Increasing';
+            painTrendEl.classList.add('negative');
+        } else {
+            painTrendEl.textContent = '→ Stable';
+            painTrendEl.classList.add('neutral');
+        }
     }
 
     // Total volume

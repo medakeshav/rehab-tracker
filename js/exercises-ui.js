@@ -11,6 +11,7 @@
 
 import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
 import { showToast } from './utils.js';
+import { getCategoryIcon } from './icons.js';
 import { createWheelPicker, getPickerValue } from './wheel-picker.js';
 import {
     currentPhase,
@@ -49,6 +50,7 @@ function loadExercises() {
     exerciseList.innerHTML = '';
 
     const visibleExercises = getVisibleExercisesForPhase(currentPhase);
+    const totalCount = visibleExercises.length;
 
     visibleExercises.forEach((item, index) => {
         if (item.isGroup) {
@@ -57,10 +59,10 @@ function loadExercises() {
             );
 
             if (isCompleted) {
-                const card = createCompletedGroupCard(item);
+                const card = createCompletedGroupCard(item, index, totalCount);
                 exerciseList.appendChild(card);
             } else {
-                const card = createGroupedExerciseCard(item);
+                const card = createGroupedExerciseCard(item, index, totalCount);
                 exerciseList.appendChild(card);
                 const activeExercise = item.exercises[balanceLevel - 1];
                 restoreExerciseData(activeExercise);
@@ -69,10 +71,10 @@ function loadExercises() {
             const isCompleted = dailyProgress.completedExercises.includes(item.id);
 
             if (isCompleted) {
-                const card = createCompletedCard(item);
+                const card = createCompletedCard(item, index, totalCount);
                 exerciseList.appendChild(card);
             } else {
-                const card = createExerciseCard(item, index);
+                const card = createExerciseCard(item, index, totalCount);
                 exerciseList.appendChild(card);
                 restoreExerciseData(item);
             }
@@ -97,16 +99,33 @@ const PROGRESSION_TEXTS = {
  * Create a small collapsed card for a completed exercise.
  * Clicking it re-expands the card for editing.
  * @param {Object} exercise - Exercise definition object
+ * @param {number} index - Position in list
+ * @param {number} total - Total exercises
  * @returns {HTMLElement} Collapsed card element
  */
-function createCompletedCard(exercise) {
+function createCompletedCard(exercise, index, total) {
     const card = document.createElement('div');
     card.className = 'exercise-card exercise-card--completed';
     card.setAttribute('data-exercise-id', exercise.id);
+    if (exercise.category) card.setAttribute('data-category', exercise.category);
+
+    // Build rep summary pill
+    const data = dailyProgress.exerciseData[exercise.id];
+    let repSummary = '';
+    if (data) {
+        if (exercise.bilateral) {
+            repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
+        } else {
+            repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+        }
+    }
+
     card.innerHTML = `
         <div class="completed-card-inner">
-            <span class="completed-checkmark">&#10003;</span>
+            <span class="exercise-number-badge">${index + 1}</span>
+            <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             <span class="completed-title">${exercise.name}</span>
+            ${repSummary}
             <span class="completed-expand-hint">tap to edit</span>
         </div>
     `;
@@ -127,10 +146,11 @@ function createCompletedCard(exercise) {
  * @param {number} index - Position index in the exercise list
  * @returns {HTMLElement} Full exercise card element
  */
-function createExerciseCard(exercise, _index) {
+function createExerciseCard(exercise, index, total) {
     const card = document.createElement('div');
     card.className = 'exercise-card';
     card.setAttribute('data-exercise-id', exercise.id);
+    if (exercise.category) card.setAttribute('data-category', exercise.category);
 
     // Add progression note if applicable (individual non-grouped exercises only)
     let progressionNote = '';
@@ -138,9 +158,14 @@ function createExerciseCard(exercise, _index) {
         progressionNote = `<div class="progression-note">${PROGRESSION_TEXTS[exercise.progressionLevel]}</div>`;
     }
 
+    // Category icon
+    const catIcon = exercise.category ? `<span class="exercise-card-category-icon">${getCategoryIcon(exercise.category, 16)}</span>` : '';
+
     card.innerHTML = `
         ${progressionNote}
         <div class="exercise-header">
+            <span class="exercise-number-badge">${(index || 0) + 1}</span>
+            ${catIcon}
             <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
             <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
         </div>
@@ -254,12 +279,13 @@ function createExerciseCard(exercise, _index) {
  * @param {Object} groupItem - Group descriptor from getVisibleExercisesForPhase()
  * @returns {HTMLElement} Grouped exercise card element
  */
-function createGroupedExerciseCard(groupItem) {
+function createGroupedExerciseCard(groupItem, index, total) {
     const activeExercise = groupItem.exercises[balanceLevel - 1];
     const card = document.createElement('div');
     card.className = 'exercise-card exercise-card--grouped';
     card.setAttribute('data-exercise-id', activeExercise.id);
     card.setAttribute('data-group', groupItem.group);
+    if (activeExercise.category) card.setAttribute('data-category', activeExercise.category);
 
     // Extract short level description from the exercise name (e.g. "Eyes Open + Support")
     const levelDescription = activeExercise.name.replace(/^\d+[a-e]\.\s*Balance:\s*/i, '');
@@ -385,7 +411,7 @@ function createGroupedExerciseCard(groupItem) {
  * @param {Object} groupItem - Group descriptor
  * @returns {HTMLElement} Collapsed card element
  */
-function createCompletedGroupCard(groupItem) {
+function createCompletedGroupCard(groupItem, index, total) {
     const card = document.createElement('div');
     card.className = 'exercise-card exercise-card--completed';
     card.setAttribute('data-group', groupItem.group);
@@ -396,12 +422,24 @@ function createCompletedGroupCard(groupItem) {
     );
     if (completedEx) {
         card.setAttribute('data-exercise-id', completedEx.id);
+        if (completedEx.category) card.setAttribute('data-category', completedEx.category);
+    }
+
+    // Rep summary
+    let repSummary = '';
+    if (completedEx) {
+        const data = dailyProgress.exerciseData[completedEx.id];
+        if (data) {
+            repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+        }
     }
 
     card.innerHTML = `
         <div class="completed-card-inner">
-            <span class="completed-checkmark">&#10003;</span>
+            <span class="exercise-number-badge">${(index || 0) + 1}</span>
+            <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             <span class="completed-title">${groupItem.groupLabel}</span>
+            ${repSummary}
             <span class="completed-expand-hint">tap to edit</span>
         </div>
     `;
@@ -635,10 +673,21 @@ function collapseCard(card, exercise) {
         card.classList.add('exercise-card--completed');
 
         const exerciseName = exercise.name;
+        const data = dailyProgress.exerciseData[exercise.id];
+        let repSummary = '';
+        if (data) {
+            if (exercise.bilateral) {
+                repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
+            } else {
+                repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+            }
+        }
+
         card.innerHTML = `
             <div class="completed-card-inner">
-                <span class="completed-checkmark">&#10003;</span>
+                <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <span class="completed-title">${exerciseName}</span>
+                ${repSummary}
                 <span class="completed-expand-hint">tap to edit</span>
             </div>
         `;
