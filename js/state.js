@@ -5,6 +5,7 @@
  * and provides functions to load, save, capture, and restore exercise data.
  */
 
+import CONFIG from './config.js';
 import { safeGetItem, safeSetItem } from './utils.js';
 import { getExercisesForPhase } from '../exercises.js';
 import { getPickerValue, setPickerValue } from './wheel-picker.js';
@@ -12,8 +13,9 @@ import { getPickerValue, setPickerValue } from './wheel-picker.js';
 // ========== Global State Variables ==========
 
 /** @type {number} Currently selected rehab phase (1, 2, or 3) */
-let currentPhase = safeGetItem('currentPhase', 1);
-if (typeof currentPhase === 'string') currentPhase = parseInt(currentPhase) || 1;
+let currentPhase = safeGetItem('currentPhase', CONFIG.DEFAULTS.PHASE);
+if (typeof currentPhase === 'string')
+    currentPhase = parseInt(currentPhase) || CONFIG.DEFAULTS.PHASE;
 
 /** @type {Array<Object>} All saved daily workout records */
 let workoutData = safeGetItem('workoutData', []);
@@ -25,14 +27,15 @@ let weeklyData = safeGetItem('weeklyData', []);
 let monthlyData = safeGetItem('monthlyData', []);
 
 /** Progress Bar Version: 'A' = sticky top bar, 'C' = mini thumbnail circles */
-let PROGRESS_BAR_VERSION = safeGetItem('progressBarVersion', 'C');
+let PROGRESS_BAR_VERSION = safeGetItem('progressBarVersion', CONFIG.DEFAULTS.PROGRESS_BAR_VERSION);
 
 /** Dark mode state: true = dark, false = light (default) */
-let darkMode = safeGetItem('darkMode', false);
+let darkMode = safeGetItem('darkMode', CONFIG.DEFAULTS.DARK_MODE);
 
 /** @type {number} Currently selected balance progression level (1-5) */
-let balanceLevel = safeGetItem('balanceLevel', 1);
-if (typeof balanceLevel === 'string') balanceLevel = parseInt(balanceLevel) || 1;
+let balanceLevel = safeGetItem('balanceLevel', CONFIG.DEFAULTS.BALANCE_LEVEL);
+if (typeof balanceLevel === 'string')
+    balanceLevel = parseInt(balanceLevel) || CONFIG.DEFAULTS.BALANCE_LEVEL;
 
 /** @type {Object} Streak tracking data (recalculated from workoutData on init) */
 let streakData = safeGetItem('streakData', {

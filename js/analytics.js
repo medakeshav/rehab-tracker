@@ -9,6 +9,7 @@
  *   - Adherence & compliance metrics
  */
 
+import Chart from 'chart.js/auto';
 import { workoutData, darkMode } from './state.js';
 import { exercises, getExercisesForPhase, getCategoryByExerciseId } from '../exercises.js';
 
@@ -98,7 +99,7 @@ function renderChart(canvasId, config) {
     }
     const canvas = document.getElementById(canvasId);
     if (!canvas) return null;
-    const chart = new window.Chart(canvas, config);
+    const chart = new Chart(canvas, config);
     chartInstances[canvasId] = chart;
     return chart;
 }

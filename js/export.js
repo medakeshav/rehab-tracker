@@ -17,6 +17,29 @@ import {
 } from './state.js';
 import { showScreen } from './navigation.js';
 
+// ========== CSV Escaping Helper ==========
+
+/**
+ * Properly escape a value for CSV format.
+ * Rules:
+ * - Doubles any quotes in the value (e.g., My "Best" Day -> My ""Best"" Day)
+ * - Wraps in quotes if value contains comma, quote, or newline
+ * - Returns empty string for null/undefined
+ *
+ * @param {*} value - Value to escape
+ * @returns {string} Escaped CSV value
+ */
+function escapeCSV(value) {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    // If value contains comma, quote, or newline, it must be quoted
+    if (/[",\n\r]/.test(str)) {
+        // Double any quotes and wrap in quotes
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}
+
 // ========== Export All Data ==========
 
 /**
@@ -55,7 +78,7 @@ function exportWorkoutsCSV() {
 
     workoutData.forEach((workout) => {
         workout.exercises.forEach((ex) => {
-            csv += `${workout.date},${workout.phase},"${ex.name}",${ex.leftReps},${ex.rightReps},${ex.sets},${ex.pain},"${ex.notes}"\n`;
+            csv += `${escapeCSV(workout.date)},${escapeCSV(workout.phase)},${escapeCSV(ex.name)},${escapeCSV(ex.leftReps)},${escapeCSV(ex.rightReps)},${escapeCSV(ex.sets)},${escapeCSV(ex.pain)},${escapeCSV(ex.notes)}\n`;
         });
     });
 
@@ -68,7 +91,7 @@ function exportWeeklyCSV() {
         'Week,Date,Stand Left,Stand Right,Bridge Left,Bridge Right,Reach Left,Reach Right,Knee Pain,Back Pain,Foot Pain,Notes\n';
 
     weeklyData.forEach((week) => {
-        csv += `${week.week},${week.date},${week.standLeft},${week.standRight},${week.bridgeLeft},${week.bridgeRight},${week.reachLeft},${week.reachRight},${week.kneePain},${week.backPain},${week.footPain},"${week.notes}"\n`;
+        csv += `${escapeCSV(week.week)},${escapeCSV(week.date)},${escapeCSV(week.standLeft)},${escapeCSV(week.standRight)},${escapeCSV(week.bridgeLeft)},${escapeCSV(week.bridgeRight)},${escapeCSV(week.reachLeft)},${escapeCSV(week.reachRight)},${escapeCSV(week.kneePain)},${escapeCSV(week.backPain)},${escapeCSV(week.footPain)},${escapeCSV(week.notes)}\n`;
     });
 
     downloadCSV(csv, 'rehab_weekly_assessments.csv');
@@ -80,7 +103,7 @@ function exportMonthlyCSV() {
         'Month,Date,Calf Right,Calf Left,Thigh Right,Thigh Left,Photos,Video,Phase,Ready Next Phase,Notes\n';
 
     monthlyData.forEach((month) => {
-        csv += `${month.month},${month.date},${month.calfRight},${month.calfLeft},${month.thighRight},${month.thighLeft},${month.photosTaken},${month.videoTaken},${month.phase},${month.readyNextPhase},"${month.notes}"\n`;
+        csv += `${escapeCSV(month.month)},${escapeCSV(month.date)},${escapeCSV(month.calfRight)},${escapeCSV(month.calfLeft)},${escapeCSV(month.thighRight)},${escapeCSV(month.thighLeft)},${escapeCSV(month.photosTaken)},${escapeCSV(month.videoTaken)},${escapeCSV(month.phase)},${escapeCSV(month.readyNextPhase)},${escapeCSV(month.notes)}\n`;
     });
 
     downloadCSV(csv, 'rehab_monthly_assessments.csv');

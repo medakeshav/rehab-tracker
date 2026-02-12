@@ -5,6 +5,8 @@
  * confetti celebrations, completion sounds, and toast messages.
  */
 
+import confetti from 'canvas-confetti';
+import CONFIG from './config.js';
 import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
 import { safeSetItem, showToast, showConfirmDialog } from './utils.js';
 import {
@@ -193,17 +195,25 @@ function checkAllComplete() {
  * Fire confetti bursts and show a celebration banner.
  */
 function showCelebration() {
-    // Fire confetti if available
-    if (typeof confetti === 'function') {
-        confetti({ particleCount: 80, spread: 70, origin: { x: 0.2, y: 0.6 } });
-        confetti({ particleCount: 80, spread: 70, origin: { x: 0.8, y: 0.6 } });
+    // Fire confetti
+    confetti({
+        particleCount: CONFIG.CONFETTI.PARTICLE_COUNT_SIDE,
+        spread: CONFIG.CONFETTI.SPREAD_SIDE,
+        origin: CONFIG.CONFETTI.ORIGIN_LEFT,
+    });
+    confetti({
+        particleCount: CONFIG.CONFETTI.PARTICLE_COUNT_SIDE,
+        spread: CONFIG.CONFETTI.SPREAD_SIDE,
+        origin: CONFIG.CONFETTI.ORIGIN_RIGHT,
+    });
 
-        setTimeout(() => {
-            if (typeof confetti === 'function') {
-                confetti({ particleCount: 50, spread: 100, origin: { x: 0.5, y: 0.4 } });
-            }
-        }, 500);
-    }
+    setTimeout(() => {
+        confetti({
+            particleCount: CONFIG.CONFETTI.PARTICLE_COUNT_CENTER,
+            spread: CONFIG.CONFETTI.SPREAD_CENTER,
+            origin: CONFIG.CONFETTI.ORIGIN_CENTER,
+        });
+    }, CONFIG.TIMEOUTS.CONFETTI_SEQUENCE);
 
     // Show celebration banner if not already visible
     let banner = document.getElementById('celebrationBanner');
@@ -249,9 +259,9 @@ function playCompletionSound() {
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'sine';
-        osc1.frequency.value = 523;
-        gain1.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc1.frequency.value = CONFIG.AUDIO.FREQUENCY_HIGH;
+        gain1.gain.setValueAtTime(CONFIG.AUDIO.GAIN, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(CONFIG.AUDIO.GAIN_RAMP_DOWN, ctx.currentTime + 0.2);
         osc1.connect(gain1);
         gain1.connect(ctx.destination);
         osc1.start(ctx.currentTime);
@@ -261,16 +271,16 @@ function playCompletionSound() {
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = 'sine';
-        osc2.frequency.value = 659;
-        gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.15);
-        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        osc2.frequency.value = CONFIG.AUDIO.FREQUENCY_LOW;
+        gain2.gain.setValueAtTime(CONFIG.AUDIO.GAIN, ctx.currentTime + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(CONFIG.AUDIO.GAIN_RAMP_DOWN, ctx.currentTime + 0.4);
         osc2.connect(gain2);
         gain2.connect(ctx.destination);
         osc2.start(ctx.currentTime + 0.15);
         osc2.stop(ctx.currentTime + 0.4);
 
         // Clean up after sound finishes
-        setTimeout(() => ctx.close(), 500);
+        setTimeout(() => ctx.close(), CONFIG.TIMEOUTS.CONFETTI_SEQUENCE);
     } catch (_e) {
         // Web Audio not supported — silently ignore
     }
