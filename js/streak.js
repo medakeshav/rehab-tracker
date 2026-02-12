@@ -23,9 +23,23 @@ const BADGES = [
 
 // ========== Date Helpers ==========
 
+/**
+ * Format a Date object as YYYY-MM-DD using local timezone.
+ * Unlike toISOString().split('T')[0] which returns the UTC date,
+ * this always returns the local calendar date.
+ * @param {Date} date
+ * @returns {string} YYYY-MM-DD
+ */
+function toLocalDateStr(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
 /** Get YYYY-MM-DD string for today in local timezone */
 function todayStr() {
-    return new Date().toISOString().split('T')[0];
+    return toLocalDateStr(new Date());
 }
 
 /** Get the ISO week start (Monday) for a given date string */
@@ -33,21 +47,21 @@ function weekStartOf(dateStr) {
     const d = normalizeDate(dateStr);
     const dow = (d.getDay() + 6) % 7; // 0=Mon
     d.setDate(d.getDate() - dow);
-    return d.toISOString().split('T')[0];
+    return toLocalDateStr(d);
 }
 
 /** Subtract N days from a YYYY-MM-DD string, return new YYYY-MM-DD */
 function subtractDays(dateStr, n) {
     const d = normalizeDate(dateStr);
     d.setDate(d.getDate() - n);
-    return d.toISOString().split('T')[0];
+    return toLocalDateStr(d);
 }
 
 /** Add N days to a YYYY-MM-DD string, return new YYYY-MM-DD */
 function addDays(dateStr, n) {
     const d = normalizeDate(dateStr);
     d.setDate(d.getDate() + n);
-    return d.toISOString().split('T')[0];
+    return toLocalDateStr(d);
 }
 
 // ========== Streak Calculation (Rest-Day-Aware) ==========
@@ -134,7 +148,7 @@ function calculateStreakFromData() {
     if (daysSinceLast > 2 && mostRecentPain < 6) {
         return {
             current: 0,
-            longest: 0,
+            longest: calculateLongestStreak(workoutDates),
             lastWorkoutDate: mostRecentDate,
             lastWorkoutAvgPain: mostRecentPain,
             previousStreak: 0,
@@ -303,7 +317,7 @@ function checkBadges(data, previousStreak) {
             .slice(0, 7);
         if (recentWorkouts.length >= 7) {
             const allLowPain = recentWorkouts.every((w) => {
-                if (!w.exercises || w.exercises.length === 0) return true;
+                if (!w.exercises || w.exercises.length === 0) return false;
                 const avgPain =
                     w.exercises.reduce((s, e) => s + (e.pain || 0), 0) /
                     w.exercises.length;
