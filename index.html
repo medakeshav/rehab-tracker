@@ -136,8 +136,16 @@
                     </button>
                 </div>
 
-                <div class="stats-card">
-                    <h3>Quick Stats</h3>
+                <!-- Streak Warning Banner -->
+                <div id="streakWarning" class="streak-warning" style="display: none"></div>
+
+                <!-- Streak Card -->
+                <div class="streak-card" id="streakCard">
+                    <!-- Rendered dynamically by streak.js -->
+                </div>
+
+                <!-- Quick Stats (compact) -->
+                <div class="stats-card stats-card--compact">
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value" id="totalWorkouts">0</div>

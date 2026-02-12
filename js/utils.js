@@ -13,6 +13,7 @@ import {
     workoutData,
     dailyProgress,
     saveDailyProgress,
+    streakData,
 } from './state.js';
 import { showScreen } from './navigation.js';
 
@@ -155,37 +156,12 @@ function normalizeDate(dateStr) {
 }
 
 /**
- * Calculate the current workout streak (consecutive days with a logged workout).
+ * Calculate the current workout streak.
+ * Delegates to the streak module's streakData (rest-day-aware calculation).
  * @returns {number} Number of consecutive days
  */
 function calculateStreak() {
-    if (workoutData.length === 0) return 0;
-
-    const sortedDates = workoutData.map((w) => normalizeDate(w.date)).sort((a, b) => b - a);
-
-    let streak = 1;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const lastWorkout = sortedDates[0];
-
-    const daysDiff = Math.round((today - lastWorkout) / (1000 * 60 * 60 * 24));
-
-    if (daysDiff > 1) return 0;
-
-    for (let i = 1; i < sortedDates.length; i++) {
-        const prevDate = sortedDates[i - 1];
-        const currDate = sortedDates[i];
-        const diff = Math.round((prevDate - currDate) / (1000 * 60 * 60 * 24));
-
-        if (diff === 1) {
-            streak++;
-        } else {
-            break;
-        }
-    }
-
-    return streak;
+    return streakData.current || 0;
 }
 
 /**

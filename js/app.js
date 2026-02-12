@@ -41,6 +41,7 @@ import { loadExercises, saveWorkout } from './exercises-ui.js';
 import { showHistoryTab, loadHistory } from './history.js';
 import { saveWeeklyAssessment, saveMonthlyAssessment } from './assessments.js';
 import { exportAllData, clearAllData } from './export.js';
+import { initStreak, checkStreakReminder } from './streak.js';
 
 // ========== Wire Up Callbacks (avoid circular imports) ==========
 
@@ -55,6 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
     setupEventListeners();
     initSwipeBack();
     updateStats();
+    initStreak();
+    checkStreakReminder();
 });
 
 // ========== Initialization ==========

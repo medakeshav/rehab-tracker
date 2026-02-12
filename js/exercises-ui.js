@@ -35,6 +35,7 @@ import {
 } from './progress.js';
 import { updateStats } from './utils.js';
 import { safeSetItem } from './utils.js';
+import { onWorkoutSaved } from './streak.js';
 
 // ========== Exercise Loading ==========
 
@@ -896,6 +897,9 @@ function saveWorkout() {
     safeSetItem('workoutData', workoutData);
 
     showToast('✓ Workout saved successfully!', 'success');
+
+    // Update streak data and show badge unlocks
+    onWorkoutSaved();
 
     // Clear daily progress after save
     setDailyProgress(createFreshProgress());

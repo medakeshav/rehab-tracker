@@ -34,6 +34,17 @@ let darkMode = safeGetItem('darkMode', false);
 let balanceLevel = safeGetItem('balanceLevel', 1);
 if (typeof balanceLevel === 'string') balanceLevel = parseInt(balanceLevel) || 1;
 
+/** @type {Object} Streak tracking data (recalculated from workoutData on init) */
+let streakData = safeGetItem('streakData', {
+    current: 0,
+    longest: 0,
+    lastWorkoutDate: '',
+    lastWorkoutAvgPain: 0,
+    isInjuryGrace: false,
+    achievements: [],
+    achievementDates: {},
+});
+
 // ========== Daily Progress (completion tracking + input values) ==========
 
 /** @type {Object} Today's progress — resets automatically on new day */
@@ -230,6 +241,9 @@ function setDarkMode(v) {
 function setBalanceLevel(v) {
     balanceLevel = v;
 }
+function setStreakData(v) {
+    streakData = v;
+}
 function setDailyProgress(v) {
     dailyProgress = v;
 }
@@ -242,6 +256,7 @@ export {
     PROGRESS_BAR_VERSION,
     darkMode,
     balanceLevel,
+    streakData,
     dailyProgress,
     loadDailyProgress,
     createFreshProgress,
@@ -257,5 +272,6 @@ export {
     setProgressBarVersion,
     setDarkMode,
     setBalanceLevel,
+    setStreakData,
     setDailyProgress,
 };
