@@ -8,17 +8,205 @@
 
 import { workoutData, streakData, setStreakData } from './state.js';
 import { safeSetItem, normalizeDate } from './utils.js';
+import { getCategoryByExerciseId } from '../exercises.js';
 
 // ========== Badge Definitions ==========
 
+/** Category metadata for muscle-group badges */
+const CATEGORY_META = {
+    'Foot & Ankle': { label: 'Calves & Ankles', icon: '🦵' },
+    'Hip & Glute': { label: 'Glutes', icon: '🍑' },
+    Core: { label: 'Core', icon: '💪' },
+    Balance: { label: 'Balance', icon: '⚖️' },
+    Mobility: { label: 'Mobility', icon: '🧘' },
+};
+
+/** Tier icons for muscle badges: 10=Bronze, 50=Silver, 100=Gold */
+const TIER_ICONS = { 10: '🥉', 50: '🥈', 100: '🥇' };
+
+/** Section groupings for badge sheet */
+const BADGE_SECTIONS = {
+    consistency: { title: '📅 Consistency', order: 1 },
+    volume: { title: '📊 Volume', order: 2 },
+    muscle: { title: '💪 Muscle Mastery', order: 3 },
+};
+
 const BADGES = [
-    { id: 'first_workout', name: 'First Step', icon: '👟', condition: 'first' },
-    { id: 'three_day', name: 'Momentum', icon: '⚡', streakRequired: 3 },
-    { id: 'week_warrior', name: 'Week Warrior', icon: '🏅', streakRequired: 7 },
-    { id: 'two_week', name: 'Two Week Champion', icon: '🏆', streakRequired: 14 },
-    { id: 'monthly_master', name: 'Monthly Master', icon: '👑', streakRequired: 30 },
-    { id: 'comeback_kid', name: 'Comeback Kid', icon: '💪', condition: 'comeback' },
-    { id: 'pain_free_week', name: 'Pain-Free Week', icon: '🌟', condition: 'painFree' },
+    // Consistency (streak + special)
+    {
+        id: 'first_workout',
+        name: 'First Step',
+        icon: '👟',
+        condition: 'first',
+        section: 'consistency',
+    },
+    { id: 'three_day', name: 'Momentum', icon: '⚡', streakRequired: 3, section: 'consistency' },
+    {
+        id: 'week_warrior',
+        name: 'Week Warrior',
+        icon: '🏅',
+        streakRequired: 7,
+        section: 'consistency',
+    },
+    {
+        id: 'two_week',
+        name: 'Two Week Champion',
+        icon: '🏆',
+        streakRequired: 14,
+        section: 'consistency',
+    },
+    {
+        id: 'monthly_master',
+        name: 'Monthly Master',
+        icon: '👑',
+        streakRequired: 30,
+        section: 'consistency',
+    },
+    {
+        id: 'comeback_kid',
+        name: 'Comeback Kid',
+        icon: '💪',
+        condition: 'comeback',
+        section: 'consistency',
+    },
+    {
+        id: 'pain_free_week',
+        name: 'Pain-Free Week',
+        icon: '🌟',
+        condition: 'painFree',
+        section: 'consistency',
+    },
+    // Volume (total exercise count)
+    { id: 'total_10', name: 'First 10', icon: '📋', totalRequired: 10, section: 'volume' },
+    { id: 'total_50', name: 'Fifty Reps', icon: '📈', totalRequired: 50, section: 'volume' },
+    { id: 'total_100', name: 'Century', icon: '💯', totalRequired: 100, section: 'volume' },
+    { id: 'total_200', name: 'Double Century', icon: '🏆', totalRequired: 200, section: 'volume' },
+    { id: 'total_300', name: 'Legend', icon: '👑', totalRequired: 300, section: 'volume' },
+    // Muscle: Calves & Ankles (10/50/100 only)
+    {
+        id: 'calves_10',
+        name: 'Calf Starter',
+        icon: '🦵',
+        category: 'Foot & Ankle',
+        categoryRequired: 10,
+        section: 'muscle',
+    },
+    {
+        id: 'calves_50',
+        name: 'Foot Strong',
+        icon: '🦵',
+        category: 'Foot & Ankle',
+        categoryRequired: 50,
+        section: 'muscle',
+    },
+    {
+        id: 'calves_100',
+        name: 'Calf Master',
+        icon: '🦵',
+        category: 'Foot & Ankle',
+        categoryRequired: 100,
+        section: 'muscle',
+    },
+    // Glutes
+    {
+        id: 'glutes_10',
+        name: 'Glute Starter',
+        icon: '🍑',
+        category: 'Hip & Glute',
+        categoryRequired: 10,
+        section: 'muscle',
+    },
+    {
+        id: 'glutes_50',
+        name: 'Glute Strong',
+        icon: '🍑',
+        category: 'Hip & Glute',
+        categoryRequired: 50,
+        section: 'muscle',
+    },
+    {
+        id: 'glutes_100',
+        name: 'Glute Master',
+        icon: '🍑',
+        category: 'Hip & Glute',
+        categoryRequired: 100,
+        section: 'muscle',
+    },
+    // Core
+    {
+        id: 'core_10',
+        name: 'Core Starter',
+        icon: '💪',
+        category: 'Core',
+        categoryRequired: 10,
+        section: 'muscle',
+    },
+    {
+        id: 'core_50',
+        name: 'Core Strong',
+        icon: '💪',
+        category: 'Core',
+        categoryRequired: 50,
+        section: 'muscle',
+    },
+    {
+        id: 'core_100',
+        name: 'Core Master',
+        icon: '💪',
+        category: 'Core',
+        categoryRequired: 100,
+        section: 'muscle',
+    },
+    // Balance
+    {
+        id: 'balance_10',
+        name: 'Balance Starter',
+        icon: '⚖️',
+        category: 'Balance',
+        categoryRequired: 10,
+        section: 'muscle',
+    },
+    {
+        id: 'balance_50',
+        name: 'Balance Strong',
+        icon: '⚖️',
+        category: 'Balance',
+        categoryRequired: 50,
+        section: 'muscle',
+    },
+    {
+        id: 'balance_100',
+        name: 'Balance Master',
+        icon: '⚖️',
+        category: 'Balance',
+        categoryRequired: 100,
+        section: 'muscle',
+    },
+    // Mobility
+    {
+        id: 'mobility_10',
+        name: 'Mobility Starter',
+        icon: '🧘',
+        category: 'Mobility',
+        categoryRequired: 10,
+        section: 'muscle',
+    },
+    {
+        id: 'mobility_50',
+        name: 'Mobility Strong',
+        icon: '🧘',
+        category: 'Mobility',
+        categoryRequired: 50,
+        section: 'muscle',
+    },
+    {
+        id: 'mobility_100',
+        name: 'Mobility Master',
+        icon: '🧘',
+        category: 'Mobility',
+        categoryRequired: 100,
+        section: 'muscle',
+    },
 ];
 
 // ========== Date Helpers ==========
@@ -253,6 +441,30 @@ function calculateLongestStreak(workoutDates) {
     return Math.max(longestStreak, currentRun);
 }
 
+// ========== Exercise Count Helpers ==========
+
+/**
+ * Get total number of exercise completions across all workouts.
+ * Each logged exercise in a saved workout counts as 1.
+ */
+function getTotalExerciseCount() {
+    return workoutData.reduce((sum, w) => sum + (w.exercises?.length || 0), 0);
+}
+
+/**
+ * Get exercise count for a specific category (e.g. 'Foot & Ankle', 'Hip & Glute').
+ */
+function getCategoryExerciseCount(category) {
+    let count = 0;
+    workoutData.forEach((w) => {
+        (w.exercises || []).forEach((ex) => {
+            const cat = getCategoryByExerciseId(ex.id);
+            if (cat === category) count++;
+        });
+    });
+    return count;
+}
+
 // ========== Badge Checking ==========
 
 /**
@@ -317,6 +529,28 @@ function checkBadges(data, previousStreak) {
             }
         }
     }
+
+    // Total exercise count badges
+    const totalCount = getTotalExerciseCount();
+    BADGES.filter((b) => b.totalRequired).forEach((badge) => {
+        if (!achievements.includes(badge.id) && totalCount >= badge.totalRequired) {
+            achievements.push(badge.id);
+            achievementDates[badge.id] = todayStr();
+            newBadges.push(badge.id);
+        }
+    });
+
+    // Category (muscle group) badges
+    BADGES.filter((b) => b.category && b.categoryRequired).forEach((badge) => {
+        if (!achievements.includes(badge.id)) {
+            const catCount = getCategoryExerciseCount(badge.category);
+            if (catCount >= badge.categoryRequired) {
+                achievements.push(badge.id);
+                achievementDates[badge.id] = todayStr();
+                newBadges.push(badge.id);
+            }
+        }
+    });
 
     data.achievements = achievements;
     data.achievementDates = achievementDates;
@@ -458,15 +692,21 @@ function renderStreakCard() {
     // This-week calendar row
     const weekHTML = renderWeekRow();
 
-    // Badge showcase (last 3 earned)
+    // Badge showcase (last 3 earned) — tappable to open full badge sheet
     const recentBadges = earnedBadges.slice(-3);
     const extraCount = earnedBadges.length - 3;
     let badgesHTML = '';
     if (recentBadges.length > 0) {
         badgesHTML = `
-            <div class="streak-badges">
+            <div class="streak-badges streak-badges--tappable">
                 ${recentBadges.map((b) => `<span class="badge-pill">${b.icon} ${b.name}</span>`).join('')}
                 ${extraCount > 0 ? `<span class="badge-pill badge-pill--more">+${extraCount} more</span>` : ''}
+            </div>
+        `;
+    } else {
+        badgesHTML = `
+            <div class="streak-badges streak-badges--tappable">
+                <span class="badge-pill badge-pill--more">🏆 View Badges</span>
             </div>
         `;
     }
@@ -483,6 +723,12 @@ function renderStreakCard() {
         ${weekHTML}
         ${badgesHTML}
     `;
+
+    // Make badge area tappable to open full badge sheet
+    const badgeArea = card.querySelector('.streak-badges--tappable');
+    if (badgeArea) {
+        badgeArea.addEventListener('click', showBadgeSheet);
+    }
 }
 
 /**
@@ -532,6 +778,290 @@ function renderWeekRow() {
     }
 
     return `<div class="streak-week-row">${cells}</div>`;
+}
+
+// ========== Badge Detail Bottom Sheet ==========
+
+/**
+ * Get the display icon for a badge (tier progression for muscle badges).
+ */
+function getBadgeDisplayIcon(badge) {
+    if (badge.category && badge.categoryRequired && TIER_ICONS[badge.categoryRequired]) {
+        const tier = TIER_ICONS[badge.categoryRequired];
+        const meta = CATEGORY_META[badge.category];
+        return meta ? `${meta.icon}${tier}` : tier;
+    }
+    return badge.icon;
+}
+
+/**
+ * Get the next locked badge per "bucket" (section + category for muscle).
+ * Used to show only upcoming badges by default.
+ */
+function getNextLockedPerBucket(unearnedBadges) {
+    const buckets = new Map(); // key → badge
+    unearnedBadges.forEach((b) => {
+        let key;
+        if (b.section === 'consistency') key = 'consistency';
+        else if (b.section === 'volume') key = 'volume';
+        else if (b.category) key = `muscle:${b.category}`;
+        else return;
+        const existing = buckets.get(key);
+        if (!existing || getBadgeSortOrder(b) < getBadgeSortOrder(existing)) {
+            buckets.set(key, b);
+        }
+    });
+    return Array.from(buckets.values());
+}
+
+/** Sort order for "next" badge (lower = sooner to earn) */
+function getBadgeSortOrder(badge) {
+    if (badge.streakRequired) return badge.streakRequired - streakData.current;
+    if (badge.totalRequired) return badge.totalRequired - getTotalExerciseCount();
+    if (badge.categoryRequired)
+        return badge.categoryRequired - getCategoryExerciseCount(badge.category);
+    return 999;
+}
+
+/**
+ * Get a human-readable description of how to earn a badge.
+ * @param {Object} badge - Badge definition
+ * @returns {string} Description text
+ */
+function getBadgeRequirement(badge) {
+    if (badge.streakRequired) {
+        return `Maintain a ${badge.streakRequired}-day streak`;
+    }
+    if (badge.totalRequired) {
+        return `${badge.totalRequired} total exercises completed`;
+    }
+    if (badge.category && badge.categoryRequired) {
+        const meta = CATEGORY_META[badge.category];
+        const label = meta ? meta.label : badge.category;
+        return `${badge.categoryRequired} ${label} exercises`;
+    }
+    switch (badge.condition) {
+        case 'first':
+            return 'Complete your first workout';
+        case 'comeback':
+            return 'Return after a 7+ day break';
+        case 'painFree':
+            return '7 consecutive workouts with avg pain \u2264 2';
+        default:
+            return '';
+    }
+}
+
+/**
+ * Get progress info for an unearned badge.
+ * @param {Object} badge - Badge definition
+ * @returns {string} Progress text (e.g. "3 days away")
+ */
+function getBadgeProgress(badge) {
+    if (badge.streakRequired) {
+        const daysAway = badge.streakRequired - streakData.current;
+        if (daysAway <= 0) return 'Ready to earn!';
+        return `${daysAway} day${daysAway !== 1 ? 's' : ''} away`;
+    }
+    if (badge.totalRequired) {
+        const count = getTotalExerciseCount();
+        const away = badge.totalRequired - count;
+        if (away <= 0) return 'Ready to earn!';
+        return `${away} more exercises`;
+    }
+    if (badge.category && badge.categoryRequired) {
+        const count = getCategoryExerciseCount(badge.category);
+        const away = badge.categoryRequired - count;
+        if (away <= 0) return 'Ready to earn!';
+        return `${away} more`;
+    }
+    switch (badge.condition) {
+        case 'first':
+            return workoutData.length >= 1 ? 'Ready to earn!' : 'Save your first workout';
+        case 'comeback':
+            return 'Earned automatically on return';
+        case 'painFree':
+            return 'Keep pain levels low';
+        default:
+            return '';
+    }
+}
+
+/** Render a single badge card (earned or locked) */
+function renderBadgeCard(badge, earned) {
+    const icon = getBadgeDisplayIcon(badge);
+    if (earned) {
+        const date = (streakData.achievementDates || {})[badge.id];
+        const dateStr = date
+            ? new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+              })
+            : '';
+        return `
+        <div class="badge-card badge-card--earned">
+            <div class="badge-card-icon">${icon}</div>
+            <div class="badge-card-name">${badge.name}</div>
+            <div class="badge-card-desc">${getBadgeRequirement(badge)}</div>
+            <div class="badge-card-status">
+                <span class="badge-card-check">\u2713</span>
+                <span class="badge-card-date">${dateStr}</span>
+            </div>
+        </div>`;
+    }
+    const progress = getBadgeProgress(badge);
+    let pct = 0;
+    if (badge.streakRequired)
+        pct = Math.min((streakData.current / badge.streakRequired) * 100, 100);
+    else if (badge.totalRequired)
+        pct = Math.min((getTotalExerciseCount() / badge.totalRequired) * 100, 100);
+    else if (badge.category && badge.categoryRequired)
+        pct = Math.min(
+            (getCategoryExerciseCount(badge.category) / badge.categoryRequired) * 100,
+            100
+        );
+    const progressBarHTML =
+        badge.streakRequired || badge.totalRequired || (badge.category && badge.categoryRequired)
+            ? `
+        <div class="badge-card-progress-bar">
+            <div class="badge-card-progress-fill" style="width: ${pct}%"></div>
+        </div>`
+            : '';
+    return `
+        <div class="badge-card badge-card--locked">
+            <div class="badge-card-icon badge-card-icon--locked">${icon}</div>
+            <div class="badge-card-name">${badge.name}</div>
+            <div class="badge-card-desc">${getBadgeRequirement(badge)}</div>
+            ${progressBarHTML}
+            <div class="badge-card-eta">${progress}</div>
+        </div>`;
+}
+
+/**
+ * Show a bottom sheet with all badges — earned and unearned, grouped by section.
+ */
+function showBadgeSheet() {
+    const existing = document.querySelector('.bottom-sheet-overlay');
+    if (existing) existing.remove();
+
+    const earned = streakData.achievements || [];
+    const earnedBadges = BADGES.filter((b) => earned.includes(b.id));
+    const unearnedBadges = BADGES.filter((b) => !earned.includes(b.id));
+    const nextLockedOnly = getNextLockedPerBucket(unearnedBadges);
+    const hasMoreLocked = unearnedBadges.length > nextLockedOnly.length;
+
+    // Group by section: each shows earned + (next-only or all locked based on toggle)
+    const sections = ['consistency', 'volume', 'muscle'];
+    const sectionHTML = sections
+        .map((sectionKey) => {
+            const config = BADGE_SECTIONS[sectionKey];
+            if (!config) return '';
+            const earnedInSection = earnedBadges.filter((b) => b.section === sectionKey);
+            const unearnedInSection = unearnedBadges.filter((b) => b.section === sectionKey);
+            const nextInSection = nextLockedOnly.filter((b) => b.section === sectionKey);
+
+            const earnedCards = earnedInSection.map((b) => renderBadgeCard(b, true)).join('');
+            const nextLockedCards = nextInSection.map((b) => renderBadgeCard(b, false)).join('');
+            const allLockedCards = unearnedInSection.map((b) => renderBadgeCard(b, false)).join('');
+            const totalInSection = earnedInSection.length + unearnedInSection.length;
+            const earnedCount = earnedInSection.length;
+            const hasMoreInSection = unearnedInSection.length > nextInSection.length;
+
+            if (earnedInSection.length === 0 && unearnedInSection.length === 0) return '';
+
+            return `
+            <div class="badge-sheet-section" data-section="${sectionKey}">
+                <h4 class="badge-sheet-section-title">
+                    ${config.title}
+                    <span class="badge-sheet-count">${earnedCount}/${totalInSection}</span>
+                </h4>
+                <div class="badge-card-grid badge-card-grid--next">
+                    ${earnedCards}
+                    ${nextLockedCards}
+                </div>
+                ${
+                    hasMoreInSection
+                        ? `
+                <div class="badge-card-grid badge-card-grid--all" style="display: none;">
+                    ${earnedCards}
+                    ${allLockedCards}
+                </div>`
+                        : ''
+                }
+            </div>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'bottom-sheet-overlay';
+
+    overlay.innerHTML = `
+        <div class="bottom-sheet">
+            <div class="bottom-sheet-handle"></div>
+            <div class="bottom-sheet-header">
+                <h3>\uD83C\uDFC6 Achievements</h3>
+                <p class="badge-sheet-subtitle">${earnedBadges.length}/${BADGES.length} earned</p>
+            </div>
+            <div class="bottom-sheet-body">
+                ${sectionHTML}
+                ${
+                    hasMoreLocked
+                        ? `
+                <button type="button" class="badge-sheet-toggle" id="badgeSheetToggle">
+                    Show all ${unearnedBadges.length} locked badges
+                </button>`
+                        : ''
+                }
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) dismissBadgeSheet(overlay);
+    });
+
+    const handle = overlay.querySelector('.bottom-sheet-handle');
+    if (handle) {
+        handle.addEventListener('click', () => dismissBadgeSheet(overlay));
+    }
+
+    const toggleBtn = overlay.querySelector('#badgeSheetToggle');
+    if (toggleBtn) {
+        let isExpanded = false;
+        toggleBtn.addEventListener('click', function () {
+            isExpanded = !isExpanded;
+            overlay.querySelectorAll('.badge-sheet-section').forEach((section) => {
+                const next = section.querySelector('.badge-card-grid--next');
+                const all = section.querySelector('.badge-card-grid--all');
+                if (next && all) {
+                    next.style.display = isExpanded ? 'none' : '';
+                    all.style.display = isExpanded ? '' : 'none';
+                }
+            });
+            toggleBtn.textContent = isExpanded
+                ? 'Show next badges only'
+                : `Show all ${unearnedBadges.length} locked badges`;
+        });
+    }
+}
+
+/**
+ * Dismiss the badge bottom sheet with animation.
+ * @param {HTMLElement} overlay
+ */
+function dismissBadgeSheet(overlay) {
+    overlay.classList.remove('visible');
+    setTimeout(() => {
+        overlay.remove();
+        document.body.style.overflow = '';
+    }, 300);
 }
 
 /**

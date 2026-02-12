@@ -15,6 +15,7 @@ import {
     showScreen,
     initSwipeBack,
     setOnHistoryScreen,
+    setOnAnalyticsScreen,
 } from './navigation.js';
 import {
     updateStats,
@@ -42,10 +43,12 @@ import { showHistoryTab, loadHistory } from './history.js';
 import { saveWeeklyAssessment, saveMonthlyAssessment } from './assessments.js';
 import { exportAllData, clearAllData } from './export.js';
 import { initStreak, checkStreakReminder } from './streak.js';
+import { initAnalytics, renderAllAnalytics, toggleAnalyticsSection } from './analytics.js';
 
 // ========== Wire Up Callbacks (avoid circular imports) ==========
 
 setOnHistoryScreen(() => loadHistory('workouts'));
+setOnAnalyticsScreen(() => renderAllAnalytics());
 setReloadExercises(() => loadExercises());
 setLoadExercises(() => loadExercises());
 
@@ -79,6 +82,9 @@ function initializeApp() {
     updateProgressBarToggleBtn();
     applyDarkMode();
     updateDarkModeToggleBtn();
+
+    // Init analytics date range buttons
+    initAnalytics();
 }
 
 // ========== Global Event Listeners ==========
@@ -169,6 +175,9 @@ function setupDelegatedActions() {
                 break;
             case 'clear-all-data':
                 clearAllData();
+                break;
+            case 'toggle-analytics-section':
+                toggleAnalyticsSection(target.dataset.section);
                 break;
         }
     });

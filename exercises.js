@@ -933,4 +933,15 @@ function getVisibleExercisesForPhase(phase) {
     return result;
 }
 
-export { exercises, getExercisesForPhase, getVisibleExercisesForPhase };
+/**
+ * Get the category for an exercise by ID.
+ * @param {string} id - Exercise ID (e.g. 'calf_raises', 'balance_level1')
+ * @returns {string|null} Category string or null if not found
+ */
+function getCategoryByExerciseId(id) {
+    const all = [...exercises.phase1, ...exercises.phase2, ...exercises.phase3];
+    const ex = all.find((e) => e.id === id);
+    return ex ? ex.category : null;
+}
+
+export { exercises, getExercisesForPhase, getVisibleExercisesForPhase, getCategoryByExerciseId };

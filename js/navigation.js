@@ -13,12 +13,23 @@ let screenHistory = ['home'];
 /** @type {Function|null} Callback to load history screen data (set by app.js to avoid circular import) */
 let onHistoryScreen = null;
 
+/** @type {Function|null} Callback to render analytics (set by app.js to avoid circular import) */
+let onAnalyticsScreen = null;
+
 /**
  * Register a callback to be called when navigating to the history screen.
  * @param {Function} fn - callback that receives no arguments
  */
 function setOnHistoryScreen(fn) {
     onHistoryScreen = fn;
+}
+
+/**
+ * Register a callback to be called when navigating to the analytics screen.
+ * @param {Function} fn - callback that receives no arguments
+ */
+function setOnAnalyticsScreen(fn) {
+    onAnalyticsScreen = fn;
 }
 
 // ========== Side Menu ==========
@@ -82,6 +93,9 @@ function showScreen(screenName, useSlideBack) {
     // Special actions for certain screens
     if (screenName === 'history' && onHistoryScreen) {
         onHistoryScreen();
+    }
+    if (screenName === 'analytics' && onAnalyticsScreen) {
+        onAnalyticsScreen();
     }
 
     closeMenu();
@@ -253,4 +267,12 @@ function initSwipeBack() {
     );
 }
 
-export { openMenu, closeMenu, showScreen, goBack, initSwipeBack, setOnHistoryScreen };
+export {
+    openMenu,
+    closeMenu,
+    showScreen,
+    goBack,
+    initSwipeBack,
+    setOnHistoryScreen,
+    setOnAnalyticsScreen,
+};

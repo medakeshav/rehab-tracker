@@ -77,8 +77,15 @@
                     <!-- Rendered dynamically by streak.js -->
                 </div>
 
-                <!-- Quick Stats (compact) -->
-                <div class="stats-card stats-card--compact">
+                <!-- Quick Stats (compact) — tap to open analytics -->
+                <div
+                    class="stats-card stats-card--compact stats-card--tappable"
+                    data-action="navigate"
+                    data-screen="analytics"
+                    role="button"
+                    tabindex="0"
+                    aria-label="View Analytics"
+                >
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value" id="totalWorkouts">0</div>
@@ -92,6 +99,10 @@
                             <div class="stat-value" id="currentWeek">1</div>
                             <div class="stat-label">Current Week</div>
                         </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        <span>View Analytics</span>
+                        <span class="stats-card-arrow">→</span>
                     </div>
                 </div>
 
@@ -435,6 +446,156 @@
                 </div>
             </div>
 
+            <!-- ANALYTICS SCREEN -->
+            <div class="screen" id="analyticsScreen">
+                <div class="screen-header">
+                    <button class="back-btn" data-action="navigate" data-screen="home">
+                        ← Back
+                    </button>
+                    <h2>Analytics</h2>
+                </div>
+
+                <!-- Date Range Selector -->
+                <div class="analytics-date-range">
+                    <button class="analytics-range-btn active" data-range="30">Last 30 days</button>
+                    <button class="analytics-range-btn" data-range="90">Last 90 days</button>
+                    <button class="analytics-range-btn" data-range="all">All time</button>
+                </div>
+
+                <!-- Summary Cards Row -->
+                <div class="analytics-summary-row" id="analyticsSummary">
+                    <div class="analytics-stat-card">
+                        <div class="analytics-stat-value" id="summaryAvgPain">--</div>
+                        <div class="analytics-stat-label">Avg Pain</div>
+                        <div class="analytics-stat-trend" id="summaryPainTrend"></div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="analytics-stat-value" id="summaryTotalVolume">--</div>
+                        <div class="analytics-stat-label">Total Reps</div>
+                        <div class="analytics-stat-trend" id="summaryVolumeTrend"></div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="analytics-stat-value" id="summaryAsymmetry">--</div>
+                        <div class="analytics-stat-label">Asymmetry</div>
+                        <div class="analytics-stat-trend" id="summaryAsymmetryTrend"></div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="analytics-stat-value" id="summaryVariety">--</div>
+                        <div class="analytics-stat-label">Variety</div>
+                        <div class="analytics-stat-trend" id="summaryVarietyTrend"></div>
+                    </div>
+                </div>
+
+                <!-- Pain & Recovery Section -->
+                <div class="analytics-section" id="painSection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="painSection"
+                    >
+                        🩹 Pain & Recovery
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-chart-container">
+                            <canvas id="painTrendChart"></canvas>
+                        </div>
+                        <div class="analytics-cards-row" id="painStatsCards">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Asymmetry Section -->
+                <div class="analytics-section" id="asymmetrySection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="asymmetrySection"
+                    >
+                        ⚖️ Left / Right Asymmetry
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-chart-container">
+                            <canvas id="asymmetryChart"></canvas>
+                        </div>
+                        <div class="analytics-cards-row" id="asymmetryCards">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progression Section -->
+                <div class="analytics-section" id="progressionSection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="progressionSection"
+                    >
+                        📈 Progression
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-chart-container">
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                        <div class="analytics-dropdown-wrap">
+                            <label for="exerciseSelector">Exercise:</label>
+                            <select id="exerciseSelector" class="analytics-dropdown">
+                                <!-- Options populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="analytics-chart-container">
+                            <canvas id="repProgressionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Balance Section -->
+                <div class="analytics-section" id="balanceSection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="balanceSection"
+                    >
+                        🎯 Training Balance
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-chart-container analytics-chart-container--square">
+                            <canvas id="categoryPieChart"></canvas>
+                        </div>
+                        <div class="analytics-cards-row" id="balanceCards">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adherence Section -->
+                <div class="analytics-section" id="adherenceSection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="adherenceSection"
+                    >
+                        ✅ Adherence & Compliance
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-cards-row" id="adherenceCards">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="analytics-empty" id="analyticsEmpty" style="display: none">
+                    <div class="analytics-empty-icon">📊</div>
+                    <p>No workout data yet. Complete some workouts to see your analytics!</p>
+                </div>
+            </div>
+
             <!-- EXPORT SCREEN -->
             <div class="screen" id="exportScreen">
                 <div class="screen-header">
@@ -563,6 +724,7 @@
             </svg>
         </button>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
         <script type="module" src="js/app.js"></script>
     </body>
