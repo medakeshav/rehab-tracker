@@ -402,12 +402,12 @@ function getFlameClass(streak, isRecovery) {
 }
 
 /**
- * Get the flame emoji based on streak state.
- * @param {boolean} isRecovery
- * @returns {string}
+ * Build the inner HTML for the CSS flame (ember particles).
+ * The actual flame shape is rendered via ::before and ::after pseudo-elements.
+ * @returns {string} HTML for ember spans
  */
-function getFlameEmoji(isRecovery) {
-    return isRecovery ? '💙' : '🔥';
+function getFlameInnerHTML() {
+    return '<span class="ember"></span><span class="ember"></span><span class="ember"></span><span class="ember"></span>';
 }
 
 /**
@@ -441,7 +441,7 @@ function renderStreakCard() {
     const best = streakData.longest;
     const isRecovery = streakData.lastWorkoutAvgPain >= 6;
     const flameClass = getFlameClass(current, isRecovery);
-    const flameEmoji = getFlameEmoji(isRecovery);
+    const flameInner = getFlameInnerHTML();
     const nextBadge = getNextBadge();
     const earnedBadges = BADGES.filter((b) =>
         streakData.achievements.includes(b.id)
@@ -490,7 +490,7 @@ function renderStreakCard() {
     card.innerHTML = `
         <div class="streak-header">
             <div class="streak-flame-wrap">
-                <span class="streak-flame ${flameClass}">${flameEmoji}</span>
+                <span class="streak-flame ${flameClass}">${flameInner}</span>
                 <span class="streak-count">${current}-Day Streak</span>
             </div>
             <div class="streak-best">Best: ${best} day${best !== 1 ? 's' : ''}</div>

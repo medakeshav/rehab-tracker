@@ -495,119 +495,357 @@ body {
     gap: var(--space-sm);
 }
 
+/* ===== CSS Flame with Embers ===== */
 .streak-flame {
-    font-size: 24px;
-    display: inline-block;
     position: relative;
-    filter: brightness(1);
+    display: inline-block;
+    font-size: 0;             /* hide emoji text */
+    width: 28px;
+    height: 36px;
+    flex-shrink: 0;
 }
 
+/* --- Main flame body (::before) --- */
+.streak-flame::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 28px;
+    background: radial-gradient(ellipse at 50% 90%,
+        #ffeb3b 0%,
+        #ff9800 30%,
+        #ff5722 55%,
+        rgba(255, 61, 0, 0) 80%
+    );
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: flameBody 0.4s ease-in-out infinite alternate;
+    filter: blur(0.5px);
+}
+
+/* --- Inner bright core (::after) --- */
+.streak-flame::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 16px;
+    background: radial-gradient(ellipse at 50% 85%,
+        #fff9c4 0%,
+        #ffeb3b 35%,
+        #ff9800 65%,
+        rgba(255, 152, 0, 0) 100%
+    );
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: flameCore 0.3s ease-in-out infinite alternate-reverse;
+    filter: blur(0.3px);
+}
+
+/* --- Ember particles (inside .ember spans) --- */
+.streak-flame .ember {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ff9800;
+    opacity: 0;
+    pointer-events: none;
+}
+.streak-flame .ember:nth-child(1) {
+    left: 35%;
+    bottom: 40%;
+    animation: emberRise 1.6s ease-out infinite 0s;
+    background: #ffab40;
+}
+.streak-flame .ember:nth-child(2) {
+    left: 60%;
+    bottom: 35%;
+    width: 2px;
+    height: 2px;
+    animation: emberRise 1.4s ease-out infinite 0.4s;
+    background: #ff6d00;
+}
+.streak-flame .ember:nth-child(3) {
+    left: 45%;
+    bottom: 50%;
+    width: 2.5px;
+    height: 2.5px;
+    animation: emberRise 1.8s ease-out infinite 0.8s;
+    background: #ff9100;
+}
+.streak-flame .ember:nth-child(4) {
+    left: 25%;
+    bottom: 30%;
+    width: 2px;
+    height: 2px;
+    animation: emberRise 1.5s ease-out infinite 1.2s;
+    background: #ffab40;
+}
+
+/* ===== Tier Variations ===== */
+
+/* None: invisible */
 .streak-flame--none {
-    opacity: 0.3;
+    opacity: 0.2;
     filter: grayscale(1);
+}
+.streak-flame--none::before,
+.streak-flame--none::after {
     animation: none;
 }
+.streak-flame--none .ember { display: none; }
 
-/* Small flame: gentle flicker */
+/* Small: gentle small flame */
 .streak-flame--small {
-    font-size: 26px;
-    animation: flameSmall 1.8s ease-in-out infinite;
-    filter: drop-shadow(0 0 3px rgba(255, 140, 0, 0.4));
+    width: 26px;
+    height: 34px;
 }
+.streak-flame--small::before {
+    width: 16px;
+    height: 24px;
+    animation: flameBody 0.6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 4px rgba(255, 140, 0, 0.35));
+}
+.streak-flame--small::after {
+    width: 8px;
+    height: 12px;
+    animation: flameCore 0.5s ease-in-out infinite alternate-reverse;
+}
+/* fewer embers for small */
+.streak-flame--small .ember:nth-child(3),
+.streak-flame--small .ember:nth-child(4) { display: none; }
 
-/* Medium flame: visible burn with glow */
+/* Medium: fuller flame with glow */
 .streak-flame--medium {
-    font-size: 32px;
-    animation:
-        flameBurn 0.8s ease-in-out infinite alternate,
-        flameGlow 2s ease-in-out infinite;
+    width: 32px;
+    height: 40px;
+}
+.streak-flame--medium::before {
+    width: 22px;
+    height: 32px;
+    animation: flameBody 0.4s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 6px rgba(255, 100, 0, 0.5))
-            drop-shadow(0 0 12px rgba(255, 60, 0, 0.25));
+            drop-shadow(0 0 12px rgba(255, 60, 0, 0.2));
+}
+.streak-flame--medium::after {
+    width: 12px;
+    height: 18px;
 }
 
-/* Large flame: intense burning with flicker + sway */
+/* Large: intense flame with more glow and sway */
 .streak-flame--large {
-    font-size: 38px;
+    width: 38px;
+    height: 48px;
+}
+.streak-flame--large::before {
+    width: 26px;
+    height: 38px;
     animation:
-        flameBurn 0.6s ease-in-out infinite alternate,
-        flameSway 1.5s ease-in-out infinite,
-        flameGlow 1.2s ease-in-out infinite;
+        flameBody 0.35s ease-in-out infinite alternate,
+        flameSway 1.5s ease-in-out infinite;
     filter: drop-shadow(0 0 8px rgba(255, 80, 0, 0.6))
-            drop-shadow(0 0 18px rgba(255, 40, 0, 0.35));
+            drop-shadow(0 0 18px rgba(255, 40, 0, 0.3));
 }
-
-/* Epic flame: wild flicker + glow + sway + scale */
-.streak-flame--epic {
-    font-size: 44px;
+.streak-flame--large::after {
+    width: 14px;
+    height: 22px;
     animation:
-        flameEpicBurn 0.4s ease-in-out infinite alternate,
-        flameSway 1s ease-in-out infinite,
-        flameGlow 0.8s ease-in-out infinite,
-        flameEpicScale 2s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px rgba(255, 60, 0, 0.7))
-            drop-shadow(0 0 24px rgba(255, 20, 0, 0.4))
-            drop-shadow(0 -4px 30px rgba(255, 160, 0, 0.3));
+        flameCore 0.25s ease-in-out infinite alternate-reverse,
+        flameSway 1.2s ease-in-out infinite reverse;
 }
 
-/* Recovery: calm pulsing blue glow */
+/* Epic: wild burning inferno */
+.streak-flame--epic {
+    width: 44px;
+    height: 56px;
+}
+.streak-flame--epic::before {
+    width: 30px;
+    height: 46px;
+    animation:
+        flameBodyEpic 0.25s ease-in-out infinite alternate,
+        flameSway 0.8s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 60, 0, 0.7))
+            drop-shadow(0 0 22px rgba(255, 20, 0, 0.4))
+            drop-shadow(0 -6px 28px rgba(255, 160, 0, 0.25));
+}
+.streak-flame--epic::after {
+    width: 16px;
+    height: 28px;
+    animation:
+        flameCoreEpic 0.2s ease-in-out infinite alternate-reverse,
+        flameSway 0.6s ease-in-out infinite reverse;
+}
+.streak-flame--epic .ember {
+    width: 3.5px;
+    height: 3.5px;
+}
+
+/* Recovery: calm blue flame */
 .streak-flame--recovery {
-    font-size: 30px;
-    animation: flameRecovery 3s ease-in-out infinite;
+    width: 30px;
+    height: 40px;
+}
+.streak-flame--recovery::before {
+    width: 20px;
+    height: 30px;
+    background: radial-gradient(ellipse at 50% 90%,
+        #bbdefb 0%,
+        #64b5f6 30%,
+        #1e88e5 55%,
+        rgba(30, 136, 229, 0) 80%
+    );
+    animation: flameBody 0.8s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 6px rgba(100, 160, 255, 0.5))
             drop-shadow(0 0 14px rgba(66, 133, 244, 0.25));
 }
+.streak-flame--recovery::after {
+    width: 10px;
+    height: 16px;
+    background: radial-gradient(ellipse at 50% 85%,
+        #e3f2fd 0%,
+        #90caf9 35%,
+        #42a5f5 65%,
+        rgba(66, 165, 245, 0) 100%
+    );
+    animation: flameCore 0.6s ease-in-out infinite alternate-reverse;
+}
+.streak-flame--recovery .ember {
+    background: #64b5f6;
+}
+.streak-flame--recovery .ember:nth-child(1) { background: #90caf9; }
+.streak-flame--recovery .ember:nth-child(2) { background: #42a5f5; }
 
-/* ---------- Flame Keyframes ---------- */
+/* ===== Flame Keyframes ===== */
 
-/* Small: gentle vertical bob */
-@keyframes flameSmall {
-    0%, 100% { transform: translateY(0) scale(1); }
-    30% { transform: translateY(-1px) scale(1.03); }
-    70% { transform: translateY(0.5px) scale(0.98); }
+/* Flame body: natural flicker via height + border-radius morph */
+@keyframes flameBody {
+    0% {
+        height: 100%;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        transform: translateX(-50%) scaleX(1);
+    }
+    33% {
+        height: 92%;
+        border-radius: 48% 52% 50% 50% / 62% 58% 42% 38%;
+        transform: translateX(calc(-50% + 0.5px)) scaleX(0.96);
+    }
+    66% {
+        height: 97%;
+        border-radius: 52% 48% 50% 50% / 58% 62% 38% 42%;
+        transform: translateX(calc(-50% - 0.5px)) scaleX(1.03);
+    }
+    100% {
+        height: 94%;
+        border-radius: 50% 50% 48% 52% / 60% 56% 44% 40%;
+        transform: translateX(-50%) scaleX(0.98);
+    }
 }
 
-/* Medium/Large: simulated burn flicker (vertical jitter) */
-@keyframes flameBurn {
-    0% { transform: translateY(0); }
-    25% { transform: translateY(-1.5px); }
-    50% { transform: translateY(-0.5px); }
-    75% { transform: translateY(-2px); }
-    100% { transform: translateY(-1px); }
+/* Inner core: faster counter-flicker */
+@keyframes flameCore {
+    0% {
+        height: 100%;
+        transform: translateX(-50%) scaleX(1);
+        opacity: 0.95;
+    }
+    50% {
+        height: 90%;
+        transform: translateX(calc(-50% + 0.3px)) scaleX(0.92);
+        opacity: 1;
+    }
+    100% {
+        height: 96%;
+        transform: translateX(calc(-50% - 0.3px)) scaleX(1.04);
+        opacity: 0.9;
+    }
 }
 
-/* Sway side to side */
+/* Epic body: wilder morph */
+@keyframes flameBodyEpic {
+    0% {
+        height: 100%;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        transform: translateX(-50%) scaleX(1) rotate(0deg);
+    }
+    25% {
+        height: 90%;
+        border-radius: 46% 54% 52% 48% / 64% 56% 44% 36%;
+        transform: translateX(calc(-50% + 1px)) scaleX(0.94) rotate(-1.5deg);
+    }
+    50% {
+        height: 96%;
+        border-radius: 54% 46% 48% 52% / 56% 64% 36% 44%;
+        transform: translateX(calc(-50% - 1px)) scaleX(1.06) rotate(1.5deg);
+    }
+    75% {
+        height: 88%;
+        border-radius: 48% 52% 54% 46% / 62% 58% 42% 38%;
+        transform: translateX(calc(-50% + 0.5px)) scaleX(0.97) rotate(-0.5deg);
+    }
+    100% {
+        height: 93%;
+        border-radius: 52% 48% 46% 54% / 58% 62% 38% 42%;
+        transform: translateX(-50%) scaleX(1.02) rotate(0.5deg);
+    }
+}
+
+/* Epic core: intense flicker */
+@keyframes flameCoreEpic {
+    0% {
+        height: 100%;
+        transform: translateX(-50%) scaleX(1);
+        opacity: 1;
+    }
+    33% {
+        height: 86%;
+        transform: translateX(calc(-50% + 0.5px)) scaleX(0.88);
+        opacity: 0.95;
+    }
+    66% {
+        height: 94%;
+        transform: translateX(calc(-50% - 0.5px)) scaleX(1.08);
+        opacity: 1;
+    }
+    100% {
+        height: 89%;
+        transform: translateX(-50%) scaleX(0.95);
+        opacity: 0.92;
+    }
+}
+
+/* Side sway for flame */
 @keyframes flameSway {
     0%, 100% { margin-left: 0; }
     25% { margin-left: -1.5px; }
     75% { margin-left: 1.5px; }
 }
 
-/* Glow intensity oscillation (via opacity) */
-@keyframes flameGlow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
-}
-
-/* Epic: wild flicker with more movement */
-@keyframes flameEpicBurn {
-    0% { transform: translateY(0) rotate(0deg); }
-    20% { transform: translateY(-2px) rotate(-2deg); }
-    40% { transform: translateY(-1px) rotate(1deg); }
-    60% { transform: translateY(-3px) rotate(-1deg); }
-    80% { transform: translateY(-1.5px) rotate(2deg); }
-    100% { transform: translateY(-2px) rotate(0deg); }
-}
-
-/* Epic: slow breathe scale */
-@keyframes flameEpicScale {
-    0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 60, 0, 0.7)) drop-shadow(0 0 24px rgba(255, 20, 0, 0.4)) drop-shadow(0 -4px 30px rgba(255, 160, 0, 0.3)) brightness(1); }
-    50% { filter: drop-shadow(0 0 14px rgba(255, 60, 0, 0.9)) drop-shadow(0 0 32px rgba(255, 20, 0, 0.55)) drop-shadow(0 -6px 40px rgba(255, 160, 0, 0.45)) brightness(1.1); }
-}
-
-/* Recovery: calm blue pulse */
-@keyframes flameRecovery {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(100, 160, 255, 0.5)) drop-shadow(0 0 14px rgba(66, 133, 244, 0.25)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(100, 160, 255, 0.65)) drop-shadow(0 0 20px rgba(66, 133, 244, 0.4)); }
+/* Embers: rise, drift, and fade */
+@keyframes emberRise {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(1);
+    }
+    10% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.7;
+        transform: translate(-4px, -18px) scale(0.8);
+    }
+    80% {
+        opacity: 0.3;
+        transform: translate(2px, -32px) scale(0.5);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-1px, -42px) scale(0.2);
+    }
 }
 
 .streak-count {
