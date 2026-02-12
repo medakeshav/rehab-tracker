@@ -1,0 +1,124 @@
+---
+description: Testing conventions and patterns for the rehab-tracker test suite. Auto-loaded when working on test files.
+globs: tests/**
+alwaysApply: false
+---
+
+# Testing Patterns
+
+## Setup
+
+- **Framework**: Vitest 2 with jsdom environment, globals enabled
+- **Coverage**: @vitest/coverage-v8, target 80%+, currently ~82% (481 tests, 22 files)
+- **Config**: `vite.config.js` → `test.coverage` section
+- **Coverage scope**: `js/**/*.js` + `exercises.js` (excludes `js/app.js` orchestrator and `js/analytics.js` charts)
+
+## Run Commands
+
+```bash
+npm test                    # All tests once
+npm run test:watch          # Watch mode
+npx vitest run --coverage   # With coverage report
+```
+
+## Two Test Patterns
+
+### 1. Pure Function Tests (no mocks needed)
+Files: `utils.test.js`, `state.test.js`, `export.test.js`, `streak-calc.test.js`, `analytics-calc.test.js`
+
+These re-implement functions inline to test logic in isolation:
+```js
+import { describe, it, expect } from 'vitest';
+
+function myPureFunction(x) { return x * 2; }
+
+describe('myPureFunction', () => {
+    it('should double input', () => {
+        expect(myPureFunction(5)).toBe(10);
+    });
+});
+```
+
+### 2. Integration Tests (mock dependencies with vi.mock)
+Files: `*-integration.test.js`
+
+These import real modules and mock their dependencies:
+```js
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Mock dependencies BEFORE imports
+vi.mock('../js/state.js', () => ({
+    workoutData: [],
+    dailyProgress: { completedExercises: [], exerciseData: {} },
+    saveDailyProgress: vi.fn(),
+}));
+
+vi.mock('../js/utils.js', () => ({
+    showToast: vi.fn(),
+    safeSetItem: vi.fn(),
+}));
+
+import { functionToTest } from '../js/module.js';
+
+describe('Module Integration', () => {
+    beforeEach(() => {
+        document.body.innerHTML = '';
+        localStorage.clear();
+        vi.clearAllMocks();
+    });
+
+    it('should do something', () => {
+        document.body.innerHTML = '<div id="container"></div>';
+        functionToTest();
+        expect(document.getElementById('container').children.length).toBeGreaterThan(0);
+    });
+});
+```
+
+## Mocking Cheatsheet
+
+| What | How |
+|------|-----|
+| localStorage | `localStorage.clear()` in beforeEach (jsdom provides it) |
+| DOM | Set `document.body.innerHTML` with minimal structure |
+| State module | `vi.mock('../js/state.js', () => ({ ... }))` with getters for mutable data |
+| Navigation | `vi.mock('../js/navigation.js', () => ({ showScreen: vi.fn() }))` |
+| canvas-confetti | `vi.mock('canvas-confetti', () => ({ default: vi.fn() }))` |
+| Wheel pickers | Mock `getPickerValue`/`setPickerValue` to read/write hidden inputs |
+| Timers | `vi.useFakeTimers()` / `vi.advanceTimersByTime(ms)` / `vi.useRealTimers()` |
+| Confirm dialogs | Mock `showConfirmDialog` to auto-invoke the `onConfirm` callback |
+
+## Gotchas
+
+- jsdom converts hex colors to RGB: `#4CAF50` → `rgb(76, 175, 80)` in `element.style`
+- jsdom doesn't support real navigation: `link.click()` triggers "Not implemented" warning (harmless)
+- `vi.mock()` calls must be BEFORE the `import` of the module being tested
+- For modules with side effects on import (state.js, wheel-picker.js), always mock their dependencies
+- Use `vi.useFakeTimers()` for testing `setTimeout`-based animations (300ms screen transitions, 1500ms nav delays)
+
+## Test File Inventory (22 files)
+
+| File | Tests | What it covers |
+|------|-------|----------------|
+| exercises.test.js | 22 | Exercise data validation |
+| config.test.js | 13 | CONFIG constants |
+| dom-helpers.test.js | 28 | Safe DOM utilities |
+| csv-escaping.test.js | 17 | CSV RFC 4180 compliance |
+| analytics-calc.test.js | 24 | Analytics calculations |
+| streak-calc.test.js | 22 | Streak pure calculations |
+| utils.test.js | 18 | Utils pure functions |
+| state.test.js | 11 | State pure functions |
+| export.test.js | 8 | CSV format builders |
+| progress-calculations.test.js | 18 | Progress percentage logic |
+| smoke.test.js | 2 | Basic smoke checks |
+| utils-integration.test.js | 41 | Real utils.js with mocked deps |
+| state-integration.test.js | 33 | Real state.js with mocked deps |
+| export-integration.test.js | 12 | Real export.js with mocked deps |
+| progress-integration.test.js | 44 | Real progress.js with mocked deps |
+| history-integration.test.js | 16 | Real history.js with mocked deps |
+| assessments-integration.test.js | 14 | Real assessments.js with mocked deps |
+| wheel-picker.test.js | 10 | Picker get/set API |
+| wheel-picker-integration.test.js | 24 | Full picker component |
+| navigation.test.js | 15 | Screen switching, menu |
+| streak-integration.test.js | 41 | Badges, streak card, warnings |
+| exercises-ui-integration.test.js | 46 | Card creation, collapse, save |

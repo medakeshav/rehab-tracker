@@ -74,11 +74,11 @@ function getChartDefaults() {
         scales: {
             x: {
                 ticks: { color: theme.textColor, font: { size: 10 } },
-                grid: { color: theme.gridColor },
+                grid: { display: false },
             },
             y: {
                 ticks: { color: theme.textColor, font: { size: 10 } },
-                grid: { color: theme.gridColor },
+                grid: { display: false },
             },
         },
     };
@@ -200,11 +200,16 @@ function renderPainTrendChart() {
                     ...defaults.scales.y,
                     min: 0,
                     max: 10,
+                    grid: { display: false },
                     title: {
                         display: true,
                         text: 'Pain (0-10)',
                         color: getChartTheme().textColor,
                     },
+                },
+                x: {
+                    ...defaults.scales.x,
+                    grid: { display: false },
                 },
             },
         },
@@ -366,10 +371,12 @@ function renderAsymmetryChart() {
             scales: {
                 x: {
                     ...defaults.scales.x,
+                    grid: { display: false },
                     title: { display: true, text: 'Reps', color: theme.textColor },
                 },
                 y: {
                     ...defaults.scales.y,
+                    grid: { display: false },
                     ticks: { ...defaults.scales.y.ticks, font: { size: 9 } },
                 },
             },
@@ -499,7 +506,12 @@ function renderVolumeChart() {
                 y: {
                     ...defaults.scales.y,
                     beginAtZero: true,
+                    grid: { display: false },
                     title: { display: true, text: 'Total Reps', color: theme.textColor },
+                },
+                x: {
+                    ...defaults.scales.x,
+                    grid: { display: false },
                 },
             },
         },
@@ -584,7 +596,12 @@ function renderRepProgressionChart(exerciseId) {
                 y: {
                     ...defaults.scales.y,
                     beginAtZero: true,
+                    grid: { display: false },
                     title: { display: true, text: 'Reps', color: theme.textColor },
+                },
+                x: {
+                    ...defaults.scales.x,
+                    grid: { display: false },
                 },
             },
         },

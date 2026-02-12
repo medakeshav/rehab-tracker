@@ -10,5 +10,11 @@ export default defineConfig(({ command }) => ({
     test: {
         environment: 'jsdom',
         globals: true,
+        coverage: {
+            provider: 'v8',
+            include: ['js/**/*.js', 'exercises.js'],
+            exclude: ['app.js', 'js/analytics.js', 'js/app.js'],
+            reporter: ['text', 'text-summary'],
+        },
     },
 }));

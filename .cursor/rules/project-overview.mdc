@@ -1,0 +1,63 @@
+---
+description: Rehab Tracker project overview — architecture, modules, patterns, and key conventions. Loaded automatically so the agent understands the codebase without exploring.
+alwaysApply: true
+---
+
+# Rehab Tracker — Project Context
+
+PCL reconstruction rehab exercise tracker. Vite 5 PWA, ES modules, Tailwind CSS 4, localStorage persistence.
+
+## Commands
+
+```
+npm run dev          # Vite dev server → http://localhost:5173
+npm run lint         # ESLint (0 errors expected)
+npm run format:check # Prettier check
+npm test             # Vitest (481 tests, 22 test files)
+npm test -- --coverage  # Coverage report (target: 80%+, currently ~82%)
+npm run build        # Production → dist/
+```
+
+## Architecture (ES modules, no shared globals)
+
+```
+exercises.js          — Exercise data for 3 phases (no deps)
+js/config.js          — 50+ centralized constants (timeouts, thresholds, defaults)
+js/dom-helpers.js     — Safe DOM utilities: h(), clearElement(), text(), fragment()
+js/utils.js           — Toast, dialog, localStorage helpers, date formatting (imports state, exercises)
+js/state.js           — Global state & persistence (imports utils, config, wheel-picker)
+js/wheel-picker.js    — iOS-style scroll picker with tap-to-activate guard (no deps)
+js/navigation.js      — Screen nav, side menu, swipe-back gesture (no deps)
+js/export.js          — CSV export with RFC 4180 escaping & data clearing (imports utils, state)
+js/history.js         — History tab rendering (imports utils, state)
+js/progress.js        — Progress bar, confetti, completion sounds/messages, toggles (imports utils, state)
+js/assessments.js     — Weekly/monthly form handlers (imports utils, state, navigation)
+js/streak.js          — Streak calculation, badge system, loss-aversion warnings, UI (imports state, utils)
+js/exercises-ui.js    — Exercise cards: create, collapse, expand, grouped, save workout (imports all)
+js/analytics.js       — Chart.js analytics dashboard (imports state, utils)
+js/app.js             — Entry point: init, event wiring, delegated actions (orchestrates all)
+```
+
+## Key Patterns
+
+- **localStorage**: Always `safeGetItem(key, fallback)` / `safeSetItem(key, value)` from utils.js
+- **Delegated actions**: `[data-action]` attributes → single click handler in app.js
+- **Toggle pattern**: `toggleX()` + `updateXBtn()` + `safeSetItem()`
+- **Bilateral exercises**: `bilateral: true` → single "Reps" picker, stored as left & right
+- **Safe DOM**: Use `h()` from dom-helpers.js instead of `innerHTML` for new code
+- **Constants**: All magic numbers live in `js/config.js` → `CONFIG` object
+- **CSV escaping**: Always use `escapeCSV()` from export.js for user data
+- **Timezone-safe**: Use `normalizeDate(dateStr)` for YYYY-MM-DD → local midnight
+- **Callback registration**: Modules use `setOnX(fn)` pattern to avoid circular imports
+
+## Commit Style
+
+Conventional commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`. These ARE the release notes.
+
+## What NOT to do
+
+- Don't create documentation files unless explicitly asked
+- Don't modify CLAUDE.md for bug fixes or CSS tweaks — only structural changes
+- Don't use CDN scripts — all deps are npm-managed
+- Don't use `innerHTML` for new code — use `h()` from dom-helpers.js
+- Don't hardcode magic numbers — add to `js/config.js`
