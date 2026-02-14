@@ -118,6 +118,7 @@ function createDefaultQuickLogCounts() {
         glute_activation_quick: 0,
         standing_posture_quick: 0,
         seated_clamshells_quick: 0,
+        mini_band_walks_quick: 0,
     };
 }
 
@@ -188,6 +189,27 @@ function getProgressionTargets(exercise) {
     }
 
     return exercise.progression[targetKey] || null;
+}
+
+// ========== Schedule Helpers ==========
+
+/**
+ * Get schedule info for a given date and phase.
+ * @param {number} phase - Current phase (1, 2, or 3)
+ * @param {string} dateStr - YYYY-MM-DD date string
+ * @returns {{ isRestDay: boolean, isMaintenanceDay: boolean, isWorkoutDay: boolean, dayOfWeek: number, dayName: string }}
+ */
+function getScheduleForDate(phase, dateStr) {
+    const schedule = CONFIG.SCHEDULE[phase] || CONFIG.SCHEDULE[1];
+    const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return {
+        isRestDay: schedule.restDays.includes(dayOfWeek),
+        isMaintenanceDay: schedule.maintenanceDays.includes(dayOfWeek),
+        isWorkoutDay: schedule.workoutDays.includes(dayOfWeek),
+        dayOfWeek,
+        dayName: dayNames[dayOfWeek],
+    };
 }
 
 // ========== Quick Log ==========
@@ -429,6 +451,7 @@ export {
     setPlanStartDate,
     getCurrentPlanWeek,
     getProgressionTargets,
+    getScheduleForDate,
     incrementQuickLog,
     decrementQuickLog,
     updateDailyMetric,

@@ -94,6 +94,58 @@ export const CONFIG = {
         LABELS: { 0: 'Sunday', 3: 'Wednesday' },
     },
 
+    // ========== Phase Schedule ==========
+    /**
+     * Per-phase workout scheduling rules.
+     * Controls which days are rest days, which Phase 1 exercises are maintained
+     * (and on which days), and any volume overrides for maintenance exercises.
+     */
+    SCHEDULE: {
+        1: {
+            /** No schedule restrictions in Phase 1 — all exercises every day */
+            restDays: [],
+            workoutDays: [0, 1, 2, 3, 4, 5, 6],
+            maintenanceDays: [],
+            /** Phase 1 evening exercise IDs carried into Phase 2 as maintenance */
+            maintainedExercises: [],
+            /** No overrides in Phase 1 */
+            maintenanceOverrides: {},
+        },
+        2: {
+            /** Rest days: Sunday=0, Wednesday=3 */
+            restDays: [0, 3],
+            /** Workout days: Mon=1, Tue=2, Thu=4, Fri=5, Sat=6 */
+            workoutDays: [1, 2, 4, 5, 6],
+            /** Maintenance days (subset of workout days): Mon=1, Thu=4, Fri=5 */
+            maintenanceDays: [1, 4, 5],
+            /** Phase 1 evening exercises to keep in Phase 2 (maintenance only) */
+            maintainedExercises: [
+                'hip_flexor_warmup',
+                'dead_bug_holds',
+                'clamshells',
+                'plank',
+                'decompression_cooldown',
+            ],
+            /**
+             * Volume overrides for maintained exercises in Phase 2.
+             * Applied when rendering cards so Phase 1 definitions stay untouched.
+             */
+            maintenanceOverrides: {
+                clamshells: { sets: 2 },
+                plank: { sets: 2 },
+                dead_bug_holds: { targetReps: 'L: 20s×4 | R: 30s×4' },
+            },
+        },
+        3: {
+            /** Phase 3 schedule — TBD, defaults to no restrictions */
+            restDays: [],
+            workoutDays: [0, 1, 2, 3, 4, 5, 6],
+            maintenanceDays: [],
+            maintainedExercises: [],
+            maintenanceOverrides: {},
+        },
+    },
+
     // ========== Badge Thresholds ==========
     BADGES: {
         /** Total exercise count thresholds */

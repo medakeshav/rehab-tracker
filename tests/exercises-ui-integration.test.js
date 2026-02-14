@@ -35,6 +35,7 @@ const mockExercisesList = [
 vi.mock('../exercises.js', () => ({
     getExercisesForPhase: vi.fn(() => mockExercisesList),
     getExercisesForTimeBlock: vi.fn(() => mockExercisesList),
+    getScheduledExercises: vi.fn(() => mockExercisesList),
     getVisibleExercisesForPhase: vi.fn(() => mockExercisesList),
 }));
 
@@ -99,6 +100,13 @@ vi.mock('../js/state.js', () => ({
     decrementQuickLog: vi.fn(),
     updateDailyMetric: vi.fn(),
     getProgressionTargets: vi.fn(() => null),
+    getScheduleForDate: vi.fn(() => ({
+        isRestDay: false,
+        isMaintenanceDay: false,
+        isWorkoutDay: true,
+        dayOfWeek: 1,
+        dayName: 'Monday',
+    })),
 }));
 
 // Mock progress.js
@@ -147,6 +155,7 @@ describe('Exercises UI Integration', () => {
     describe('loadExercises()', () => {
         it('should render exercise cards into exerciseList', () => {
             document.body.innerHTML = `
+                <input id="workoutDate" value="2025-02-10">
                 <div id="exerciseList"></div>
                 <div id="progressBarA"></div>
                 <div id="progressBarC"></div>
@@ -159,6 +168,7 @@ describe('Exercises UI Integration', () => {
 
         it('should call updateProgressBar', () => {
             document.body.innerHTML = `
+                <input id="workoutDate" value="2025-02-10">
                 <div id="exerciseList"></div>
                 <div id="progressBarA"></div>
                 <div id="progressBarC"></div>
@@ -170,6 +180,7 @@ describe('Exercises UI Integration', () => {
 
         it('should restore exercise data for non-completed exercises', () => {
             document.body.innerHTML = `
+                <input id="workoutDate" value="2025-02-10">
                 <div id="exerciseList"></div>
                 <div id="progressBarA"></div>
                 <div id="progressBarC"></div>
@@ -182,6 +193,7 @@ describe('Exercises UI Integration', () => {
         it('should render completed cards for completed exercises', () => {
             mockDailyProgress.completedExercises = ['calf_raises'];
             document.body.innerHTML = `
+                <input id="workoutDate" value="2025-02-10">
                 <div id="exerciseList"></div>
                 <div id="progressBarA"></div>
                 <div id="progressBarC"></div>

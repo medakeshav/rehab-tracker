@@ -56,6 +56,14 @@
     --cat-balance: #f1c40f;
     --cat-strength: #e74c3c;
     --cat-power: #ff6b6b;
+    --cat-hip-flexor: #e74c3c;
+    --cat-glute-med: #e67e22;
+    --cat-hamstring: #d35400;
+    --cat-decompression: #1abc9c;
+    --cat-posture: #2ecc71;
+    --cat-single-leg: #e74c3c;
+    --cat-dynamic-stability: #f39c12;
+    --cat-controlled-loading: #c0392b;
 
     /* Spacing */
     --space-xs: 4px;
@@ -3980,6 +3988,42 @@ body.dark-mode .analytics-dropdown {
     border-left: 4px solid var(--cat-power);
 }
 
+.exercise-card[data-category="Hip Flexor"] {
+    border-left: 4px solid var(--cat-hip-flexor);
+}
+
+.exercise-card[data-category="Glute Med"] {
+    border-left: 4px solid var(--cat-glute-med);
+}
+
+.exercise-card[data-category="Hamstring"] {
+    border-left: 4px solid var(--cat-hamstring);
+}
+
+.exercise-card[data-category="Decompression"] {
+    border-left: 4px solid var(--cat-decompression);
+}
+
+.exercise-card[data-category="Posture"] {
+    border-left: 4px solid var(--cat-posture);
+}
+
+.exercise-card[data-category="Single-Leg Strength"] {
+    border-left: 4px solid var(--cat-single-leg);
+}
+
+.exercise-card[data-category="Dynamic Stability"] {
+    border-left: 4px solid var(--cat-dynamic-stability);
+}
+
+.exercise-card[data-category="Controlled Loading"] {
+    border-left: 4px solid var(--cat-controlled-loading);
+}
+
+.exercise-card[data-category="Power & Plyometrics"] {
+    border-left: 4px solid var(--cat-power);
+}
+
 .exercise-card-category-icon {
     display: inline-flex;
     align-items: center;
@@ -4473,6 +4517,119 @@ body.dark .rest-day-banner {
 
 body.dark .rest-day-text {
     color: #ddd;
+}
+
+/* ============================================================
+   V2: REST DAY CARD (shown in exercise list on rest days)
+   ============================================================ */
+.rest-day-card {
+    background: linear-gradient(135deg, #ebf5fb, #d6eaf8);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl) var(--space-xl);
+    text-align: center;
+    margin: var(--space-md) 0;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.rest-day-card-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-sm);
+}
+
+.rest-day-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: var(--space-sm);
+}
+
+.rest-day-card-text {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: var(--space-md);
+}
+
+.rest-day-card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+.rest-day-card-list li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text-dark);
+    position: relative;
+    padding-left: 24px;
+}
+
+.rest-day-card-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success-color);
+    font-weight: 700;
+}
+
+body.dark .rest-day-card {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(52, 152, 219, 0.08));
+    border-color: rgba(52, 152, 219, 0.15);
+}
+
+body.dark .rest-day-card-title {
+    color: #eee;
+}
+
+body.dark .rest-day-card-text {
+    color: #aaa;
+}
+
+body.dark .rest-day-card-list li {
+    color: #ddd;
+}
+
+/* ============================================================
+   V2: SCHEDULE INDICATOR (evening workout day type)
+   ============================================================ */
+.schedule-indicator {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--text-light);
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.schedule-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.schedule-badge--full {
+    background: var(--primary-color);
+    color: white;
+}
+
+.schedule-badge--p2 {
+    background: #e67e22;
+    color: white;
+}
+
+body.dark .schedule-indicator {
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
 }
 
 /* ============================================================
