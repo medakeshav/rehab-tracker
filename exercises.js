@@ -942,166 +942,327 @@ const exercises = {
     ],
 
     phase2: [
-        // Phase 2 exercises kept intact but hidden in UI until updated
+        // ============================================================
+        // PHASE 2 — MORNING ADDITIONS (Daily)
+        // ============================================================
+        {
+            id: 'worlds_greatest_stretch',
+            name: '3. World\'s Greatest Stretch',
+            timeBlock: 'morning',
+            exerciseType: 'reps',
+            targetReps: 'L: 5 | R: 8',
+            leftTarget: 5,
+            rightTarget: 8,
+            sets: 1,
+            category: 'Mobility',
+            instructions: {
+                title: 'World\'s Greatest Stretch',
+                steps: [
+                    'Start in push-up position',
+                    'Step RIGHT foot forward outside RIGHT hand',
+                    'Drop back knee to ground',
+                    'Reach RIGHT arm up toward ceiling (rotation)',
+                    'Hold 3 seconds',
+                    'Return hand to ground',
+                    'Rock hips back (hamstring stretch)',
+                    'Return to start',
+                    'Complete 8 reps RIGHT side (weaker)',
+                    'Switch: 5 reps LEFT side',
+                ],
+                reps: 'Left: 5 | Right: 8',
+                sets: '1 set each side',
+                why: 'Dynamic mobility for hip, spine, ankle — addresses multiple areas simultaneously',
+                tips: [
+                    'Keep back knee on ground for stability',
+                    'Rotate through thoracic spine, not lower back',
+                    'Feel the stretch through hip flexor, hamstring, and upper back',
+                    'Move slowly and with control',
+                ],
+            },
+        },
+        {
+            id: 'standing_glute_activation',
+            name: '4. Standing Single-Leg Glute Activation',
+            timeBlock: 'morning',
+            exerciseType: 'reps',
+            targetReps: 'L: 10 | R: 15',
+            leftTarget: 10,
+            rightTarget: 15,
+            sets: 2,
+            category: 'Glute Med',
+            instructions: {
+                title: 'Standing Single-Leg Glute Activation',
+                steps: [
+                    'Stand on RIGHT leg (weaker)',
+                    'Hands on hips',
+                    'Lift LEFT knee to 90°',
+                    'Hold balance 3 seconds',
+                    'Push LEFT knee OUT to side (like clamshell standing)',
+                    'Feel RIGHT glute med engage',
+                    'Return to center',
+                    'Lower foot to ground',
+                    'Complete 15 reps RIGHT leg standing',
+                    'Switch: 10 reps LEFT leg standing',
+                ],
+                reps: 'Left: 10 | Right: 15',
+                sets: '2 sets each leg',
+                why: 'Functional glute med work in standing (now that core is stronger)',
+                tips: [
+                    'Focus on feeling the glute med of the standing leg',
+                    'Keep hips level throughout',
+                    'Use wall for balance initially if needed',
+                    'RIGHT leg standing will be harder (expected)',
+                ],
+            },
+        },
+
+        // ============================================================
+        // PHASE 2 — THROUGHOUT DAY ADDITION
+        // ============================================================
+        {
+            id: 'mini_band_walks_quick',
+            name: 'Mini Band Walks',
+            timeBlock: 'throughout_day',
+            exerciseType: 'quick_log',
+            targetReps: '30 sec each direction',
+            leftTarget: 10,
+            rightTarget: 10,
+            sets: 1,
+            bilateral: true,
+            category: 'Glute Med',
+            quickLogTarget: 7,
+            quickLogUnit: 'times',
+            quickLogReminder: 'Every bathroom break',
+            instructions: {
+                title: 'Mini Band Walk at Bathroom Breaks',
+                steps: [
+                    'Place mini band above knees',
+                    'Slight squat stance',
+                    'Side-step RIGHT 10 steps',
+                    'Side-step LEFT 10 steps',
+                    'Maintain tension on band',
+                    'Keep toes forward',
+                ],
+                reps: '10 steps each direction (30 seconds)',
+                sets: 'Every bathroom break (6-8x per day)',
+                why: 'Glute med activation in functional pattern',
+                tips: [
+                    'Keep constant tension on the band',
+                    'Stay low in quarter squat',
+                    'Toes point forward throughout',
+                    'Feel burn in side of hips',
+                ],
+            },
+        },
+
+        // ============================================================
+        // PHASE 2 — EVENING EXERCISES (5 days/week)
+        // ============================================================
         {
             id: 'step_ups',
-            name: '16. Step-Ups',
-            targetReps: '12 each (18 right)',
+            name: '7. Step-Ups',
+            targetReps: 'L: 12 | R: 18',
             leftTarget: 12,
             rightTarget: 18,
             sets: 3,
             category: 'Single-Leg Strength',
             timeBlock: 'evening',
             exerciseType: 'reps',
+            progression: {
+                9: { note: '6-8" step, bodyweight' },
+                11: { note: '8-10" step, bodyweight' },
+                13: { note: '10-12" step, bodyweight' },
+                15: { note: '12" step, hold 2-5kg dumbbells' },
+            },
             instructions: {
-                title: 'Step-Ups',
+                title: 'Step-Ups (Single-Leg Strength)',
                 steps: [
-                    'Use a step or box 6-12 inches high',
-                    'Place right foot fully on step',
-                    'Push through right heel to step up',
-                    'Bring left foot up to meet right',
-                    'Step down with control, left foot first',
-                    'Repeat for all reps, then switch legs',
+                    'Stand facing step/box',
+                    'Place RIGHT foot on step (weaker leg)',
+                    'Drive through RIGHT heel',
+                    'Step up, bring LEFT leg to meet RIGHT',
+                    'Stand tall at top',
+                    'Step down with LEFT leg first (control)',
+                    'RIGHT leg stays on step',
+                    'Step down with RIGHT leg',
+                    'Complete 18 reps RIGHT leg leading',
+                    'Switch: 12 reps LEFT leg leading',
                 ],
-                reps: '12 each leg (18 right)',
-                sets: '3 sets',
-                why: 'Builds single-leg strength, improves balance',
+                reps: 'Left: 12 | Right: 18',
+                sets: '3 sets each leg',
+                why: 'Functional single-leg strength, reveals and corrects asymmetries',
                 tips: [
-                    'Drive through heel of elevated foot',
-                    'Keep chest up, core engaged',
-                    'Step down slowly',
-                    'Start with lower step, progress higher',
+                    'RIGHT leg will fatigue more (expected)',
+                    'Drive through HEEL, not toes',
+                    'Control the descent',
+                    'Keep torso upright',
+                    'No pushing off bottom foot',
                 ],
             },
         },
         {
             id: 'split_squats',
-            name: '17. Split Squats (Bulgarian)',
-            targetReps: '10 each (15 right)',
+            name: '8. Bulgarian Split Squats',
+            targetReps: 'L: 10 | R: 15',
             leftTarget: 10,
             rightTarget: 15,
             sets: 3,
             category: 'Single-Leg Strength',
             timeBlock: 'evening',
             exerciseType: 'reps',
+            progression: {
+                9: { note: 'Bodyweight, partial depth' },
+                11: { note: 'Bodyweight, full depth' },
+                13: { note: 'Hold 2-5kg dumbbells each hand' },
+                15: { note: 'Hold 5-8kg dumbbells each hand' },
+            },
             instructions: {
-                title: 'Bulgarian Split Squats',
+                title: 'Bulgarian Split Squats (Advanced Single-Leg)',
                 steps: [
-                    'Stand facing away from bench/chair',
-                    'Place top of back foot on bench',
-                    'Front foot 2-3 feet in front',
-                    'Lower down by bending front knee',
-                    'Back knee drops toward floor',
-                    'Push through front heel to stand',
+                    'Stand facing away from bench (knee height)',
+                    'Place LEFT foot on bench behind you (works RIGHT leg)',
+                    'RIGHT foot 2-3 feet in front of bench',
+                    'Lower into lunge position',
+                    'RIGHT knee tracks over toes',
+                    'Lower until RIGHT thigh parallel to ground',
+                    'Drive through RIGHT heel to stand',
+                    'Complete 15 reps RIGHT leg',
+                    'Switch: 10 reps LEFT leg',
                 ],
-                reps: '10 each leg (15 right)',
-                sets: '3 sets',
-                why: 'Elite single-leg strength builder',
+                reps: 'Left: 10 | Right: 15',
+                sets: '3 sets each leg',
+                why: 'Safer than heavy bilateral squats for L5-S1, builds massive single-leg strength',
                 tips: [
-                    'Start bodyweight only',
-                    'Front knee tracks over toes',
-                    'Chest stays up',
-                    'Back leg is just for balance',
+                    'RIGHT leg will be MUCH harder',
+                    'Front knee stays over toes',
+                    'Torso stays upright',
+                    'Back foot just for balance',
+                    '90% of weight on front leg',
                 ],
             },
         },
         {
             id: 'single_leg_deadlift',
-            name: '18. Single-Leg Deadlift',
-            targetReps: '10 each (15 right)',
+            name: '9. Single-Leg Deadlift',
+            targetReps: 'L: 10 | R: 15',
             leftTarget: 10,
             rightTarget: 15,
             sets: 3,
             category: 'Single-Leg Strength',
             timeBlock: 'evening',
             exerciseType: 'reps',
+            progression: {
+                9: { note: 'Hand reaches to mid-shin' },
+                11: { note: 'Hand reaches to ankle/floor' },
+                13: { note: 'Hold light dumbbell (2-5kg)' },
+                15: { note: 'Increase weight to 5-8kg' },
+            },
             instructions: {
-                title: 'Single-Leg Deadlift (RDL)',
+                title: 'Single-Leg Deadlift (Posterior Chain)',
                 steps: [
-                    'Stand on one leg, slight bend in knee',
-                    'Hinge at hips, reaching forward',
-                    'Back leg extends straight behind',
-                    'Keep back flat, core tight',
-                    'Reach hand toward floor',
-                    'Pull back up using glute and hamstring',
+                    'Stand on RIGHT leg (weaker)',
+                    'Slight bend in RIGHT knee',
+                    'Hinge at hip, reach toward floor',
+                    'LEFT leg extends behind for balance',
+                    'Keep back straight (no rounding)',
+                    'Feel stretch in RIGHT hamstring',
+                    'Drive through RIGHT heel to stand',
+                    'Squeeze RIGHT glute at top',
+                    'Complete 15 reps RIGHT leg',
+                    'Switch: 10 reps LEFT leg',
                 ],
-                reps: '10 each leg (15 right)',
-                sets: '3 sets',
-                why: 'Challenges balance, builds posterior chain',
+                reps: 'Left: 10 | Right: 15',
+                sets: '3 sets each leg',
+                why: 'Builds posterior chain in single-leg pattern, functional for daily life',
                 tips: [
-                    'Start holding wall for support',
-                    'Hinge at hips, not round the back',
+                    'RIGHT hamstring will be tighter initially',
+                    'Back stays FLAT — no rounding',
+                    'Extended leg just for balance',
+                    'Feel it in standing leg hamstring/glute',
                     'Move slowly and controlled',
-                    'Add weight when form is perfect',
                 ],
             },
         },
         {
             id: 'lateral_band_walks',
-            name: '19. Lateral Band Walks',
-            targetReps: '15 steps each way',
+            name: '10. Lateral Band Walks',
+            targetReps: '15 steps each direction',
             leftTarget: 15,
-            rightTarget: 22,
+            rightTarget: 15,
             sets: 3,
+            bilateral: true,
             category: 'Dynamic Stability',
             timeBlock: 'evening',
             exerciseType: 'reps',
+            progression: {
+                9: { note: 'Light band, quarter squat' },
+                11: { note: 'Medium band, quarter squat' },
+                13: { note: 'Medium band, half squat' },
+                15: { note: 'Heavy band, half squat' },
+            },
             instructions: {
-                title: 'Lateral Band Walks',
+                title: 'Lateral Band Walks (Dynamic Glute Med)',
                 steps: [
                     'Place resistance band above knees',
-                    'Stand with feet hip-width apart',
-                    'Slight bend in knees, hips back',
-                    'Step sideways with right foot',
-                    'Follow with left foot, maintaining tension',
-                    'Take 15 steps each direction',
+                    'Slight squat stance (quarter squat)',
+                    'Feet shoulder-width apart',
+                    'Step RIGHT 15 steps',
+                    'Maintain band tension (knees stay apart)',
+                    'Toes always pointing forward',
+                    'No hip dropping',
+                    'Step LEFT 15 steps',
+                    'Complete circuit',
                 ],
-                reps: '15 steps each direction (22 right)',
-                sets: '3 sets',
-                why: 'Activates glute med dynamically',
+                reps: '15 steps each direction',
+                sets: '3 circuits',
+                why: 'Glute med in functional, moving context — mimics lateral stability needs',
                 tips: [
-                    'Keep knees pushing out against band',
-                    'Stay low in athletic stance',
-                    'Feel burn in side of glutes',
-                    'Constant tension',
+                    'Keep tension on band entire time',
+                    'Don\'t let knees cave in',
+                    'Toes forward always',
+                    'Feel burn in SIDE of hips',
+                    'RIGHT side works harder when stepping LEFT',
                 ],
             },
         },
         {
             id: 'balance_reaches',
-            name: '20. Single-Leg Balance Reaches',
-            targetReps: '8 each direction',
-            leftTarget: 8,
-            rightTarget: 12,
+            name: '11. Single-Leg Balance Reaches',
+            targetReps: 'L: 6 | R: 8 per direction',
+            leftTarget: 6,
+            rightTarget: 8,
             sets: 2,
             category: 'Dynamic Stability',
             timeBlock: 'evening',
             exerciseType: 'reps',
             instructions: {
-                title: 'Single-Leg Balance Reaches',
+                title: 'Single-Leg Balance Reaches (Dynamic Stability)',
                 steps: [
-                    'Stand on one leg',
-                    'Reach other leg forward, tap toe',
-                    'Return to center',
-                    'Reach to the side, tap',
-                    'Return to center',
-                    'Reach backward, tap',
-                    'Return to center',
+                    'Stand on RIGHT leg (weaker)',
+                    'Soft knee bend',
+                    'Reach forward with LEFT hand to target',
+                    'Touch ground/target',
+                    'Return to standing',
+                    'Reach to next direction (clockwise)',
+                    'Complete all 8 directions: forward, diagonal forward-right, right, diagonal back-right, back, diagonal back-left, left, diagonal forward-left',
+                    'RIGHT leg: 8 reps × 8 directions = 64 total reaches',
+                    'Switch: LEFT leg: 6 reps × 8 directions = 48 total reaches',
                 ],
-                reps: '8 reaches per direction (12 right)',
-                sets: '2 sets',
-                why: 'Dynamic balance challenge, trains stability in multiple planes',
+                reps: 'Right leg: 8 per direction (64 total) | Left leg: 6 per direction (48 total)',
+                sets: '2 sets each leg',
+                why: 'Challenges stability in all planes, functional balance training',
                 tips: [
-                    'Standing leg stays slightly bent',
-                    'Just tap with toe - light touch',
-                    'Control the movement',
-                    'Keep hips level throughout',
+                    'RIGHT leg will wobble more',
+                    'Start with shallow reaches',
+                    'Progress depth over weeks',
+                    'Keep standing knee soft',
+                    'Hip stays level',
                 ],
             },
         },
         {
             id: 'goblet_squats',
-            name: '21. Goblet Squats',
+            name: '12. Goblet Squats',
             targetReps: '12-15',
             leftTarget: 12,
             rightTarget: 12,
@@ -1110,24 +1271,168 @@ const exercises = {
             category: 'Controlled Loading',
             timeBlock: 'evening',
             exerciseType: 'reps',
+            progression: {
+                9: { note: '5-8kg, to parallel' },
+                11: { note: '8-12kg, to parallel' },
+                13: { note: '12-16kg, to parallel' },
+                15: { note: '16-20kg, to parallel' },
+            },
             instructions: {
-                title: 'Goblet Squats',
+                title: 'Goblet Squats (Controlled Bilateral Loading)',
                 steps: [
-                    'Hold dumbbell or kettlebell at chest',
-                    'Feet shoulder-width apart, toes slightly out',
-                    'Keep chest up, core braced',
-                    'Sit back and down, weight in heels',
-                    'Descend until thighs parallel',
+                    'Hold kettlebell/dumbbell at chest',
+                    'Feet shoulder-width apart',
+                    'Squat down, elbows inside knees',
+                    'Go to parallel (NOT below if back hurts)',
+                    'Chest stays up',
                     'Drive through heels to stand',
+                    'Squeeze glutes at top',
                 ],
                 reps: '12-15',
                 sets: '3 sets',
-                why: 'Safe squat progression, bilateral leg strength',
+                why: 'Safe squat pattern, builds legs without back compression',
                 tips: [
-                    'Weight at chest helps keep torso upright',
-                    'Start light (10-20 lbs)',
-                    'Knees track over toes',
-                    'Full depth only if comfortable',
+                    'Stop at parallel — don\'t go deeper',
+                    'If back hurts, reduce weight or depth',
+                    'Chest stays proud',
+                    'Elbows push knees out',
+                    'Safe for L5-S1',
+                ],
+            },
+        },
+        {
+            id: 'copenhagen_plank',
+            name: '13. Copenhagen Plank',
+            timeBlock: 'evening',
+            exerciseType: 'timed',
+            timerDuration: { left: 15, right: 25 },
+            targetReps: 'L: 15s | R: 25s',
+            leftTarget: 15,
+            rightTarget: 25,
+            sets: 2,
+            category: 'Core',
+            instructions: {
+                title: 'Copenhagen Plank (Advanced Core + Adductor)',
+                steps: [
+                    'Side plank position, forearm down',
+                    'Start with RIGHT side (weaker core)',
+                    'Top leg (LEFT leg) on bench/chair',
+                    'Bottom leg (RIGHT leg) off ground',
+                    'Hold position — body in straight line',
+                    'Hold 25 seconds RIGHT side',
+                    'Switch: 15 seconds LEFT side',
+                ],
+                reps: 'Left: 15 seconds | Right: 25 seconds',
+                sets: '2 sets each side',
+                why: 'Advanced core stability, addresses RIGHT-side core weakness specifically',
+                tips: [
+                    'RIGHT side will be MUCH harder',
+                    'Start with bench lower (easier)',
+                    'Progress to higher bench',
+                    'Don\'t let hips sag',
+                    'Extremely challenging — work up to it',
+                ],
+            },
+        },
+        {
+            id: 'single_leg_bridge_elevated',
+            name: '14. Single-Leg Glute Bridge (Elevated)',
+            timeBlock: 'evening',
+            exerciseType: 'reps',
+            targetReps: 'L: 12 | R: 18',
+            leftTarget: 12,
+            rightTarget: 18,
+            sets: 3,
+            category: 'Hamstring',
+            instructions: {
+                title: 'Single-Leg Glute Bridge — Elevated (Progression)',
+                steps: [
+                    'Lie on back',
+                    'Place RIGHT foot on step/box (6-8 inch)',
+                    'LEFT leg extended straight',
+                    'Press through RIGHT heel, lift hips',
+                    'Elevate hips HIGH',
+                    'Hold 3 seconds',
+                    'Lower with control',
+                    'Complete 18 reps RIGHT leg',
+                    'Switch: 12 reps LEFT leg',
+                ],
+                reps: 'Left: 12 | Right: 18',
+                sets: '3 sets each leg',
+                why: 'Harder variation increases RIGHT hamstring/glute strength beyond Phase 1',
+                tips: [
+                    'Keep hips perfectly level',
+                    'Extended leg stays straight',
+                    'Drive through heel of elevated foot',
+                    'RIGHT side will be harder (expected)',
+                    'Control the descent — no dropping',
+                ],
+            },
+        },
+        {
+            id: 'bird_dog_movement',
+            name: '15. Bird Dog with Movement',
+            timeBlock: 'evening',
+            exerciseType: 'reps',
+            targetReps: 'L: 10 | R: 15',
+            leftTarget: 10,
+            rightTarget: 15,
+            sets: 3,
+            category: 'Core',
+            instructions: {
+                title: 'Bird Dog with Movement (Progression from Phase 1)',
+                steps: [
+                    'Hands and knees position',
+                    'Extend LEFT arm + RIGHT leg (works RIGHT core)',
+                    'Hold 3 seconds',
+                    'CRUNCH: Bring elbow to knee under body',
+                    'Extend back out',
+                    'Complete 15 reps RIGHT core working',
+                    'Switch: 10 reps LEFT core working',
+                ],
+                reps: 'Left: 10 | Right: 15',
+                sets: '3 sets each combination',
+                why: 'Adds dynamic movement to challenge RIGHT core more than static holds',
+                tips: [
+                    'Don\'t let hips rotate during crunch',
+                    'Move slowly and with control',
+                    'Full extension each rep',
+                    'RIGHT side working harder = fixing imbalance',
+                ],
+            },
+        },
+        {
+            id: 'pallof_press',
+            name: '16. Pallof Press',
+            timeBlock: 'evening',
+            exerciseType: 'reps',
+            targetReps: 'L: 12 | R: 18',
+            leftTarget: 12,
+            rightTarget: 18,
+            sets: 3,
+            category: 'Core',
+            instructions: {
+                title: 'Pallof Press (Anti-Rotation Core)',
+                steps: [
+                    'Attach resistance band to sturdy anchor (chest height)',
+                    'Stand sideways to anchor, RIGHT side toward anchor (works LEFT core)',
+                    'Hold band at chest with both hands',
+                    'Press band straight forward',
+                    'Band tries to rotate you — RESIST with core',
+                    'Hold extended 3 seconds',
+                    'Return to chest',
+                    'Complete 12 reps LEFT core',
+                    'Switch: RIGHT core gets 18 reps',
+                ],
+                reps: 'Left: 12 | Right: 18',
+                sets: '3 sets each side',
+                why: 'Functional anti-rotation strength, addresses RIGHT core weakness',
+                tips: [
+                    'RIGHT core emphasis: when LEFT side faces anchor, RIGHT core resists harder',
+                    'Arms stay at chest height',
+                    'Core does the work, not arms',
+                    'Maintain neutral spine throughout',
+                    'Progress to heavier band when form is solid',
                 ],
             },
         },
@@ -1322,11 +1627,68 @@ function getTimeBlocksForPhase(phase) {
         .sort((a, b) => TIME_BLOCKS[a].order - TIME_BLOCKS[b].order);
 }
 
+/**
+ * Get exercises for a phase + time block, filtered by schedule rules.
+ * For Phase 2+, evening exercises are filtered based on:
+ * - Rest days: no evening exercises
+ * - Maintenance days: Phase 1 maintained exercises + Phase 2 exercises
+ * - Non-maintenance workout days: Phase 2 exercises only (no Phase 1 maintenance)
+ * Morning, throughout_day, before_bed, bonus: always show all (no day filtering).
+ *
+ * @param {number} phase - Phase number
+ * @param {string} timeBlock - Time block key
+ * @param {Object} scheduleInfo - From getScheduleForDate()
+ * @param {Object} scheduleConfig - CONFIG.SCHEDULE[phase]
+ * @returns {Array} Filtered exercises, with maintenance overrides applied
+ */
+function getScheduledExercises(phase, timeBlock, scheduleInfo, scheduleConfig) {
+    if (!scheduleConfig || phase === 1) {
+        // Phase 1: no filtering, return all
+        return getExercisesForTimeBlock(phase, timeBlock);
+    }
+
+    const all = getExercisesForTimeBlock(phase, timeBlock);
+
+    // Non-evening blocks: always show everything
+    if (timeBlock !== 'evening') {
+        return all;
+    }
+
+    // Evening on a rest day: return empty (rest day card shown by UI)
+    if (scheduleInfo.isRestDay) {
+        return [];
+    }
+
+    // Evening on a workout day: filter Phase 1 exercises
+    const phase1Ids = new Set(exercises.phase1.map((ex) => ex.id));
+    const maintainedSet = new Set(scheduleConfig.maintainedExercises || []);
+    const overrides = scheduleConfig.maintenanceOverrides || {};
+
+    return all
+        .filter((ex) => {
+            const isPhase1Exercise = phase1Ids.has(ex.id);
+            if (!isPhase1Exercise) {
+                // Phase 2+ exercise: always show on workout days
+                return true;
+            }
+            // Phase 1 exercise: only show if maintained AND it's a maintenance day
+            return maintainedSet.has(ex.id) && scheduleInfo.isMaintenanceDay;
+        })
+        .map((ex) => {
+            // Apply maintenance overrides to Phase 1 exercises
+            if (phase1Ids.has(ex.id) && overrides[ex.id]) {
+                return { ...ex, ...overrides[ex.id] };
+            }
+            return ex;
+        });
+}
+
 export {
     exercises,
     TIME_BLOCKS,
     getExercisesForPhase,
     getExercisesForTimeBlock,
+    getScheduledExercises,
     getVisibleExercisesForPhase,
     getCategoryByExerciseId,
     getTimeBlocksForPhase,

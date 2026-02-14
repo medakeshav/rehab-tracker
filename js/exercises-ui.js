@@ -5,7 +5,7 @@
  * timed holds, quick-log cards for throughout-day exercises, and daily metrics.
  */
 
-import { getExercisesForPhase, getExercisesForTimeBlock } from '../exercises.js';
+import { getExercisesForPhase, getScheduledExercises } from '../exercises.js';
 import { showToast } from './utils.js';
 import { createWheelPicker, getPickerValue } from './wheel-picker.js';
 import CONFIG from './config.js';
@@ -25,6 +25,7 @@ import {
     decrementQuickLog,
     updateDailyMetric,
     getProgressionTargets,
+    getScheduleForDate,
     setPlanStartDate,
     planStartDate,
 } from './state.js';
@@ -43,15 +44,58 @@ import { onWorkoutSaved } from './streak.js';
 
 /**
  * Load exercises for the currently active time block and render them.
+ * Uses schedule-aware filtering for Phase 2+ (rest days, maintenance days).
  */
 function loadExercises() {
     const exerciseList = document.getElementById('exerciseList');
     exerciseList.innerHTML = '';
 
-    const exercises = getExercisesForTimeBlock(currentPhase, activeTimeBlock);
+    // Get schedule info for the selected workout date
+    const dateInput = document.getElementById('workoutDate');
+    const dateStr = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+    const scheduleConfig = CONFIG.SCHEDULE[currentPhase] || CONFIG.SCHEDULE[1];
+    const scheduleInfo = getScheduleForDate(currentPhase, dateStr);
+
+    // Use schedule-aware filtering
+    const exercises = getScheduledExercises(currentPhase, activeTimeBlock, scheduleInfo, scheduleConfig);
 
     // Render daily metrics form if applicable
     renderDailyMetrics();
+
+    // Show rest day card for evening block on rest days (Phase 2+)
+    if (activeTimeBlock === 'evening' && scheduleInfo.isRestDay && currentPhase >= 2) {
+        const restCard = document.createElement('div');
+        restCard.className = 'rest-day-card';
+        restCard.innerHTML = `
+            <div class="rest-day-card-icon">🧘</div>
+            <div class="rest-day-card-title">Active Recovery Day</div>
+            <div class="rest-day-card-text">
+                No evening workout today. Focus on:
+            </div>
+            <ul class="rest-day-card-list">
+                <li>Morning routine (all exercises)</li>
+                <li>Throughout-day micro-routines</li>
+                <li>Light walking (20-30 min)</li>
+                <li>Foam rolling &amp; stretching</li>
+                <li>Yoga or swimming (optional)</li>
+            </ul>
+        `;
+        exerciseList.appendChild(restCard);
+        updateProgressBar();
+        return;
+    }
+
+    // Show schedule indicator for evening block on maintenance days (Phase 2+)
+    if (activeTimeBlock === 'evening' && currentPhase >= 2 && scheduleInfo.isWorkoutDay) {
+        const indicator = document.createElement('div');
+        indicator.className = 'schedule-indicator';
+        if (scheduleInfo.isMaintenanceDay) {
+            indicator.innerHTML = `<span class="schedule-badge schedule-badge--full">Full Workout</span> Phase 2 exercises + Phase 1 maintenance`;
+        } else {
+            indicator.innerHTML = `<span class="schedule-badge schedule-badge--p2">Phase 2 Only</span> No maintenance exercises today`;
+        }
+        exerciseList.appendChild(indicator);
+    }
 
     if (activeTimeBlock === 'throughout_day') {
         // Throughout-day header

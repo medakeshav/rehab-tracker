@@ -3,6 +3,7 @@ import {
     exercises,
     getExercisesForPhase,
     getExercisesForTimeBlock,
+    getScheduledExercises,
     getVisibleExercisesForPhase,
     getTimeBlocksForPhase,
     TIME_BLOCKS,
@@ -303,5 +304,184 @@ describe('exercise instructions', () => {
             expect(Array.isArray(ex.instructions.steps)).toBe(true);
             expect(ex.instructions.steps.length).toBeGreaterThan(0);
         });
+    });
+
+    it('all phase 2 exercises should have instructions', () => {
+        exercises.phase2.forEach((ex) => {
+            expect(
+                ex.instructions,
+                `Phase 2 exercise "${ex.name}" should have instructions`
+            ).toBeDefined();
+            expect(ex.instructions.title).toBeDefined();
+            expect(ex.instructions.steps).toBeDefined();
+            expect(Array.isArray(ex.instructions.steps)).toBe(true);
+            expect(ex.instructions.steps.length).toBeGreaterThan(0);
+        });
+    });
+});
+
+// ========== Phase 2 Exercise Data ==========
+
+describe('V2: Phase 2 exercise data', () => {
+    it('every phase 2 exercise should have a timeBlock', () => {
+        exercises.phase2.forEach((ex) => {
+            expect(ex.timeBlock, `Exercise ${ex.id} missing timeBlock`).toBeDefined();
+            expect(Object.keys(TIME_BLOCKS)).toContain(ex.timeBlock);
+        });
+    });
+
+    it('every phase 2 exercise should have an exerciseType', () => {
+        const validTypes = ['reps', 'timed', 'timed_holds', 'quick_log'];
+        exercises.phase2.forEach((ex) => {
+            expect(ex.exerciseType, `Exercise ${ex.id} missing exerciseType`).toBeDefined();
+            expect(validTypes).toContain(ex.exerciseType);
+        });
+    });
+
+    it('should have 13 Phase 2 exercises total', () => {
+        expect(exercises.phase2.length).toBe(13);
+    });
+
+    it('should have Phase 2 morning additions', () => {
+        const morning = exercises.phase2.filter((ex) => ex.timeBlock === 'morning');
+        expect(morning.length).toBe(2);
+        const ids = morning.map((ex) => ex.id);
+        expect(ids).toContain('worlds_greatest_stretch');
+        expect(ids).toContain('standing_glute_activation');
+    });
+
+    it('should have Phase 2 throughout-day addition', () => {
+        const day = exercises.phase2.filter((ex) => ex.timeBlock === 'throughout_day');
+        expect(day.length).toBe(1);
+        expect(day[0].id).toBe('mini_band_walks_quick');
+        expect(day[0].exerciseType).toBe('quick_log');
+    });
+
+    it('should have 10 Phase 2 evening exercises', () => {
+        const evening = exercises.phase2.filter((ex) => ex.timeBlock === 'evening');
+        expect(evening.length).toBe(10);
+    });
+
+    it('should have all expected Phase 2 evening exercise IDs', () => {
+        const evening = exercises.phase2.filter((ex) => ex.timeBlock === 'evening');
+        const ids = evening.map((ex) => ex.id);
+        expect(ids).toContain('step_ups');
+        expect(ids).toContain('split_squats');
+        expect(ids).toContain('single_leg_deadlift');
+        expect(ids).toContain('lateral_band_walks');
+        expect(ids).toContain('balance_reaches');
+        expect(ids).toContain('goblet_squats');
+        expect(ids).toContain('copenhagen_plank');
+        expect(ids).toContain('single_leg_bridge_elevated');
+        expect(ids).toContain('bird_dog_movement');
+        expect(ids).toContain('pallof_press');
+    });
+
+    it('copenhagen plank should be a timed exercise', () => {
+        const cp = exercises.phase2.find((ex) => ex.id === 'copenhagen_plank');
+        expect(cp).toBeDefined();
+        expect(cp.exerciseType).toBe('timed');
+        expect(cp.timerDuration.left).toBe(15);
+        expect(cp.timerDuration.right).toBe(25);
+    });
+
+    it('step-ups should have progression data', () => {
+        const stepUps = exercises.phase2.find((ex) => ex.id === 'step_ups');
+        expect(stepUps).toBeDefined();
+        expect(stepUps.progression).toBeDefined();
+        expect(stepUps.progression[9]).toBeDefined();
+        expect(stepUps.progression[15]).toBeDefined();
+    });
+
+    it('lateral band walks should be bilateral', () => {
+        const lbw = exercises.phase2.find((ex) => ex.id === 'lateral_band_walks');
+        expect(lbw).toBeDefined();
+        expect(lbw.bilateral).toBe(true);
+    });
+
+    it('Phase 2 combined with Phase 1 should have morning exercises from both', () => {
+        const all = getExercisesForTimeBlock(2, 'morning');
+        expect(all.length).toBe(6); // 4 from Phase 1 + 2 from Phase 2
+    });
+
+    it('Phase 2 combined with Phase 1 should have throughout-day exercises from both', () => {
+        const all = getExercisesForTimeBlock(2, 'throughout_day');
+        expect(all.length).toBe(5); // 4 from Phase 1 + 1 from Phase 2
+    });
+});
+
+// ========== getScheduledExercises ==========
+
+describe('getScheduledExercises', () => {
+    const workoutDay = { isRestDay: false, isMaintenanceDay: false, isWorkoutDay: true, dayOfWeek: 2, dayName: 'Tuesday' };
+    const restDay = { isRestDay: true, isMaintenanceDay: false, isWorkoutDay: false, dayOfWeek: 3, dayName: 'Wednesday' };
+    const maintenanceDay = { isRestDay: false, isMaintenanceDay: true, isWorkoutDay: true, dayOfWeek: 1, dayName: 'Monday' };
+
+    const scheduleConfig = {
+        restDays: [0, 3],
+        workoutDays: [1, 2, 4, 5, 6],
+        maintenanceDays: [1, 4, 5],
+        maintainedExercises: ['hip_flexor_warmup', 'dead_bug_holds', 'clamshells', 'plank', 'decompression_cooldown'],
+        maintenanceOverrides: {
+            clamshells: { sets: 2 },
+            plank: { sets: 2 },
+        },
+    };
+
+    it('should return empty array for evening on rest days', () => {
+        const result = getScheduledExercises(2, 'evening', restDay, scheduleConfig);
+        expect(result.length).toBe(0);
+    });
+
+    it('should return all exercises for morning regardless of day', () => {
+        const restResult = getScheduledExercises(2, 'morning', restDay, scheduleConfig);
+        const workResult = getScheduledExercises(2, 'morning', workoutDay, scheduleConfig);
+        expect(restResult.length).toBe(workResult.length);
+        expect(restResult.length).toBeGreaterThan(0);
+    });
+
+    it('should include maintained Phase 1 exercises on maintenance days', () => {
+        const result = getScheduledExercises(2, 'evening', maintenanceDay, scheduleConfig);
+        const ids = result.map((ex) => ex.id);
+        expect(ids).toContain('hip_flexor_warmup');
+        expect(ids).toContain('clamshells');
+        expect(ids).toContain('plank');
+    });
+
+    it('should NOT include maintained Phase 1 exercises on non-maintenance workout days', () => {
+        const result = getScheduledExercises(2, 'evening', workoutDay, scheduleConfig);
+        const ids = result.map((ex) => ex.id);
+        expect(ids).not.toContain('hip_flexor_warmup');
+        expect(ids).not.toContain('clamshells');
+    });
+
+    it('should always include Phase 2 exercises on workout days', () => {
+        const result = getScheduledExercises(2, 'evening', workoutDay, scheduleConfig);
+        const ids = result.map((ex) => ex.id);
+        expect(ids).toContain('step_ups');
+        expect(ids).toContain('copenhagen_plank');
+        expect(ids).toContain('pallof_press');
+    });
+
+    it('should apply maintenance overrides to maintained exercises', () => {
+        const result = getScheduledExercises(2, 'evening', maintenanceDay, scheduleConfig);
+        const clamshells = result.find((ex) => ex.id === 'clamshells');
+        expect(clamshells).toBeDefined();
+        expect(clamshells.sets).toBe(2); // overridden from 3 to 2
+    });
+
+    it('should NOT include non-maintained Phase 1 evening exercises', () => {
+        const result = getScheduledExercises(2, 'evening', maintenanceDay, scheduleConfig);
+        const ids = result.map((ex) => ex.id);
+        // These Phase 1 evening exercises are NOT in the maintained list
+        expect(ids).not.toContain('supine_glute_med');
+        expect(ids).not.toContain('glute_bridges');
+        expect(ids).not.toContain('prone_hamstring_curls');
+        expect(ids).not.toContain('hip_abduction');
+    });
+
+    it('should return unfiltered for Phase 1 (no schedule)', () => {
+        const result = getScheduledExercises(1, 'evening', workoutDay, null);
+        expect(result.length).toBe(getExercisesForTimeBlock(1, 'evening').length);
     });
 });

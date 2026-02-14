@@ -29,6 +29,8 @@ import {
     activeTimeBlock,
     setActiveTimeBlock,
     getCurrentPlanWeek,
+    getScheduleForDate,
+    currentPhase,
 } from './state.js';
 import CONFIG from './config.js';
 import {
@@ -143,17 +145,32 @@ function setActiveTabUI(block) {
 // ========== Rest Day Banner ==========
 
 /**
- * Show/hide the rest day banner based on today's day of week and active tab.
+ * Show/hide the rest day banner based on workout date, phase, and active tab.
+ * Uses phase-specific schedule config for Phase 2+, falls back to
+ * CONFIG.REST_DAYS.SUGGESTED for Phase 1.
  */
 function updateRestDayBanner() {
     const banner = document.getElementById('restDayBanner');
     if (!banner) return;
 
-    const today = new Date().getDay(); // 0=Sun, 3=Wed
-    const isSuggestedRestDay = CONFIG.REST_DAYS.SUGGESTED.includes(today);
+    const dateInput = document.getElementById('workoutDate');
+    const dateStr = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+    const scheduleInfo = getScheduleForDate(currentPhase, dateStr);
+
+    const isRestDay = currentPhase >= 2
+        ? scheduleInfo.isRestDay
+        : CONFIG.REST_DAYS.SUGGESTED.includes(scheduleInfo.dayOfWeek);
+
+    // Update banner text based on phase
+    const textEl = banner.querySelector('.rest-day-text');
+    if (textEl && currentPhase >= 2 && isRestDay) {
+        textEl.textContent = `${scheduleInfo.dayName} — Active Recovery Day. Evening exercises are skipped.`;
+    } else if (textEl) {
+        textEl.textContent = 'Suggested rest day — evening workout is optional today';
+    }
 
     // Show banner on rest days when viewing evening tab
-    if (isSuggestedRestDay && activeTimeBlock === 'evening') {
+    if (isRestDay && activeTimeBlock === 'evening') {
         banner.style.display = 'flex';
     } else {
         banner.style.display = 'none';
@@ -214,6 +231,15 @@ function setupEventListeners() {
     if (restDayDismiss) {
         restDayDismiss.addEventListener('click', function () {
             document.getElementById('restDayBanner').style.display = 'none';
+        });
+    }
+
+    // Reload exercises when date changes (schedule-aware filtering depends on date)
+    const workoutDateInput = document.getElementById('workoutDate');
+    if (workoutDateInput) {
+        workoutDateInput.addEventListener('change', function () {
+            loadExercises();
+            updateRestDayBanner();
         });
     }
 
