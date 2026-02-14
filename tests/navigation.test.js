@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { showScreen, goBack, openMenu, closeMenu } from '../js/navigation.js';
 
 /**
@@ -62,15 +62,13 @@ describe('Navigation', () => {
 
         it('should navigate back to previous screen', () => {
             vi.useFakeTimers();
-            document.body.innerHTML += '<div id="historyScreen" class="screen"></div>';
             showScreen('daily');
-            showScreen('history');
             goBack();
             // goBack uses slide-back animation with 300ms timeout
-            vi.advanceTimersByTime(300);
+            vi.advanceTimersByTime(350);
+            // After going back from 'daily', should return to 'home'
             expect(
-                document.getElementById('dailyScreen').classList.contains('active') ||
-                    document.getElementById('homeScreen').classList.contains('active')
+                document.getElementById('homeScreen').classList.contains('active')
             ).toBe(true);
             vi.useRealTimers();
         });

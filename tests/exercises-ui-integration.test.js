@@ -1,67 +1,41 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock exercises.js
+const mockExercisesList = [
+    {
+        id: 'calf_raises',
+        name: 'Calf Raises',
+        targetReps: '15',
+        leftTarget: 15,
+        rightTarget: 15,
+        sets: 3,
+        category: 'Foot & Ankle',
+        bilateral: true,
+        instructions: {
+            title: 'Calf Raises',
+            steps: ['Stand on one leg', 'Rise up on toes'],
+            reps: '15 each leg',
+            sets: '3 sets',
+            why: 'Builds calf strength',
+            tips: ['Go slowly'],
+        },
+    },
+    {
+        id: 'quad_sets',
+        name: 'Quad Sets',
+        targetReps: '10',
+        leftTarget: 10,
+        rightTarget: 10,
+        sets: 3,
+        category: 'Core',
+        bilateral: false,
+    },
+];
+
 vi.mock('../exercises.js', () => ({
-    getExercisesForPhase: vi.fn(() => [
-        {
-            id: 'calf_raises',
-            name: 'Calf Raises',
-            targetReps: '15',
-            leftTarget: 15,
-            rightTarget: 15,
-            sets: 3,
-            category: 'Foot & Ankle',
-            bilateral: true,
-            instructions: {
-                title: 'Calf Raises',
-                steps: ['Stand on one leg', 'Rise up on toes'],
-                reps: '15 each leg',
-                sets: '3 sets',
-                why: 'Builds calf strength',
-                tips: ['Go slowly'],
-            },
-        },
-        {
-            id: 'quad_sets',
-            name: 'Quad Sets',
-            targetReps: '10',
-            leftTarget: 10,
-            rightTarget: 10,
-            sets: 3,
-            category: 'Core',
-            bilateral: false,
-        },
-    ]),
-    getVisibleExercisesForPhase: vi.fn(() => [
-        {
-            id: 'calf_raises',
-            name: 'Calf Raises',
-            targetReps: '15',
-            leftTarget: 15,
-            rightTarget: 15,
-            sets: 3,
-            category: 'Foot & Ankle',
-            bilateral: true,
-            instructions: {
-                title: 'Calf Raises',
-                steps: ['Stand on one leg', 'Rise up on toes'],
-                reps: '15 each leg',
-                sets: '3 sets',
-                why: 'Builds calf strength',
-                tips: ['Go slowly'],
-            },
-        },
-        {
-            id: 'quad_sets',
-            name: 'Quad Sets',
-            targetReps: '10',
-            leftTarget: 10,
-            rightTarget: 10,
-            sets: 3,
-            category: 'Core',
-            bilateral: false,
-        },
-    ]),
+    getExercisesForPhase: vi.fn(() => mockExercisesList),
+    getExercisesForTimeBlock: vi.fn(() => mockExercisesList),
+    getVisibleExercisesForPhase: vi.fn(() => mockExercisesList),
 }));
 
 // Mock utils.js
@@ -118,6 +92,13 @@ vi.mock('../js/state.js', () => ({
     setDailyProgress: vi.fn(),
     balanceLevel: 1,
     setBalanceLevel: vi.fn(),
+    activeTimeBlock: 'morning',
+    planStartDate: null,
+    setPlanStartDate: vi.fn(),
+    incrementQuickLog: vi.fn(),
+    decrementQuickLog: vi.fn(),
+    updateDailyMetric: vi.fn(),
+    getProgressionTargets: vi.fn(() => null),
 }));
 
 // Mock progress.js
@@ -138,17 +119,17 @@ import {
     loadExercises,
     createExerciseCard,
     createCompletedCard,
-    createGroupedExerciseCard,
-    createCompletedGroupCard,
+    createTimedExerciseCard,
+    createTimedHoldsCard,
+    createQuickLogCard,
     collapseCard,
     expandCard,
-    switchBalanceLevel,
     scrollToNextIncomplete,
     attachPainSliderListeners,
-    reattachCardListeners,
     dismissBottomSheet,
     showInstructionsBottomSheet,
     saveWorkout,
+    renderDailyMetrics,
 } from '../js/exercises-ui.js';
 import { showToast } from '../js/utils.js';
 import { updateProgressBar } from '../js/progress.js';
@@ -283,19 +264,19 @@ describe('Exercises UI Integration', () => {
             expect(card.innerHTML).toContain('Right Leg Reps');
         });
 
-        it('should show progression note for exercises with progressionLevel', () => {
-            const progExercise = {
-                id: 'prog_ex',
-                name: 'Progression',
+        it('should create card with exercise header', () => {
+            const exercise = {
+                id: 'test_ex',
+                name: 'Test Exercise',
                 targetReps: '10',
                 leftTarget: 10,
                 rightTarget: 10,
                 sets: 3,
                 bilateral: false,
-                progressionLevel: 1,
             };
-            const card = createExerciseCard(progExercise, 0);
-            expect(card.innerHTML).toContain('Start here');
+            const card = createExerciseCard(exercise, 0);
+            expect(card.innerHTML).toContain('Test Exercise');
+            expect(card.innerHTML).toContain('exercise-header');
         });
     });
 
@@ -320,7 +301,7 @@ describe('Exercises UI Integration', () => {
 
         it('should show checkmark', () => {
             const card = createCompletedCard(mockExercise);
-            expect(card.innerHTML).toContain('✓');
+            expect(card.innerHTML).toContain('completed-checkmark');
         });
 
         it('should show tap to edit hint', () => {
@@ -495,112 +476,6 @@ describe('Exercises UI Integration', () => {
         });
     });
 
-    // ========== createGroupedExerciseCard ==========
-    describe('createGroupedExerciseCard()', () => {
-        const groupItem = {
-            isGroup: true,
-            group: 'balance',
-            groupLabel: 'Balance Training',
-            exercises: [
-                {
-                    id: 'balance_1',
-                    name: '1a. Balance: Eyes Open',
-                    targetReps: '30s',
-                    leftTarget: 30,
-                    rightTarget: 30,
-                    sets: 3,
-                    bilateral: false,
-                    progressionLevel: 1,
-                },
-                {
-                    id: 'balance_2',
-                    name: '1b. Balance: Eyes Closed',
-                    targetReps: '30s',
-                    leftTarget: 30,
-                    rightTarget: 30,
-                    sets: 3,
-                    bilateral: false,
-                    progressionLevel: 2,
-                },
-            ],
-        };
-
-        it('should return a DOM element', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            expect(card).toBeInstanceOf(HTMLElement);
-        });
-
-        it('should have grouped class', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            expect(card.classList.contains('exercise-card--grouped')).toBe(true);
-        });
-
-        it('should display group label', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            expect(card.innerHTML).toContain('Balance Training');
-        });
-
-        it('should include level selector buttons', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            const buttons = card.querySelectorAll('.balance-level-btn');
-            expect(buttons.length).toBe(2);
-        });
-
-        it('should include mark complete button', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            const btn = card.querySelector('.mark-complete-btn');
-            expect(btn).toBeTruthy();
-        });
-
-        it('should include pain slider', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            const slider = card.querySelector('.pain-slider');
-            expect(slider).toBeTruthy();
-        });
-
-        it('should set data-group attribute', () => {
-            const card = createGroupedExerciseCard(groupItem);
-            expect(card.getAttribute('data-group')).toBe('balance');
-        });
-    });
-
-    // ========== createCompletedGroupCard ==========
-    describe('createCompletedGroupCard()', () => {
-        const groupItem = {
-            isGroup: true,
-            group: 'balance',
-            groupLabel: 'Balance Training',
-            exercises: [
-                { id: 'bal_1', name: 'Balance 1', progressionLevel: 1 },
-                { id: 'bal_2', name: 'Balance 2', progressionLevel: 2 },
-            ],
-        };
-
-        it('should return a DOM element', () => {
-            mockDailyProgress.completedExercises = ['bal_1'];
-            const card = createCompletedGroupCard(groupItem);
-            expect(card).toBeInstanceOf(HTMLElement);
-        });
-
-        it('should have completed class', () => {
-            mockDailyProgress.completedExercises = ['bal_1'];
-            const card = createCompletedGroupCard(groupItem);
-            expect(card.classList.contains('exercise-card--completed')).toBe(true);
-        });
-
-        it('should display group label', () => {
-            mockDailyProgress.completedExercises = ['bal_1'];
-            const card = createCompletedGroupCard(groupItem);
-            expect(card.innerHTML).toContain('Balance Training');
-        });
-
-        it('should show checkmark', () => {
-            mockDailyProgress.completedExercises = ['bal_1'];
-            const card = createCompletedGroupCard(groupItem);
-            expect(card.innerHTML).toContain('✓');
-        });
-    });
-
     // ========== collapseCard ==========
     describe('collapseCard()', () => {
         it('should mark exercise as completed', () => {
@@ -640,18 +515,6 @@ describe('Exercises UI Integration', () => {
         });
     });
 
-    // ========== reattachCardListeners ==========
-    describe('reattachCardListeners()', () => {
-        it('should not throw', () => {
-            const card = document.createElement('div');
-            card.innerHTML = `
-                <input type="range" class="pain-slider" id="pain_test" min="0" max="10" value="0">
-                <span class="pain-value" id="pain_value_test">0</span>
-            `;
-            expect(() => reattachCardListeners(card, { id: 'test', name: 'Test' })).not.toThrow();
-        });
-    });
-
     // ========== saveWorkout ==========
     describe('saveWorkout()', () => {
         it('should show error when no date selected', () => {
@@ -680,7 +543,7 @@ describe('Exercises UI Integration', () => {
                 calf_raises: { left: 15, right: 15, sets: 3, pain: 2, notes: '' },
             };
             saveWorkout();
-            expect(showToast).toHaveBeenCalledWith('✓ Workout saved successfully!', 'success');
+            expect(showToast).toHaveBeenCalledWith('Workout saved successfully!', 'success');
             vi.useRealTimers();
         });
     });

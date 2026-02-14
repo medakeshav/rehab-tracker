@@ -7,8 +7,25 @@
 
 import CONFIG from './config.js';
 import { safeGetItem, safeSetItem } from './utils.js';
-import { getExercisesForPhase } from '../exercises.js';
+import { getExercisesForTimeBlock } from '../exercises.js';
 import { getPickerValue, setPickerValue } from './wheel-picker.js';
+
+// ========== V2 Data Migration ==========
+// Clear all old data on first load of v2 (user chose "start fresh")
+const APP_VERSION_KEY = 'rehabAppVersion';
+const CURRENT_VERSION = '2.0';
+
+if (safeGetItem(APP_VERSION_KEY, null) !== CURRENT_VERSION) {
+    // Clear all previous data
+    localStorage.removeItem('workoutData');
+    localStorage.removeItem('weeklyData');
+    localStorage.removeItem('monthlyData');
+    localStorage.removeItem('rehabDailyProgress');
+    localStorage.removeItem('streakData');
+    localStorage.removeItem('currentPhase');
+    localStorage.removeItem('balanceLevel');
+    safeSetItem(APP_VERSION_KEY, CURRENT_VERSION);
+}
 
 // ========== Global State Variables ==========
 
@@ -48,6 +65,12 @@ let streakData = safeGetItem('streakData', {
     achievementDates: {},
 });
 
+/** @type {string} Currently active time block tab */
+let activeTimeBlock = safeGetItem('activeTimeBlock', 'morning');
+
+/** @type {string|null} Date of first workout with v2 plan (for auto-progression) */
+let planStartDate = safeGetItem('planStartDate', null);
+
 // ========== Daily Progress (completion tracking + input values) ==========
 
 /** @type {Object} Today's progress — resets automatically on new day */
@@ -63,10 +86,39 @@ function loadDailyProgress() {
     if (data) {
         const today = new Date().toISOString().split('T')[0];
         if (data.date === today) {
+            // Ensure new fields exist (migration safety)
+            if (!data.dailyMetrics) data.dailyMetrics = createDefaultMetrics();
+            if (!data.quickLogCounts) data.quickLogCounts = createDefaultQuickLogCounts();
             return data;
         }
     }
     return createFreshProgress();
+}
+
+/**
+ * Create default daily metrics object.
+ * @returns {Object}
+ */
+function createDefaultMetrics() {
+    return {
+        morningStiffness: null,
+        hipFlexorTightness: null,
+        standingTolerance: null,
+        backPain: null,
+    };
+}
+
+/**
+ * Create default quick log counts.
+ * @returns {Object}
+ */
+function createDefaultQuickLogCounts() {
+    return {
+        hip_flexor_quick: 0,
+        glute_activation_quick: 0,
+        standing_posture_quick: 0,
+        seated_clamshells_quick: 0,
+    };
 }
 
 /**
@@ -79,6 +131,8 @@ function createFreshProgress() {
         completedExercises: [],
         exerciseData: {},
         soundEnabled: true,
+        dailyMetrics: createDefaultMetrics(),
+        quickLogCounts: createDefaultQuickLogCounts(),
     };
 }
 
@@ -87,6 +141,98 @@ function createFreshProgress() {
  */
 function saveDailyProgress() {
     safeSetItem('rehabDailyProgress', dailyProgress);
+}
+
+// ========== Plan Start Date & Week Calculation ==========
+
+/**
+ * Set the plan start date (called on first workout save).
+ * @param {string} dateStr - YYYY-MM-DD
+ */
+function setPlanStartDate(dateStr) {
+    planStartDate = dateStr;
+    safeSetItem('planStartDate', planStartDate);
+}
+
+/**
+ * Get the current week number since plan start.
+ * @returns {number} Week number (1-based), or 1 if no start date
+ */
+function getCurrentPlanWeek() {
+    if (!planStartDate) return 1;
+    const start = new Date(planStartDate + 'T00:00:00');
+    const now = new Date();
+    const diffMs = now - start;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return Math.max(1, Math.floor(diffDays / 7) + 1);
+}
+
+/**
+ * Get the progression targets for an exercise based on current week.
+ * Returns the timer duration (for timed exercises) based on the progression table.
+ * @param {Object} exercise - Exercise definition
+ * @returns {{ left: number, right: number, note?: string }|null} Progression targets or null
+ */
+function getProgressionTargets(exercise) {
+    if (!exercise.progression) return null;
+    const week = getCurrentPlanWeek();
+
+    // Find the highest week key that is <= current week
+    const weekKeys = Object.keys(exercise.progression)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    let targetKey = weekKeys[0];
+    for (const key of weekKeys) {
+        if (key <= week) targetKey = key;
+    }
+
+    return exercise.progression[targetKey] || null;
+}
+
+// ========== Quick Log ==========
+
+/**
+ * Increment a quick-log exercise count.
+ * @param {string} exerciseId - Quick-log exercise ID
+ */
+function incrementQuickLog(exerciseId) {
+    if (!dailyProgress.quickLogCounts) {
+        dailyProgress.quickLogCounts = createDefaultQuickLogCounts();
+    }
+    dailyProgress.quickLogCounts[exerciseId] =
+        (dailyProgress.quickLogCounts[exerciseId] || 0) + 1;
+    saveDailyProgress();
+}
+
+/**
+ * Decrement a quick-log exercise count (minimum 0).
+ * @param {string} exerciseId
+ */
+function decrementQuickLog(exerciseId) {
+    if (!dailyProgress.quickLogCounts) {
+        dailyProgress.quickLogCounts = createDefaultQuickLogCounts();
+    }
+    dailyProgress.quickLogCounts[exerciseId] = Math.max(
+        0,
+        (dailyProgress.quickLogCounts[exerciseId] || 0) - 1
+    );
+    saveDailyProgress();
+}
+
+// ========== Daily Metrics ==========
+
+/**
+ * Update a daily metric value.
+ * @param {string} key - Metric key (morningStiffness, hipFlexorTightness, standingTolerance, backPain)
+ * @param {number} value - Metric value
+ */
+function updateDailyMetric(key, value) {
+    if (!dailyProgress.dailyMetrics) {
+        dailyProgress.dailyMetrics = createDefaultMetrics();
+    }
+    dailyProgress.dailyMetrics[key] = value;
+    saveDailyProgress();
 }
 
 // ========== Exercise Data Capture & Restore ==========
@@ -170,8 +316,12 @@ function restoreExerciseData(exercise) {
  * any card that is still expanded (not yet marked complete).
  */
 function autoSaveDailyProgress() {
-    const phaseExercises = getExercisesForPhase(currentPhase);
+    const phaseExercises = getExercisesForTimeBlock(currentPhase, activeTimeBlock);
     phaseExercises.forEach((exercise) => {
+        // Skip quick-log and pure-timed exercises (no DOM pickers)
+        if (exercise.exerciseType === 'quick_log') return;
+        if (exercise.exerciseType === 'timed' && exercise.bilateral) return;
+
         // Only capture from DOM if the card is expanded (not collapsed)
         if (!dailyProgress.completedExercises.includes(exercise.id)) {
             // Bilateral exercises use a single "reps" picker
@@ -250,6 +400,10 @@ function setStreakData(v) {
 function setDailyProgress(v) {
     dailyProgress = v;
 }
+function setActiveTimeBlock(v) {
+    activeTimeBlock = v;
+    safeSetItem('activeTimeBlock', v);
+}
 
 export {
     currentPhase,
@@ -261,13 +415,23 @@ export {
     balanceLevel,
     streakData,
     dailyProgress,
+    activeTimeBlock,
+    planStartDate,
     loadDailyProgress,
     createFreshProgress,
+    createDefaultMetrics,
+    createDefaultQuickLogCounts,
     saveDailyProgress,
     captureExerciseData,
     restoreExerciseData,
     autoSaveDailyProgress,
     updatePainColor,
+    setPlanStartDate,
+    getCurrentPlanWeek,
+    getProgressionTargets,
+    incrementQuickLog,
+    decrementQuickLog,
+    updateDailyMetric,
     setCurrentPhase,
     setWorkoutData,
     setWeeklyData,
@@ -277,4 +441,5 @@ export {
     setBalanceLevel,
     setStreakData,
     setDailyProgress,
+    setActiveTimeBlock,
 };

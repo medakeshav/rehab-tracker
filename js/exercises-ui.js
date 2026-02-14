@@ -1,17 +1,14 @@
 /**
  * exercises-ui.js — Exercise card UI: creation, completion, expand/collapse, instructions
  *
- * The most complex UI module. Handles:
- * - Loading exercises for the current phase
- * - Creating full exercise cards with wheel pickers and pain sliders
- * - Collapsing cards on completion (with animation)
- * - Expanding completed cards back to full state
- * - Showing exercise instruction modals (bottom sheet)
+ * V2 rewrite: supports time-block tabs, timed exercises with countdown timer,
+ * timed holds, quick-log cards for throughout-day exercises, and daily metrics.
  */
 
-import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
+import { getExercisesForPhase, getExercisesForTimeBlock } from '../exercises.js';
 import { showToast } from './utils.js';
 import { createWheelPicker, getPickerValue } from './wheel-picker.js';
+import CONFIG from './config.js';
 import {
     currentPhase,
     dailyProgress,
@@ -23,8 +20,13 @@ import {
     workoutData,
     createFreshProgress,
     setDailyProgress,
-    balanceLevel,
-    setBalanceLevel,
+    activeTimeBlock,
+    incrementQuickLog,
+    decrementQuickLog,
+    updateDailyMetric,
+    getProgressionTargets,
+    setPlanStartDate,
+    planStartDate,
 } from './state.js';
 import {
     updateProgressBar,
@@ -40,80 +42,145 @@ import { onWorkoutSaved } from './streak.js';
 // ========== Exercise Loading ==========
 
 /**
- * Load all exercises for the current phase and render them.
- * Completed exercises render as collapsed cards; others render fully expanded.
- * Grouped exercises (e.g. balance levels) render as a single card with a level picker.
+ * Load exercises for the currently active time block and render them.
  */
 function loadExercises() {
     const exerciseList = document.getElementById('exerciseList');
     exerciseList.innerHTML = '';
 
-    const visibleExercises = getVisibleExercisesForPhase(currentPhase);
-    const totalCount = visibleExercises.length;
+    const exercises = getExercisesForTimeBlock(currentPhase, activeTimeBlock);
 
-    visibleExercises.forEach((item, index) => {
-        if (item.isGroup) {
-            const isCompleted = item.exercises.some((ex) =>
-                dailyProgress.completedExercises.includes(ex.id)
-            );
+    // Render daily metrics form if applicable
+    renderDailyMetrics();
 
+    if (activeTimeBlock === 'throughout_day') {
+        // Throughout-day header
+        const header = document.createElement('div');
+        header.className = 'throughout-day-header';
+        header.innerHTML = '<strong>Micro-Routines</strong>Tap the + button each time you complete an exercise';
+        exerciseList.appendChild(header);
+    }
+
+    exercises.forEach((exercise, index) => {
+        let card;
+        if (exercise.exerciseType === 'quick_log') {
+            card = createQuickLogCard(exercise);
+        } else if (exercise.exerciseType === 'timed') {
+            const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
             if (isCompleted) {
-                const card = createCompletedGroupCard(item, index, totalCount);
-                exerciseList.appendChild(card);
+                card = createCompletedCard(exercise, index, exercises.length);
             } else {
-                const card = createGroupedExerciseCard(item, index, totalCount);
-                exerciseList.appendChild(card);
-                const activeExercise = item.exercises[balanceLevel - 1];
-                restoreExerciseData(activeExercise);
+                card = createTimedExerciseCard(exercise, index, exercises.length);
+                restoreExerciseData(exercise);
+            }
+        } else if (exercise.exerciseType === 'timed_holds') {
+            const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
+            if (isCompleted) {
+                card = createCompletedCard(exercise, index, exercises.length);
+            } else {
+                card = createTimedHoldsCard(exercise, index, exercises.length);
+                restoreExerciseData(exercise);
             }
         } else {
-            const isCompleted = dailyProgress.completedExercises.includes(item.id);
-
+            // Standard reps exercise
+            const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
             if (isCompleted) {
-                const card = createCompletedCard(item, index, totalCount);
-                exerciseList.appendChild(card);
+                card = createCompletedCard(exercise, index, exercises.length);
             } else {
-                const card = createExerciseCard(item, index, totalCount);
-                exerciseList.appendChild(card);
-                restoreExerciseData(item);
+                card = createExerciseCard(exercise, index, exercises.length);
+                restoreExerciseData(exercise);
             }
         }
+        exerciseList.appendChild(card);
     });
 
     updateProgressBar();
 }
 
-/** Progression text lookup shared by individual and grouped cards */
-const PROGRESSION_TEXTS = {
-    1: '🟢 Start here - easiest level',
-    2: '🟡 Progress when Level 1 feels easy',
-    3: '🟠 Intermediate - adds challenge',
-    4: '🔴 Advanced - no support',
-    5: '⚫ Expert - most challenging',
-};
+// ========== Daily Metrics ==========
+
+/**
+ * Render AM or PM daily metrics form based on active time block.
+ */
+function renderDailyMetrics() {
+    const container = document.getElementById('dailyMetricsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    let metricsConfig = null;
+    let title = '';
+
+    if (activeTimeBlock === 'morning') {
+        metricsConfig = CONFIG.METRICS.MORNING;
+        title = '📋 Morning Check-in';
+    } else if (activeTimeBlock === 'evening') {
+        metricsConfig = CONFIG.METRICS.EVENING;
+        title = '📋 Evening Check-in';
+    }
+
+    if (!metricsConfig) return;
+
+    const section = document.createElement('div');
+    section.className = 'daily-metrics-section';
+
+    let rowsHTML = '';
+    metricsConfig.forEach((metric) => {
+        const currentVal =
+            dailyProgress.dailyMetrics && dailyProgress.dailyMetrics[metric.key] !== null && dailyProgress.dailyMetrics[metric.key] !== undefined
+                ? dailyProgress.dailyMetrics[metric.key]
+                : metric.key === 'standingTolerance'
+                  ? 0
+                  : 0;
+        rowsHTML += `
+            <div class="metric-row">
+                <span class="metric-label">${metric.label}</span>
+                <div class="metric-slider-wrap">
+                    <input type="range" class="metric-slider" id="metric_${metric.key}"
+                           min="${metric.min}" max="${metric.max}" value="${currentVal}" step="1">
+                    <span class="metric-value" id="metric_val_${metric.key}">${currentVal}${metric.unit}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    section.innerHTML = `
+        <div class="daily-metrics-title">${title}</div>
+        ${rowsHTML}
+    `;
+
+    container.appendChild(section);
+
+    // Attach slider listeners
+    metricsConfig.forEach((metric) => {
+        const slider = document.getElementById(`metric_${metric.key}`);
+        const display = document.getElementById(`metric_val_${metric.key}`);
+        if (slider && display) {
+            slider.addEventListener('input', function () {
+                display.textContent = this.value + metric.unit;
+                updateDailyMetric(metric.key, parseInt(this.value));
+            });
+        }
+    });
+}
 
 // ========== Completed (Collapsed) Card ==========
 
 /**
  * Create a small collapsed card for a completed exercise.
- * Clicking it re-expands the card for editing.
- * @param {Object} exercise - Exercise definition object
- * @param {number} index - Position in list
- * @param {number} total - Total exercises
- * @returns {HTMLElement} Collapsed card element
  */
-function createCompletedCard(exercise, index, total) {
+function createCompletedCard(exercise, _index, _total) {
     const card = document.createElement('div');
     card.className = 'exercise-card exercise-card--completed';
     card.setAttribute('data-exercise-id', exercise.id);
     if (exercise.category) card.setAttribute('data-category', exercise.category);
 
-    // Build rep summary pill
     const data = dailyProgress.exerciseData[exercise.id];
     let repSummary = '';
     if (data) {
         if (exercise.bilateral) {
             repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
+        } else if (exercise.exerciseType === 'timed' || exercise.exerciseType === 'timed_holds') {
+            repSummary = `<span class="exercise-rep-summary">Done</span>`;
         } else {
             repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
         }
@@ -128,36 +195,382 @@ function createCompletedCard(exercise, index, total) {
         </div>
     `;
 
-    card.addEventListener('click', function (_e) {
+    card.addEventListener('click', function () {
         expandCard(card, exercise);
     });
 
     return card;
 }
 
-// ========== Full Exercise Card ==========
+// ========== Quick-Log Card (Throughout Day) ==========
 
 /**
- * Create a fully expanded exercise card with wheel pickers, pain slider,
- * info button, and mark-complete button.
- * @param {Object} exercise - Exercise definition object
- * @param {number} index - Position index in the exercise list
- * @returns {HTMLElement} Full exercise card element
+ * Create a quick-log card for throughout-the-day exercises.
  */
-function createExerciseCard(exercise, index, total) {
+function createQuickLogCard(exercise) {
+    const card = document.createElement('div');
+    card.className = 'quick-log-card';
+    card.setAttribute('data-exercise-id', exercise.id);
+
+    const count =
+        (dailyProgress.quickLogCounts && dailyProgress.quickLogCounts[exercise.id]) || 0;
+    const target = exercise.quickLogTarget || 10;
+
+    card.innerHTML = `
+        <div class="quick-log-info">
+            <div class="quick-log-name quick-log-name-link" data-exercise-id="${exercise.id}">${exercise.name}</div>
+            <div class="quick-log-reminder">${exercise.quickLogReminder || ''}</div>
+            <div class="quick-log-target">${count}/${target} ${exercise.quickLogUnit || 'times'} today</div>
+        </div>
+        <div class="quick-log-controls">
+            <button class="quick-log-btn minus" data-ql-minus="${exercise.id}">−</button>
+            <span class="quick-log-count" id="ql_count_${exercise.id}">${count}</span>
+            <button class="quick-log-btn" data-ql-plus="${exercise.id}">+</button>
+        </div>
+    `;
+
+    // Plus button
+    const plusBtn = card.querySelector(`[data-ql-plus="${exercise.id}"]`);
+    if (plusBtn) {
+        plusBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            incrementQuickLog(exercise.id);
+            const newCount = dailyProgress.quickLogCounts[exercise.id] || 0;
+            const countEl = card.querySelector(`#ql_count_${exercise.id}`);
+            const targetEl = card.querySelector('.quick-log-target');
+            if (countEl) countEl.textContent = newCount;
+            if (targetEl)
+                targetEl.textContent = `${newCount}/${target} ${exercise.quickLogUnit || 'times'} today`;
+
+            // Pulse animation
+            plusBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => (plusBtn.style.transform = ''), 150);
+        });
+    }
+
+    // Minus button
+    const minusBtn = card.querySelector(`[data-ql-minus="${exercise.id}"]`);
+    if (minusBtn) {
+        minusBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            decrementQuickLog(exercise.id);
+            const newCount = dailyProgress.quickLogCounts[exercise.id] || 0;
+            const countEl = card.querySelector(`#ql_count_${exercise.id}`);
+            const targetEl = card.querySelector('.quick-log-target');
+            if (countEl) countEl.textContent = newCount;
+            if (targetEl)
+                targetEl.textContent = `${newCount}/${target} ${exercise.quickLogUnit || 'times'} today`;
+        });
+    }
+
+    // Name tap -> instructions
+    const nameEl = card.querySelector('.quick-log-name-link');
+    if (nameEl && exercise.instructions) {
+        nameEl.addEventListener('click', function (e) {
+            e.preventDefault();
+            showInstructionsBottomSheet(exercise);
+        });
+    }
+
+    return card;
+}
+
+// ========== Timed Exercise Card ==========
+
+/**
+ * Create a card for a timed exercise with countdown timer.
+ */
+function createTimedExerciseCard(exercise, _index, _total) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card exercise-card--timed';
+    card.setAttribute('data-exercise-id', exercise.id);
+    if (exercise.category) card.setAttribute('data-category', exercise.category);
+
+    // Get progression targets if available
+    const progression = getProgressionTargets(exercise);
+    const leftDuration = progression ? progression.left : exercise.timerDuration.left;
+    const rightDuration = progression ? progression.right : exercise.timerDuration.right;
+    const progressionNote = progression && progression.note ? `<div class="hold-duration-badge"><span class="hold-icon">📈</span>${progression.note}</div>` : '';
+
+    const isBilateral = exercise.bilateral;
+    const timerLabel = isBilateral ? '' : 'LEFT SIDE';
+    const duration = isBilateral ? leftDuration : leftDuration;
+
+    const circumference = 2 * Math.PI * 50;
+
+    card.innerHTML = `
+        ${progressionNote}
+        <div class="exercise-header">
+            <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
+            <div class="exercise-target">${exercise.targetReps}</div>
+        </div>
+        <div class="timer-section">
+            <div class="timer-display">
+                <div class="timer-side-label" id="timer_label_${exercise.id}">${timerLabel}</div>
+                <div class="timer-circle">
+                    <svg viewBox="0 0 112 112">
+                        <circle class="timer-bg" cx="56" cy="56" r="50"/>
+                        <circle class="timer-progress" id="timer_ring_${exercise.id}" cx="56" cy="56" r="50"
+                                stroke-dasharray="${circumference}" stroke-dashoffset="0"/>
+                    </svg>
+                    <span class="timer-time" id="timer_time_${exercise.id}">${formatTime(duration)}</span>
+                </div>
+                <div class="timer-controls">
+                    <button class="timer-start-btn" id="timer_btn_${exercise.id}">Start</button>
+                </div>
+            </div>
+        </div>
+        <div class="pain-section">
+            <label>
+                Pain Level (0-10):
+                <span class="pain-value" id="pain_value_${exercise.id}">0</span>
+            </label>
+            <div style="padding: 15px 5px;">
+                <input type="range" class="pain-slider" id="pain_${exercise.id}"
+                       min="0" max="10" value="0" step="1">
+            </div>
+        </div>
+        <button class="mark-complete-btn" id="complete_${exercise.id}">✓ Mark Complete</button>
+    `;
+
+    // Timer logic
+    const timerState = {
+        running: false,
+        intervalId: null,
+        currentSide: isBilateral ? 'both' : 'left',
+        secondsRemaining: duration,
+        leftDuration,
+        rightDuration,
+    };
+
+    const timerBtn = card.querySelector(`#timer_btn_${exercise.id}`);
+    const timerTime = card.querySelector(`#timer_time_${exercise.id}`);
+    const timerRing = card.querySelector(`#timer_ring_${exercise.id}`);
+    const timerLabel2 = card.querySelector(`#timer_label_${exercise.id}`);
+
+    if (timerBtn) {
+        timerBtn.addEventListener('click', function () {
+            if (timerState.running) {
+                // Pause
+                clearInterval(timerState.intervalId);
+                timerState.running = false;
+                timerBtn.textContent = 'Resume';
+                timerBtn.classList.remove('running');
+            } else {
+                // Start / Resume
+                timerState.running = true;
+                timerBtn.textContent = 'Pause';
+                timerBtn.classList.add('running');
+
+                const totalDuration =
+                    timerState.currentSide === 'right'
+                        ? timerState.rightDuration
+                        : timerState.leftDuration;
+
+                timerState.intervalId = setInterval(function () {
+                    timerState.secondsRemaining--;
+
+                    if (timerState.secondsRemaining <= 0) {
+                        clearInterval(timerState.intervalId);
+                        timerState.running = false;
+
+                        // Play completion beep
+                        playTimerBeep();
+
+                        if (!isBilateral && timerState.currentSide === 'left') {
+                            // Switch to right side
+                            timerState.currentSide = 'right';
+                            timerState.secondsRemaining = timerState.rightDuration;
+                            if (timerLabel2) timerLabel2.textContent = 'RIGHT SIDE';
+                            timerBtn.textContent = 'Start';
+                            timerBtn.classList.remove('running', 'done');
+                            updateTimerDisplay(
+                                timerTime,
+                                timerRing,
+                                timerState.secondsRemaining,
+                                timerState.rightDuration,
+                                circumference
+                            );
+                        } else {
+                            // All done
+                            timerBtn.textContent = 'Done!';
+                            timerBtn.classList.remove('running');
+                            timerBtn.classList.add('done');
+                            timerBtn.disabled = true;
+                            updateTimerDisplay(timerTime, timerRing, 0, totalDuration, circumference);
+                        }
+                        return;
+                    }
+
+                    updateTimerDisplay(
+                        timerTime,
+                        timerRing,
+                        timerState.secondsRemaining,
+                        totalDuration,
+                        circumference
+                    );
+
+                    // Warning animation at 5 seconds
+                    if (timerState.secondsRemaining <= CONFIG.TIMER.WARNING_THRESHOLD) {
+                        timerTime.classList.add('timer-warning');
+                    }
+                }, CONFIG.TIMER.COUNTDOWN_INTERVAL);
+            }
+        });
+    }
+
+    // Pain slider
+    const painSlider = card.querySelector(`#pain_${exercise.id}`);
+    const painValue = card.querySelector(`#pain_value_${exercise.id}`);
+    attachPainSliderListeners(painSlider, painValue);
+
+    // Exercise name tap -> instructions
+    const exerciseName = card.querySelector('.exercise-name--tappable');
+    if (exercise.instructions && exerciseName) {
+        exerciseName.addEventListener('click', function (e) {
+            e.preventDefault();
+            showInstructionsBottomSheet(exercise);
+        });
+    }
+
+    // Mark Complete
+    const completeBtn = card.querySelector(`#complete_${exercise.id}`);
+    if (completeBtn) {
+        completeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Clean up timer
+            if (timerState.intervalId) clearInterval(timerState.intervalId);
+            collapseCard(card, exercise);
+        });
+    }
+
+    return card;
+}
+
+// ========== Timed Holds Card ==========
+
+/**
+ * Create a card for timed-holds exercises (Dead Bug, Bird Dog).
+ * Uses reps picker for number of holds completed, displays target hold duration as guidance.
+ */
+function createTimedHoldsCard(exercise, _index, _total) {
     const card = document.createElement('div');
     card.className = 'exercise-card';
     card.setAttribute('data-exercise-id', exercise.id);
     if (exercise.category) card.setAttribute('data-category', exercise.category);
 
-    // Add progression note if applicable (individual non-grouped exercises only)
-    let progressionNote = '';
-    if (exercise.progressionLevel && !exercise.group) {
-        progressionNote = `<div class="progression-note">${PROGRESSION_TEXTS[exercise.progressionLevel]}</div>`;
-    }
+    // Get progression targets for hold durations
+    const progression = getProgressionTargets(exercise);
+    const leftHoldTime = progression ? progression.left : exercise.timerDuration.left;
+    const rightHoldTime = progression ? progression.right : exercise.timerDuration.right;
+    const progressionNote = progression && progression.note ? `<div class="hold-duration-badge"><span class="hold-icon">📈</span>${progression.note}</div>` : '';
 
     card.innerHTML = `
         ${progressionNote}
+        <div class="exercise-header">
+            <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
+            <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
+        </div>
+        <div class="hold-duration-badge">
+            <span class="hold-icon">⏱</span>
+            Hold: ${leftHoldTime}s (left) / ${rightHoldTime}s (right)
+        </div>
+        <div class="exercise-inputs">
+            <div class="input-group">
+                <label>Left Holds Completed:</label>
+                <div id="picker_left_${exercise.id}"></div>
+            </div>
+            <div class="input-group">
+                <label>Right Holds Completed:</label>
+                <div id="picker_right_${exercise.id}"></div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Sets Completed:</label>
+            <input type="hidden" id="sets_${exercise.id}" value="${exercise.sets}">
+            <div class="sets-radio-group" data-sets-id="sets_${exercise.id}">
+                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="sets-radio-btn${n === exercise.sets ? ' active' : ''}" data-value="${n}">${n}</button>`).join('')}
+            </div>
+        </div>
+        <div class="pain-section">
+            <label>
+                Pain Level (0-10):
+                <span class="pain-value" id="pain_value_${exercise.id}">0</span>
+            </label>
+            <div style="padding: 15px 5px;">
+                <input type="range" class="pain-slider" id="pain_${exercise.id}"
+                       min="0" max="10" value="0" step="1">
+            </div>
+        </div>
+        <button class="mark-complete-btn" id="complete_${exercise.id}">✓ Mark Complete</button>
+    `;
+
+    // Insert wheel pickers
+    const leftPickerContainer = card.querySelector(`#picker_left_${exercise.id}`);
+    const rightPickerContainer = card.querySelector(`#picker_right_${exercise.id}`);
+    if (leftPickerContainer) {
+        leftPickerContainer.replaceWith(
+            createWheelPicker(`left_${exercise.id}`, 0, 20, 1, exercise.leftTarget)
+        );
+    }
+    if (rightPickerContainer) {
+        rightPickerContainer.replaceWith(
+            createWheelPicker(`right_${exercise.id}`, 0, 20, 1, exercise.rightTarget)
+        );
+    }
+
+    // Sets radio button handler
+    const setsGroup = card.querySelector(`[data-sets-id="sets_${exercise.id}"]`);
+    if (setsGroup) {
+        setsGroup.addEventListener('click', function (e) {
+            const btn = e.target.closest('.sets-radio-btn');
+            if (!btn) return;
+            setsGroup.querySelectorAll('.sets-radio-btn').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`sets_${exercise.id}`).value = btn.dataset.value;
+        });
+    }
+
+    // Pain slider
+    const painSlider = card.querySelector(`#pain_${exercise.id}`);
+    const painValue = card.querySelector(`#pain_value_${exercise.id}`);
+    attachPainSliderListeners(painSlider, painValue);
+
+    // Exercise name tap -> instructions
+    const exerciseName = card.querySelector('.exercise-name--tappable');
+    if (exercise.instructions && exerciseName) {
+        exerciseName.addEventListener('click', function (e) {
+            e.preventDefault();
+            showInstructionsBottomSheet(exercise);
+        });
+    }
+
+    // Mark Complete
+    const completeBtn = card.querySelector(`#complete_${exercise.id}`);
+    if (completeBtn) {
+        completeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            collapseCard(card, exercise);
+        });
+    }
+
+    return card;
+}
+
+// ========== Standard Reps Exercise Card ==========
+
+/**
+ * Create a fully expanded exercise card with wheel pickers, pain slider, and mark-complete.
+ */
+function createExerciseCard(exercise, _index, _total) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+    card.setAttribute('data-exercise-id', exercise.id);
+    if (exercise.category) card.setAttribute('data-category', exercise.category);
+
+    card.innerHTML = `
         <div class="exercise-header">
             <div class="exercise-name exercise-name--tappable" data-exercise-id="${exercise.id}">${exercise.name}</div>
             <div class="exercise-target">${exercise.targetReps} × ${exercise.sets}</div>
@@ -203,7 +616,7 @@ function createExerciseCard(exercise, index, total) {
         <button class="mark-complete-btn" id="complete_${exercise.id}">✓ Mark Complete</button>
     `;
 
-    // Insert wheel pickers into placeholder divs
+    // Insert wheel pickers
     const repsPickerContainer = card.querySelector(`#picker_reps_${exercise.id}`);
     const leftPickerContainer = card.querySelector(`#picker_left_${exercise.id}`);
     const rightPickerContainer = card.querySelector(`#picker_right_${exercise.id}`);
@@ -223,26 +636,24 @@ function createExerciseCard(exercise, index, total) {
         );
     }
 
-    // Sets radio button click handler
+    // Sets radio button handler
     const setsGroup = card.querySelector(`[data-sets-id="sets_${exercise.id}"]`);
     if (setsGroup) {
         setsGroup.addEventListener('click', function (e) {
             const btn = e.target.closest('.sets-radio-btn');
             if (!btn) return;
-            setsGroup
-                .querySelectorAll('.sets-radio-btn')
-                .forEach((b) => b.classList.remove('active'));
+            setsGroup.querySelectorAll('.sets-radio-btn').forEach((b) => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(`sets_${exercise.id}`).value = btn.dataset.value;
         });
     }
 
-    // Attach pain slider listeners (shared helper to avoid duplication)
+    // Pain slider
     const painSlider = card.querySelector(`#pain_${exercise.id}`);
     const painValue = card.querySelector(`#pain_value_${exercise.id}`);
     attachPainSliderListeners(painSlider, painValue);
 
-    // Exercise name tap → bottom sheet with instructions
+    // Exercise name tap -> instructions
     const exerciseName = card.querySelector('.exercise-name--tappable');
     if (exercise.instructions && exerciseName) {
         exerciseName.addEventListener('click', function (e) {
@@ -251,7 +662,7 @@ function createExerciseCard(exercise, index, total) {
         });
     }
 
-    // Mark Complete button handler
+    // Mark Complete
     const completeBtn = card.querySelector(`#complete_${exercise.id}`);
     if (completeBtn) {
         completeBtn.addEventListener('click', function (e) {
@@ -264,353 +675,53 @@ function createExerciseCard(exercise, index, total) {
     return card;
 }
 
-// ========== Grouped Exercise Card (Balance Levels) ==========
+// ========== Timer Helpers ==========
 
-/**
- * Create a single exercise card that represents an entire group (e.g. 5 balance levels).
- * Includes a level selector so the user picks one level per session.
- * @param {Object} groupItem - Group descriptor from getVisibleExercisesForPhase()
- * @returns {HTMLElement} Grouped exercise card element
- */
-function createGroupedExerciseCard(groupItem, index, total) {
-    const activeExercise = groupItem.exercises[balanceLevel - 1];
-    const card = document.createElement('div');
-    card.className = 'exercise-card exercise-card--grouped';
-    card.setAttribute('data-exercise-id', activeExercise.id);
-    card.setAttribute('data-group', groupItem.group);
-    if (activeExercise.category) card.setAttribute('data-category', activeExercise.category);
-
-    // Extract short level description from the exercise name (e.g. "Eyes Open + Support")
-    const levelDescription = activeExercise.name.replace(/^\d+[a-e]\.\s*Balance:\s*/i, '');
-
-    // Build level selector buttons
-    const levelButtons = groupItem.exercises
-        .map(
-            (ex, i) =>
-                `<button type="button" class="balance-level-btn${i + 1 === balanceLevel ? ' active' : ''}" data-level="${i + 1}">${i + 1}</button>`
-        )
-        .join('');
-
-    card.innerHTML = `
-        <div class="exercise-header">
-            <div class="exercise-name exercise-name--tappable" data-exercise-id="${activeExercise.id}">${groupItem.groupLabel}</div>
-            <div class="exercise-target">${activeExercise.targetReps} × ${activeExercise.sets}</div>
-        </div>
-        <div class="balance-level-selector">
-            <span class="balance-level-label">Level:</span>
-            <div class="balance-level-buttons">${levelButtons}</div>
-        </div>
-        <div class="progression-note">
-            <strong>${levelDescription}</strong><br>
-            ${PROGRESSION_TEXTS[activeExercise.progressionLevel]}
-        </div>
-        <div class="exercise-inputs">
-            <div class="input-group">
-                <label>Left Leg Reps:</label>
-                <div id="picker_left_${activeExercise.id}"></div>
-            </div>
-            <div class="input-group">
-                <label>Right Leg Reps:</label>
-                <div id="picker_right_${activeExercise.id}"></div>
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Sets Completed:</label>
-            <input type="hidden" id="sets_${activeExercise.id}" value="${activeExercise.sets}">
-            <div class="sets-radio-group" data-sets-id="sets_${activeExercise.id}">
-                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="sets-radio-btn${n === activeExercise.sets ? ' active' : ''}" data-value="${n}">${n}</button>`).join('')}
-            </div>
-        </div>
-        <div class="pain-section">
-            <label>
-                Pain Level (0-10):
-                <span class="pain-value" id="pain_value_${activeExercise.id}">0</span>
-            </label>
-            <div style="padding: 15px 5px;">
-                <input type="range" class="pain-slider" id="pain_${activeExercise.id}"
-                       min="0" max="10" value="0" step="1">
-            </div>
-        </div>
-        <button class="mark-complete-btn" id="complete_${activeExercise.id}">✓ Mark Complete</button>
-    `;
-
-    // Insert wheel pickers
-    const leftPickerContainer = card.querySelector(`#picker_left_${activeExercise.id}`);
-    const rightPickerContainer = card.querySelector(`#picker_right_${activeExercise.id}`);
-    if (leftPickerContainer) {
-        leftPickerContainer.replaceWith(
-            createWheelPicker(`left_${activeExercise.id}`, 0, 60, 1, activeExercise.leftTarget)
-        );
-    }
-    if (rightPickerContainer) {
-        rightPickerContainer.replaceWith(
-            createWheelPicker(`right_${activeExercise.id}`, 0, 60, 1, activeExercise.rightTarget)
-        );
-    }
-
-    // Sets radio button handler
-    const setsGroup = card.querySelector(`[data-sets-id="sets_${activeExercise.id}"]`);
-    if (setsGroup) {
-        setsGroup.addEventListener('click', function (e) {
-            const btn = e.target.closest('.sets-radio-btn');
-            if (!btn) return;
-            setsGroup
-                .querySelectorAll('.sets-radio-btn')
-                .forEach((b) => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(`sets_${activeExercise.id}`).value = btn.dataset.value;
-        });
-    }
-
-    // Pain slider
-    const painSlider = card.querySelector(`#pain_${activeExercise.id}`);
-    const painValue = card.querySelector(`#pain_value_${activeExercise.id}`);
-    attachPainSliderListeners(painSlider, painValue);
-
-    // Exercise name tap → instructions for the active level
-    const exerciseNameEl = card.querySelector('.exercise-name--tappable');
-    if (activeExercise.instructions && exerciseNameEl) {
-        exerciseNameEl.addEventListener('click', function (e) {
-            e.preventDefault();
-            showInstructionsBottomSheet(activeExercise);
-        });
-    }
-
-    // Level selector click handler
-    card.querySelectorAll('.balance-level-btn').forEach((btn) => {
-        btn.addEventListener('click', function () {
-            const newLevel = parseInt(btn.dataset.level);
-            if (newLevel !== balanceLevel) {
-                switchBalanceLevel(card, groupItem, newLevel);
-            }
-        });
-    });
-
-    // Mark Complete button
-    const completeBtn = card.querySelector(`#complete_${activeExercise.id}`);
-    if (completeBtn) {
-        completeBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            collapseGroupCard(card, groupItem, activeExercise);
-        });
-    }
-
-    return card;
+function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}`;
 }
 
-/**
- * Create a collapsed completed card for a grouped exercise.
- * @param {Object} groupItem - Group descriptor
- * @returns {HTMLElement} Collapsed card element
- */
-function createCompletedGroupCard(groupItem, index, total) {
-    const card = document.createElement('div');
-    card.className = 'exercise-card exercise-card--completed';
-    card.setAttribute('data-group', groupItem.group);
-
-    // Set data-exercise-id to whichever level was completed
-    const completedEx = groupItem.exercises.find((ex) =>
-        dailyProgress.completedExercises.includes(ex.id)
-    );
-    if (completedEx) {
-        card.setAttribute('data-exercise-id', completedEx.id);
-        if (completedEx.category) card.setAttribute('data-category', completedEx.category);
-    }
-
-    // Rep summary
-    let repSummary = '';
-    if (completedEx) {
-        const data = dailyProgress.exerciseData[completedEx.id];
-        if (data) {
-            repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
+function updateTimerDisplay(timeEl, ringEl, remaining, total, circumference) {
+    if (timeEl) {
+        timeEl.textContent = formatTime(remaining);
+        if (remaining > CONFIG.TIMER.WARNING_THRESHOLD) {
+            timeEl.classList.remove('timer-warning');
         }
     }
-
-    card.innerHTML = `
-        <div class="completed-card-inner">
-            <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-            <span class="completed-title">${groupItem.groupLabel}</span>
-            ${repSummary}
-            <span class="completed-expand-hint">tap to edit</span>
-        </div>
-    `;
-
-    card.addEventListener('click', function (_e) {
-        expandGroupCard(card, groupItem);
-    });
-
-    return card;
-}
-
-/**
- * Switch the active balance level within a grouped card.
- * Captures current data, updates state, and rebuilds the card.
- * @param {HTMLElement} card - The current grouped card element
- * @param {Object} groupItem - Group descriptor
- * @param {number} newLevel - The level to switch to (1-5)
- */
-function switchBalanceLevel(card, groupItem, newLevel) {
-    // Capture current level's data before switching
-    const currentExercise = groupItem.exercises[balanceLevel - 1];
-    captureExerciseData(currentExercise.id);
-
-    // Update state and persist
-    setBalanceLevel(newLevel);
-    safeSetItem('balanceLevel', newLevel);
-
-    // Rebuild card with new level
-    const newCard = createGroupedExerciseCard(groupItem);
-    card.replaceWith(newCard);
-
-    // Restore any previously saved data for the new level
-    const newExercise = groupItem.exercises[newLevel - 1];
-    restoreExerciseData(newExercise);
-}
-
-/**
- * Collapse a grouped exercise card after marking complete.
- * @param {HTMLElement} card - The grouped card element
- * @param {Object} groupItem - Group descriptor
- * @param {Object} activeExercise - The currently selected level's exercise
- */
-function collapseGroupCard(card, groupItem, activeExercise) {
-    // Capture current input values
-    captureExerciseData(activeExercise.id);
-
-    // Mark only the active level as completed
-    if (!dailyProgress.completedExercises.includes(activeExercise.id)) {
-        dailyProgress.completedExercises.push(activeExercise.id);
+    if (ringEl) {
+        const progress = total > 0 ? (total - remaining) / total : 0;
+        ringEl.style.strokeDashoffset = circumference * (1 - progress);
     }
-    saveDailyProgress();
-
-    // --- Step 1: Lock height ---
-    const startHeight = card.offsetHeight;
-    card.style.height = startHeight + 'px';
-    card.classList.add('exercise-card--completing-flash');
-
-    requestAnimationFrame(() => {
-        card.classList.add('exercise-card--collapsing');
-
-        // --- Step 2: Replace content after brief pause ---
-        setTimeout(() => {
-            card.removeAttribute('data-group');
-            card.innerHTML = `
-                <div class="completed-card-inner">
-                    <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    <span class="completed-title">${groupItem.groupLabel}</span>
-                    <span class="completed-expand-hint">tap to edit</span>
-                </div>
-            `;
-
-            card.style.height = '50px';
-            card.style.padding = '0 var(--space-xl)';
-            card.style.borderLeft = '4px solid var(--success-color)';
-            card.style.background = '#f0faf0';
-        }, 200);
-
-        // --- Step 3: Finalize ---
-        setTimeout(() => {
-            card.classList.remove('exercise-card--collapsing', 'exercise-card--completing-flash');
-            card.classList.add('exercise-card--completed');
-            card.style.height = '';
-            card.style.padding = '';
-            card.style.borderLeft = '';
-            card.style.background = '';
-            card.setAttribute('data-group', groupItem.group);
-
-            card.addEventListener('click', function onExpand(_e) {
-                card.removeEventListener('click', onExpand);
-                expandGroupCard(card, groupItem);
-            });
-        }, 700);
-    });
-
-    playCompletionSound();
-    showCompletionToast(activeExercise);
-    updateProgressBar();
-    checkAllComplete();
-
-    setTimeout(() => {
-        scrollToNextIncomplete(card);
-    }, 800);
 }
 
-/**
- * Re-expand a completed grouped card back to full editing state.
- * Detects which level was previously completed and restores it.
- * @param {HTMLElement} card - The collapsed card element
- * @param {Object} groupItem - Group descriptor
- */
-function expandGroupCard(card, groupItem) {
-    // Find which level was completed
-    const completedExercise = groupItem.exercises.find((ex) =>
-        dailyProgress.completedExercises.includes(ex.id)
-    );
-
-    // Remove all group exercise IDs from completed
-    dailyProgress.completedExercises = dailyProgress.completedExercises.filter(
-        (id) => !groupItem.exercises.some((ex) => ex.id === id)
-    );
-    saveDailyProgress();
-
-    // Restore the level selector to the previously completed level
-    if (completedExercise) {
-        setBalanceLevel(completedExercise.progressionLevel);
-        safeSetItem('balanceLevel', completedExercise.progressionLevel);
+function playTimerBeep() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = CONFIG.TIMER.BEEP_FREQUENCY;
+        gain.gain.setValueAtTime(CONFIG.TIMER.BEEP_GAIN, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + CONFIG.TIMER.BEEP_DURATION);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + CONFIG.TIMER.BEEP_DURATION);
+        setTimeout(() => ctx.close(), 500);
+    } catch (_e) {
+        // Web Audio not supported
     }
 
-    // --- Step 1: Lock collapsed height ---
-    const collapsedHeight = card.offsetHeight;
-    card.style.height = collapsedHeight + 'px';
-    card.style.overflow = 'hidden';
-
-    // --- Step 2: Measure target height off-screen ---
-    const measureCard = createGroupedExerciseCard(groupItem);
-    measureCard.style.position = 'absolute';
-    measureCard.style.visibility = 'hidden';
-    measureCard.style.width = card.offsetWidth + 'px';
-    document.body.appendChild(measureCard);
-    const targetHeight = measureCard.offsetHeight;
-    document.body.removeChild(measureCard);
-
-    // --- Step 3: Replace with full card, start at collapsed height ---
-    const newCard = createGroupedExerciseCard(groupItem);
-    newCard.classList.add('exercise-card--expanding');
-    newCard.style.height = collapsedHeight + 'px';
-    newCard.style.overflow = 'hidden';
-    card.replaceWith(newCard);
-
-    // --- Step 4: Animate to full height ---
-    requestAnimationFrame(() => {
-        newCard.style.height = targetHeight + 'px';
-        newCard.classList.add('exercise-card--expand-reveal');
-    });
-
-    // --- Step 5: Finalize ---
-    setTimeout(() => {
-        newCard.classList.remove('exercise-card--expanding', 'exercise-card--expand-reveal');
-        newCard.style.height = '';
-        newCard.style.overflow = '';
-    }, 500);
-
-    // Restore saved input values
-    const activeExercise = groupItem.exercises[balanceLevel - 1];
-    restoreExerciseData(activeExercise);
-
-    updateProgressBar();
-    checkAllComplete();
+    // Vibrate
+    if (navigator.vibrate) {
+        navigator.vibrate(CONFIG.TIMER.VIBRATION_PATTERN);
+    }
 }
 
-// ========== Shared Pain Slider Listener Setup ==========
+// ========== Pain Slider Listener ==========
 
-/**
- * Attach touch/mouse event listeners to a pain slider for proper
- * scroll-protection and value display. Extracted from duplicated code
- * in createExerciseCard() and reattachCardListeners().
- * @param {HTMLInputElement} slider - The range input element
- * @param {HTMLElement} display - The span element showing the current value
- */
 function attachPainSliderListeners(slider, display) {
     if (!slider || !display) return;
 
@@ -651,74 +762,31 @@ function attachPainSliderListeners(slider, display) {
     });
 }
 
-// ========== Re-attach Listeners (after DOM rebuild) ==========
-
-/**
- * Re-attach all interactive listeners to a rebuilt exercise card.
- * Used when expandCard() creates a fresh card via createExerciseCard().
- * @param {HTMLElement} card - The exercise card DOM element
- * @param {Object} exercise - Exercise definition object
- */
-function reattachCardListeners(card, exercise) {
-    const painSlider = card.querySelector(`#pain_${exercise.id}`);
-    const painValue = card.querySelector(`#pain_value_${exercise.id}`);
-    attachPainSliderListeners(painSlider, painValue);
-
-    const exerciseNameEl = card.querySelector('.exercise-name--tappable');
-    if (exercise.instructions && exerciseNameEl) {
-        exerciseNameEl.addEventListener('click', function (e) {
-            e.preventDefault();
-            showInstructionsBottomSheet(exercise);
-        });
-    }
-
-    const completeBtn = card.querySelector(`#complete_${exercise.id}`);
-    if (completeBtn) {
-        completeBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            collapseCard(card, exercise);
-        });
-    }
-}
-
 // ========== Card Collapse (Mark Complete) ==========
 
-/**
- * Animate an exercise card collapsing into a completed state.
- * Captures input data, marks complete, plays sound, and auto-scrolls.
- * @param {HTMLElement} card - The exercise card DOM element
- * @param {Object} exercise - Exercise definition object
- */
 function collapseCard(card, exercise) {
-    // Capture current input values
     captureExerciseData(exercise.id);
 
-    // Mark as completed
     if (!dailyProgress.completedExercises.includes(exercise.id)) {
         dailyProgress.completedExercises.push(exercise.id);
     }
     saveDailyProgress();
 
-    // --- Step 1: Lock the current height so CSS transition has a start value ---
     const startHeight = card.offsetHeight;
     card.style.height = startHeight + 'px';
-
-    // Flash green briefly
     card.classList.add('exercise-card--completing-flash');
 
-    // --- Step 2: After a brief pause (flash visible), begin the height collapse ---
     requestAnimationFrame(() => {
         card.classList.add('exercise-card--collapsing');
 
-        // Replace content with completed state while collapsing
         setTimeout(() => {
-            const exerciseName = exercise.name;
             const data = dailyProgress.exerciseData[exercise.id];
             let repSummary = '';
             if (data) {
                 if (exercise.bilateral) {
                     repSummary = `<span class="exercise-rep-summary">${data.left || 0} reps</span>`;
+                } else if (exercise.exerciseType === 'timed' || exercise.exerciseType === 'timed_holds') {
+                    repSummary = `<span class="exercise-rep-summary">Done</span>`;
                 } else {
                     repSummary = `<span class="exercise-rep-summary">${data.left || 0}L/${data.right || 0}R</span>`;
                 }
@@ -727,20 +795,18 @@ function collapseCard(card, exercise) {
             card.innerHTML = `
                 <div class="completed-card-inner">
                     <span class="completed-checkmark check-draw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    <span class="completed-title">${exerciseName}</span>
+                    <span class="completed-title">${exercise.name}</span>
                     ${repSummary}
                     <span class="completed-expand-hint">tap to edit</span>
                 </div>
             `;
 
-            // Animate to completed height
             card.style.height = '50px';
             card.style.padding = '0 var(--space-xl)';
             card.style.borderLeft = '4px solid var(--success-color)';
             card.style.background = '#f0faf0';
         }, 200);
 
-        // --- Step 3: After transition completes, finalize ---
         setTimeout(() => {
             card.classList.remove('exercise-card--collapsing', 'exercise-card--completing-flash');
             card.classList.add('exercise-card--completed');
@@ -749,25 +815,18 @@ function collapseCard(card, exercise) {
             card.style.borderLeft = '';
             card.style.background = '';
 
-            // Add click-to-expand handler on the collapsed card
-            card.addEventListener('click', function onExpand(_e) {
+            card.addEventListener('click', function onExpand() {
                 card.removeEventListener('click', onExpand);
                 expandCard(card, exercise);
             });
         }, 700);
     });
 
-    // Play sound and show toast
     playCompletionSound();
     showCompletionToast(exercise);
-
-    // Update progress bar
     updateProgressBar();
-
-    // Check if all complete for celebration
     checkAllComplete();
 
-    // Auto-scroll to next incomplete card
     setTimeout(() => {
         scrollToNextIncomplete(card);
     }, 800);
@@ -775,72 +834,59 @@ function collapseCard(card, exercise) {
 
 // ========== Card Expand (Undo Complete) ==========
 
-/**
- * Re-expand a completed card back to full editing state.
- * Rebuilds the card from scratch and restores saved values.
- * @param {HTMLElement} card - The collapsed card DOM element
- * @param {Object} exercise - Exercise definition object
- */
 function expandCard(card, exercise) {
-    // Remove from completed
     dailyProgress.completedExercises = dailyProgress.completedExercises.filter(
         (id) => id !== exercise.id
     );
     saveDailyProgress();
 
-    // --- Step 1: Lock collapsed height ---
     const collapsedHeight = card.offsetHeight;
     card.style.height = collapsedHeight + 'px';
     card.style.overflow = 'hidden';
 
-    // --- Step 2: Build the new full card off-screen to measure its height ---
-    const newCard = createExerciseCard(exercise, 0);
-    newCard.style.position = 'absolute';
-    newCard.style.visibility = 'hidden';
-    newCard.style.width = card.offsetWidth + 'px';
-    document.body.appendChild(newCard);
-    const targetHeight = newCard.offsetHeight;
-    document.body.removeChild(newCard);
+    // Create appropriate card type based on exercise type
+    let newCardFn;
+    if (exercise.exerciseType === 'timed') {
+        newCardFn = createTimedExerciseCard;
+    } else if (exercise.exerciseType === 'timed_holds') {
+        newCardFn = createTimedHoldsCard;
+    } else {
+        newCardFn = createExerciseCard;
+    }
 
-    // --- Step 3: Replace the card content in-place ---
-    const fullCard = createExerciseCard(exercise, 0);
+    // Measure target
+    const measureCard = newCardFn(exercise, 0, 0);
+    measureCard.style.position = 'absolute';
+    measureCard.style.visibility = 'hidden';
+    measureCard.style.width = card.offsetWidth + 'px';
+    document.body.appendChild(measureCard);
+    const targetHeight = measureCard.offsetHeight;
+    document.body.removeChild(measureCard);
+
+    const fullCard = newCardFn(exercise, 0, 0);
     fullCard.classList.add('exercise-card--expanding');
     fullCard.style.height = collapsedHeight + 'px';
     fullCard.style.overflow = 'hidden';
     card.replaceWith(fullCard);
 
-    // --- Step 4: Animate to full height ---
     requestAnimationFrame(() => {
         fullCard.style.height = targetHeight + 'px';
-
-        // Content reveal animation
         fullCard.classList.add('exercise-card--expand-reveal');
     });
 
-    // --- Step 5: Finalize after transition ---
     setTimeout(() => {
         fullCard.classList.remove('exercise-card--expanding', 'exercise-card--expand-reveal');
         fullCard.style.height = '';
         fullCard.style.overflow = '';
     }, 500);
 
-    // Restore saved input values (pickers, pain, notes)
     restoreExerciseData(exercise);
-
-    // Update progress bar
     updateProgressBar();
-
-    // Check celebration state (hide if no longer all complete)
     checkAllComplete();
 }
 
 // ========== Auto-Scroll to Next Incomplete ==========
 
-/**
- * Scroll the viewport to the next incomplete exercise card after the given one.
- * Wraps around to the first incomplete card if none found after current.
- * @param {HTMLElement} currentCard - The card that was just completed
- */
 function scrollToNextIncomplete(currentCard) {
     const allCards = document.querySelectorAll('.exercise-card');
     let foundCurrent = false;
@@ -854,7 +900,6 @@ function scrollToNextIncomplete(currentCard) {
             return;
         }
     }
-    // Wrap around: find first incomplete
     for (const card of allCards) {
         if (!card.classList.contains('exercise-card--completed')) {
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -865,10 +910,6 @@ function scrollToNextIncomplete(currentCard) {
 
 // ========== Instructions Bottom Sheet ==========
 
-/**
- * Dismiss a bottom sheet overlay with animation.
- * @param {HTMLElement} overlay - The overlay element to dismiss
- */
 function dismissBottomSheet(overlay) {
     overlay.classList.remove('visible');
     setTimeout(() => {
@@ -877,18 +918,12 @@ function dismissBottomSheet(overlay) {
     }, 300);
 }
 
-/**
- * Show a bottom sheet with detailed exercise instructions.
- * Slides up from the bottom when exercise name is tapped.
- * @param {Object} exercise - Exercise object with .instructions property
- */
 function showInstructionsBottomSheet(exercise) {
     if (!exercise.instructions) {
         showToast('No instructions available', 'info');
         return;
     }
 
-    // Remove existing sheet if any
     const existing = document.querySelector('.bottom-sheet-overlay');
     if (existing) existing.remove();
 
@@ -930,15 +965,12 @@ function showInstructionsBottomSheet(exercise) {
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
 
-    // Animate in
     requestAnimationFrame(() => overlay.classList.add('visible'));
 
-    // Close on overlay tap
     overlay.addEventListener('click', function (e) {
         if (e.target === overlay) dismissBottomSheet(overlay);
     });
 
-    // Close on handle tap
     const handle = overlay.querySelector('.bottom-sheet-handle');
     if (handle) {
         handle.addEventListener('click', function () {
@@ -949,10 +981,6 @@ function showInstructionsBottomSheet(exercise) {
 
 // ========== Save Workout ==========
 
-/**
- * Collect all exercise data and save the complete workout to localStorage.
- * Reads from both completed (collapsed) cards and expanded cards.
- */
 function saveWorkout() {
     const date = document.getElementById('workoutDate').value;
     if (!date) {
@@ -960,18 +988,23 @@ function saveWorkout() {
         return;
     }
 
-    // First, capture data from any still-expanded cards into dailyProgress
     autoSaveDailyProgress();
 
-    const phaseExercises = getExercisesForPhase(currentPhase);
+    const allExercises = getExercisesForPhase(currentPhase);
     const workout = {
         date: date,
         phase: currentPhase,
         exercises: [],
+        quickLogCounts: { ...(dailyProgress.quickLogCounts || {}) },
+        dailyMetrics: { ...(dailyProgress.dailyMetrics || {}) },
     };
 
     let hasData = false;
-    phaseExercises.forEach((exercise) => {
+
+    allExercises.forEach((exercise) => {
+        // Skip quick-log exercises (saved separately)
+        if (exercise.exerciseType === 'quick_log') return;
+
         const isCompleted = dailyProgress.completedExercises.includes(exercise.id);
         const savedData = dailyProgress.exerciseData[exercise.id];
 
@@ -990,7 +1023,6 @@ function saveWorkout() {
             pain = savedData.pain;
             notes = savedData.notes;
         } else {
-            // Bilateral exercises use a single "reps" picker
             const repsPicker = document.getElementById(`reps_${exercise.id}`);
             if (repsPicker) {
                 const reps = getPickerValue(`reps_${exercise.id}`);
@@ -1007,7 +1039,7 @@ function saveWorkout() {
             notes = notesEl ? notesEl.value || '' : '';
         }
 
-        if (leftReps || rightReps || sets || pain > 0 || notes) {
+        if (leftReps || rightReps || sets || pain > 0 || notes || isCompleted) {
             hasData = true;
             workout.exercises.push({
                 id: exercise.id,
@@ -1021,28 +1053,32 @@ function saveWorkout() {
         }
     });
 
+    // Check quick log data
+    const quickLogHasData = Object.values(dailyProgress.quickLogCounts || {}).some((v) => v > 0);
+    if (quickLogHasData) hasData = true;
+
     if (!hasData) {
         showToast('Please enter at least some data', 'error');
         return;
     }
 
-    // Save to storage
+    // Set plan start date on first workout
+    if (!planStartDate) {
+        setPlanStartDate(date);
+    }
+
     workoutData.push(workout);
     safeSetItem('workoutData', workoutData);
 
-    showToast('✓ Workout saved successfully!', 'success');
+    showToast('Workout saved successfully!', 'success');
 
-    // Update streak data and show badge unlocks
     onWorkoutSaved();
 
-    // Clear daily progress after save
     setDailyProgress(createFreshProgress());
     saveDailyProgress();
 
-    // Hide celebration banner
     hideCelebration();
 
-    // Clear form and reload
     setTimeout(() => {
         loadExercises();
         updateStats();
@@ -1053,17 +1089,15 @@ export {
     loadExercises,
     createExerciseCard,
     createCompletedCard,
-    createGroupedExerciseCard,
-    createCompletedGroupCard,
+    createTimedExerciseCard,
+    createTimedHoldsCard,
+    createQuickLogCard,
     collapseCard,
     expandCard,
-    collapseGroupCard,
-    expandGroupCard,
-    switchBalanceLevel,
     scrollToNextIncomplete,
     attachPainSliderListeners,
-    reattachCardListeners,
     dismissBottomSheet,
     showInstructionsBottomSheet,
     saveWorkout,
+    renderDailyMetrics,
 };

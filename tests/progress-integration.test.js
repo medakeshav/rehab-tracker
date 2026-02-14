@@ -13,6 +13,12 @@ vi.mock('../exercises.js', () => ({
         { id: 'ex3', name: 'Bridges' },
         { id: 'ex4', name: 'Heel Slides' },
     ]),
+    getExercisesForTimeBlock: vi.fn(() => [
+        { id: 'ex1', name: 'Calf Raises' },
+        { id: 'ex2', name: 'Quad Sets' },
+        { id: 'ex3', name: 'Bridges' },
+        { id: 'ex4', name: 'Heel Slides' },
+    ]),
     getVisibleExercisesForPhase: vi.fn(() => [
         { id: 'ex1', name: 'Calf Raises' },
         { id: 'ex2', name: 'Quad Sets' },
@@ -39,6 +45,7 @@ vi.mock('../js/state.js', () => ({
     setProgressBarVersion: vi.fn(),
     darkMode: false,
     setDarkMode: vi.fn(),
+    activeTimeBlock: 'morning',
 }));
 
 // Mock utils.js

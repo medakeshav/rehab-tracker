@@ -9,6 +9,7 @@
 import { workoutData, streakData, setStreakData } from './state.js';
 import { safeSetItem, normalizeDate } from './utils.js';
 import { getCategoryByExerciseId } from '../exercises.js';
+import CONFIG from './config.js';
 
 // ========== Badge Definitions ==========
 
@@ -347,9 +348,13 @@ function calculateStreakFromData() {
     let lastKnownPain = mostRecentPain;
     let injuryGrace = mostRecentPain >= 6;
 
+    const suggestedRestDays = CONFIG.REST_DAYS.SUGGESTED; // [0, 3] = Sun, Wed
+
     for (let i = 0; i <= 365; i++) {
         const checkDate = subtractDays(today, i);
         const isWorkout = workoutDates.has(checkDate);
+        const checkDateObj = normalizeDate(checkDate);
+        const isSuggestedRest = suggestedRestDays.includes(checkDateObj.getDay());
 
         if (isWorkout) {
             streak++;
@@ -357,6 +362,12 @@ function calculateStreakFromData() {
             lastKnownPain = getAvgPainForDate(checkDate);
             injuryGrace = lastKnownPain >= 6;
         } else {
+            // Suggested rest days (Wed/Sun) are always allowed - don't break streak
+            if (isSuggestedRest) {
+                lastDayWasRest = true;
+                continue;
+            }
+
             // Consecutive rest rule (unless injury grace)
             if (lastDayWasRest && !injuryGrace) {
                 break;
@@ -747,24 +758,30 @@ function renderWeekRow() {
     const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     let cells = '';
 
+    // JS day-of-week for each day starting from Monday
+    // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
+    const jsDayOfWeek = [1, 2, 3, 4, 5, 6, 0];
+    const suggestedRestDays = CONFIG.REST_DAYS.SUGGESTED; // [0, 3] = Sun, Wed
+
     for (let i = 0; i < 7; i++) {
         const d = addDays(monday, i);
         const dDate = normalizeDate(d);
         const isToday = d === today;
+        const isSuggestedRest = suggestedRestDays.includes(jsDayOfWeek[i]);
         let statusClass, icon;
 
         if (dDate > todayDate) {
             statusClass = 'week-day--future';
-            icon = '—';
+            icon = isSuggestedRest ? 'R' : '—';
         } else if (workoutDates.has(d)) {
             statusClass = 'week-day--done';
             icon = '✅';
         } else if (isToday) {
-            statusClass = 'week-day--today';
-            icon = '·';
+            statusClass = isSuggestedRest ? 'week-day--suggested-rest' : 'week-day--today';
+            icon = isSuggestedRest ? 'R' : '·';
         } else {
-            statusClass = 'week-day--rest';
-            icon = '😴';
+            statusClass = isSuggestedRest ? 'week-day--suggested-rest' : 'week-day--rest';
+            icon = isSuggestedRest ? 'R' : '😴';
         }
 
         const currentClass = isToday ? ' week-day--current' : '';

@@ -1,12 +1,8 @@
 /**
  * app.js — Application orchestrator
  *
- * This is the entry point that wires everything together.
- * It initializes the app on DOMContentLoaded, sets up global event listeners,
- * and handles auto-save on page close.
- *
- * All functionality is implemented in the other js/*.js modules;
- * this file just calls into them.
+ * Entry point that wires everything together.
+ * V2: Added time-block tab navigation, rest day banner, plan week display.
  */
 
 import {
@@ -25,9 +21,17 @@ import {
     calculateCurrentWeek,
     setLoadExercises,
 } from './utils.js';
-import { autoSaveDailyProgress, workoutData, weeklyData, monthlyData } from './state.js';
 import {
-    updateProgressBar,
+    autoSaveDailyProgress,
+    workoutData,
+    weeklyData,
+    monthlyData,
+    activeTimeBlock,
+    setActiveTimeBlock,
+    getCurrentPlanWeek,
+} from './state.js';
+import CONFIG from './config.js';
+import {
     clearDailyProgress,
     toggleSound,
     updateSoundToggleBtn,
@@ -40,7 +44,12 @@ import {
 } from './progress.js';
 import { loadExercises, saveWorkout } from './exercises-ui.js';
 import { showHistoryTab, loadHistory } from './history.js';
-import { saveWeeklyAssessment, saveMonthlyAssessment, showPreviousWeeklyValues, showPreviousMonthlyValues } from './assessments.js';
+import {
+    saveWeeklyAssessment,
+    saveMonthlyAssessment,
+    showPreviousWeeklyValues,
+    showPreviousMonthlyValues,
+} from './assessments.js';
 import { exportAllData, clearAllData } from './export.js';
 import { initStreak, checkStreakReminder } from './streak.js';
 import { initAnalytics, renderAllAnalytics, toggleAnalyticsSection } from './analytics.js';
@@ -66,17 +75,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ========== Initialization ==========
 
-/**
- * Set up initial app state: display today's date, set form defaults,
- * load exercises, and update UI to reflect current state.
- */
 function initializeApp() {
     // Set workout date input to today
     document.getElementById('workoutDate').valueAsDate = new Date();
 
     // Load current phase exercises
     updatePhaseInfo();
+
+    // Set active time block tab from state
+    setActiveTabUI(activeTimeBlock);
+
+    // Load exercises for active tab
     loadExercises();
+
+    // Show rest day banner if applicable
+    updateRestDayBanner();
+
+    // Update plan week info on home screen
+    updatePlanWeekInfo();
 
     // Update toggle button states
     updateSoundToggleBtn();
@@ -97,12 +113,68 @@ function initializeApp() {
     updateExportPreview();
 }
 
-// ========== Global Event Listeners ==========
+// ========== Time Block Tab Navigation ==========
 
 /**
- * Wire up all non-inline event listeners.
- * Menu buttons, form submissions, pain sliders, delegated actions, etc.
+ * Switch the active time block tab and reload exercises.
+ * @param {string} block - Time block key
  */
+function switchTimeBlock(block) {
+    // Auto-save current tab's data before switching
+    autoSaveDailyProgress();
+
+    setActiveTimeBlock(block);
+    setActiveTabUI(block);
+    loadExercises();
+    updateRestDayBanner();
+}
+
+/**
+ * Update the tab bar UI to show the active tab.
+ * @param {string} block - Active time block key
+ */
+function setActiveTabUI(block) {
+    const tabs = document.querySelectorAll('.time-block-tab');
+    tabs.forEach((tab) => {
+        tab.classList.toggle('active', tab.dataset.block === block);
+    });
+}
+
+// ========== Rest Day Banner ==========
+
+/**
+ * Show/hide the rest day banner based on today's day of week and active tab.
+ */
+function updateRestDayBanner() {
+    const banner = document.getElementById('restDayBanner');
+    if (!banner) return;
+
+    const today = new Date().getDay(); // 0=Sun, 3=Wed
+    const isSuggestedRestDay = CONFIG.REST_DAYS.SUGGESTED.includes(today);
+
+    // Show banner on rest days when viewing evening tab
+    if (isSuggestedRestDay && activeTimeBlock === 'evening') {
+        banner.style.display = 'flex';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+// ========== Plan Week Info ==========
+
+/**
+ * Update the plan week display on the home screen.
+ */
+function updatePlanWeekInfo() {
+    const el = document.getElementById('planWeekInfo');
+    if (el) {
+        const week = getCurrentPlanWeek();
+        el.textContent = `Week ${week}`;
+    }
+}
+
+// ========== Global Event Listeners ==========
+
 function setupEventListeners() {
     // Menu functionality
     document.getElementById('menuBtn').addEventListener('click', openMenu);
@@ -137,17 +209,20 @@ function setupEventListeners() {
     document.getElementById('weeklyDate').value = today;
     document.getElementById('monthlyDate').value = today;
 
+    // Rest day banner dismiss
+    const restDayDismiss = document.getElementById('restDayDismiss');
+    if (restDayDismiss) {
+        restDayDismiss.addEventListener('click', function () {
+            document.getElementById('restDayBanner').style.display = 'none';
+        });
+    }
+
     // Scroll to top button
     setupScrollToTop();
 }
 
 // ========== Delegated Action Handler ==========
 
-/**
- * Single delegated event listener for all [data-action] elements.
- * Replaces inline onclick handlers with a centralized action router.
- * Also handles keyboard activation (Enter/Space) on non-button elements.
- */
 function setupDelegatedActions() {
     document.addEventListener('click', function (e) {
         const target = e.target.closest('[data-action]');
@@ -162,6 +237,10 @@ function setupDelegatedActions() {
                 if (screen === 'weekly') showPreviousWeeklyValues();
                 if (screen === 'monthly') showPreviousMonthlyValues();
                 if (screen === 'export') updateExportPreview();
+                if (screen === 'daily') {
+                    updateRestDayBanner();
+                    updatePlanWeekInfo();
+                }
                 break;
             }
             case 'tab-navigate':
@@ -169,6 +248,9 @@ function setupDelegatedActions() {
                 break;
             case 'select-phase':
                 selectPhase(Number(target.dataset.phase));
+                break;
+            case 'switch-time-block':
+                switchTimeBlock(target.dataset.block);
                 break;
             case 'toggle-sound':
                 toggleSound();
@@ -204,7 +286,7 @@ function setupDelegatedActions() {
         }
     });
 
-    // Allow keyboard activation (Enter/Space) on non-button elements with data-action
+    // Keyboard activation on non-button elements
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
 
@@ -218,14 +300,10 @@ function setupDelegatedActions() {
 
 // ========== Scroll to Top Button ==========
 
-/**
- * Set up scroll-to-top button that appears after scrolling 25% of page height.
- */
 function setupScrollToTop() {
     const scrollBtn = document.getElementById('scrollToTopBtn');
     if (!scrollBtn) return;
 
-    // Show/hide button based on scroll position (hidden on home screen)
     window.addEventListener('scroll', function () {
         const homeScreen = document.getElementById('homeScreen');
         if (homeScreen && homeScreen.classList.contains('active')) {
@@ -243,7 +321,6 @@ function setupScrollToTop() {
         }
     });
 
-    // Scroll to top on click
     scrollBtn.addEventListener('click', function () {
         window.scrollTo({
             top: 0,
@@ -254,9 +331,6 @@ function setupScrollToTop() {
 
 // ========== Greeting Banner ==========
 
-/**
- * Render a time-of-day greeting on the home screen.
- */
 function renderGreetingBanner() {
     const textEl = document.getElementById('greetingText');
     const subEl = document.getElementById('greetingSub');
@@ -266,13 +340,13 @@ function renderGreetingBanner() {
     let greeting, sub;
     if (hour < 12) {
         greeting = 'Good Morning';
-        sub = 'Start your day with some exercises!';
+        sub = 'Start your day with the morning routine!';
     } else if (hour < 17) {
         greeting = 'Good Afternoon';
-        sub = 'Ready to keep building strength?';
+        sub = "Don't forget your throughout-the-day exercises!";
     } else {
         greeting = 'Good Evening';
-        sub = 'Keep going — every rep counts!';
+        sub = 'Time for your evening workout!';
     }
 
     textEl.textContent = greeting;
@@ -281,18 +355,20 @@ function renderGreetingBanner() {
 
 // ========== SVG Icon Injection ==========
 
-/**
- * Inject SVG icons into all elements with [data-icon] attributes.
- */
 function injectIcons() {
     document.querySelectorAll('[data-icon]').forEach((el) => {
         const iconName = el.dataset.icon;
         const iconFn = icons[iconName];
         if (iconFn) {
-            const size = el.classList.contains('bottom-tab-icon') ? 22 :
-                         el.classList.contains('assess-hub-icon') ? 24 :
-                         el.classList.contains('export-card-icon') ? 32 :
-                         el.classList.contains('action-card-icon') ? 28 : 18;
+            const size = el.classList.contains('bottom-tab-icon')
+                ? 22
+                : el.classList.contains('assess-hub-icon')
+                  ? 24
+                  : el.classList.contains('export-card-icon')
+                    ? 32
+                    : el.classList.contains('action-card-icon')
+                      ? 28
+                      : 18;
             el.innerHTML = iconFn(size);
         }
     });
@@ -300,9 +376,6 @@ function injectIcons() {
 
 // ========== Export Preview ==========
 
-/**
- * Update the export data preview with current data counts.
- */
 function updateExportPreview() {
     const preview = document.getElementById('exportDataPreview');
     if (!preview) return;
@@ -311,7 +384,9 @@ function updateExportPreview() {
     const wk = weeklyData.length;
     const mo = monthlyData.length;
     const lastExport = localStorage.getItem('lastExportTimestamp');
-    const lastExportStr = lastExport ? `Last exported: ${new Date(lastExport).toLocaleDateString()}` : 'Never exported';
+    const lastExportStr = lastExport
+        ? `Last exported: ${new Date(lastExport).toLocaleDateString()}`
+        : 'Never exported';
 
     preview.innerHTML = `<strong>${w}</strong> workouts, <strong>${wk}</strong> weekly, <strong>${mo}</strong> monthly assessments available<br><span style="font-size:11px">${lastExportStr}</span>`;
 }

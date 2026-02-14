@@ -40,6 +40,22 @@ export const CONFIG = {
         NOTE_DURATION: 400,
     },
 
+    // ========== Timer Settings ==========
+    TIMER: {
+        /** Timer completion beep frequency (Hz) */
+        BEEP_FREQUENCY: 880,
+        /** Timer beep duration (seconds) */
+        BEEP_DURATION: 0.3,
+        /** Timer beep gain */
+        BEEP_GAIN: 0.4,
+        /** Vibration pattern on timer complete (ms) */
+        VIBRATION_PATTERN: [200, 100, 200],
+        /** Countdown interval (ms) */
+        COUNTDOWN_INTERVAL: 1000,
+        /** Warning threshold (seconds remaining) */
+        WARNING_THRESHOLD: 5,
+    },
+
     // ========== Pain Thresholds ==========
     PAIN: {
         /** Pain scale minimum */
@@ -68,6 +84,14 @@ export const CONFIG = {
         DAYS_IN_WEEK: 7,
         /** Milestone thresholds for badges */
         MILESTONES: [3, 7, 14, 30, 60, 100],
+    },
+
+    // ========== Rest Days ==========
+    REST_DAYS: {
+        /** Suggested rest days (JS day-of-week: 0=Sun, 3=Wed) */
+        SUGGESTED: [0, 3],
+        /** Labels for suggested rest days */
+        LABELS: { 0: 'Sunday', 3: 'Wednesday' },
     },
 
     // ========== Badge Thresholds ==========
@@ -138,6 +162,31 @@ export const CONFIG = {
         BALANCE_LEVEL: 1,
     },
 
+    // ========== Daily Metrics ==========
+    METRICS: {
+        /** Metric definitions */
+        MORNING: [
+            { key: 'morningStiffness', label: 'Morning Stiffness', min: 0, max: 10, unit: '/10' },
+            {
+                key: 'hipFlexorTightness',
+                label: 'Hip Flexor Tightness',
+                min: 0,
+                max: 10,
+                unit: '/10',
+            },
+        ],
+        EVENING: [
+            {
+                key: 'standingTolerance',
+                label: 'Standing Tolerance',
+                min: 0,
+                max: 60,
+                unit: ' min',
+            },
+            { key: 'backPain', label: 'Back Pain (End of Day)', min: 0, max: 10, unit: '/10' },
+        ],
+    },
+
     // ========== CSV Export ==========
     CSV: {
         /** CSV file names */
@@ -172,17 +221,36 @@ export const CONFIG = {
 
 /**
  * Category color mapping for exercise cards.
- * Used by exercises-ui.js for visual differentiation.
+ * Updated for v2 time-block-based categories.
  */
 export const CATEGORY_COLORS = {
     'Foot & Ankle': '#4472c4',
     'Hip & Glute': '#e67e22',
+    'Hip Flexor': '#e74c3c',
+    'Glute Med': '#e67e22',
+    Hamstring: '#d35400',
     Core: '#8e44ad',
     Mobility: '#3498db',
-    'Balance & Stability': '#f1c40f',
     Balance: '#f1c40f',
+    Decompression: '#1abc9c',
+    Posture: '#2ecc71',
     Strength: '#e74c3c',
     Power: '#ff6b6b',
+    'Single-Leg Strength': '#e74c3c',
+    'Dynamic Stability': '#f39c12',
+    'Controlled Loading': '#c0392b',
+    'Power & Plyometrics': '#ff6b6b',
+};
+
+/**
+ * Time block colors for tab bar and section accents.
+ */
+export const TIME_BLOCK_COLORS = {
+    morning: '#f0a500',
+    throughout_day: '#3498db',
+    evening: '#8e44ad',
+    before_bed: '#2c3e50',
+    bonus: '#95a5a6',
 };
 
 export default CONFIG;

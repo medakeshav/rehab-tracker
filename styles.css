@@ -4337,3 +4337,564 @@ body.dark .analytics-stat-trend.negative {
 body.dark .history-phase-dot {
     opacity: 0.9;
 }
+
+/* ============================================================
+   V2: TIME BLOCK TAB BAR
+   ============================================================ */
+.time-block-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    margin: 0 0 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.time-block-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.time-block-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    min-width: 60px;
+    position: relative;
+}
+
+.time-block-tab .tab-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.time-block-tab .tab-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.time-block-tab.active {
+    background: var(--phase-accent-light);
+}
+
+.time-block-tab.active .tab-label {
+    color: var(--phase-accent);
+}
+
+.time-block-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--phase-accent);
+}
+
+.time-block-tab[data-block='morning'].active { --phase-accent: #f0a500; --phase-accent-light: rgba(240, 165, 0, 0.1); }
+.time-block-tab[data-block='throughout_day'].active { --phase-accent: #3498db; --phase-accent-light: rgba(52, 152, 219, 0.1); }
+.time-block-tab[data-block='evening'].active { --phase-accent: #8e44ad; --phase-accent-light: rgba(142, 68, 173, 0.1); }
+.time-block-tab[data-block='before_bed'].active { --phase-accent: #2c3e50; --phase-accent-light: rgba(44, 62, 80, 0.1); }
+.time-block-tab[data-block='bonus'].active { --phase-accent: #95a5a6; --phase-accent-light: rgba(149, 165, 166, 0.1); }
+
+/* Tab completion indicator dot */
+.time-block-tab .tab-complete-dot {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success-color);
+}
+
+body.dark .time-block-tabs {
+    background: #1e2128;
+}
+
+body.dark .time-block-tab .tab-label {
+    color: #888;
+}
+
+/* ============================================================
+   V2: REST DAY BANNER
+   ============================================================ */
+.rest-day-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #ebf5fb, #d6eaf8);
+    border-radius: var(--radius-lg);
+    margin: 0 0 12px;
+    border-left: 4px solid #3498db;
+}
+
+.rest-day-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.rest-day-text {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+.rest-day-dismiss {
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+body.dark .rest-day-banner {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(52, 152, 219, 0.08));
+    border-left-color: #5dade2;
+}
+
+body.dark .rest-day-text {
+    color: #ddd;
+}
+
+/* ============================================================
+   V2: PLAN INFO CARD (Home Screen)
+   ============================================================ */
+.plan-info-card {
+    background: linear-gradient(135deg, var(--phase-accent), var(--phase-accent-dark));
+    color: white;
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    margin: 16px 0;
+    text-align: center;
+}
+
+.plan-info-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.plan-info-card p {
+    font-size: 13px;
+    opacity: 0.85;
+    margin: 0 0 10px;
+}
+
+.plan-info-week {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.plan-info-card[role="button"] {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.plan-info-card[role="button"]:active {
+    transform: scale(0.97);
+}
+
+.plan-info-cta {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.9;
+    letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   V2: QUICK-LOG CARD (Throughout Day)
+   ============================================================ */
+.quick-log-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.quick-log-info {
+    flex: 1;
+}
+
+.quick-log-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+}
+
+.quick-log-reminder {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.quick-log-target {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
+.quick-log-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quick-log-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--phase-accent);
+    background: var(--phase-accent-light);
+    color: var(--phase-accent);
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.quick-log-btn:active {
+    transform: scale(0.9);
+    background: var(--phase-accent);
+    color: white;
+}
+
+.quick-log-btn.minus {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    border-color: var(--text-light);
+    background: transparent;
+    color: var(--text-light);
+}
+
+.quick-log-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+    min-width: 32px;
+    text-align: center;
+}
+
+.quick-log-name-link {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+}
+
+body.dark .quick-log-card {
+    background: #1e2128;
+}
+
+body.dark .quick-log-name {
+    color: #eee;
+}
+
+body.dark .quick-log-count {
+    color: #eee;
+}
+
+/* ============================================================
+   V2: TIMED EXERCISE CARD ADDITIONS
+   ============================================================ */
+.timer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    gap: 12px;
+}
+
+.timer-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.timer-circle svg {
+    width: 120px;
+    height: 120px;
+    transform: rotate(-90deg);
+}
+
+.timer-circle .timer-bg {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 6;
+}
+
+.timer-circle .timer-progress {
+    fill: none;
+    stroke: var(--phase-accent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.timer-time {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-side-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.timer-start-btn {
+    padding: 10px 32px;
+    border: none;
+    border-radius: 24px;
+    background: var(--phase-accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timer-start-btn:active {
+    transform: scale(0.95);
+}
+
+.timer-start-btn.running {
+    background: var(--warning-color);
+}
+
+.timer-start-btn.done {
+    background: var(--success-color);
+}
+
+.timer-warning {
+    animation: timer-pulse 0.5s ease infinite;
+}
+
+@keyframes timer-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+body.dark .timer-time {
+    color: #eee;
+}
+
+body.dark .timer-circle .timer-bg {
+    stroke: #333;
+}
+
+/* ============================================================
+   V2: TIMED HOLDS GUIDANCE
+   ============================================================ */
+.hold-duration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(142, 68, 173, 0.1);
+    color: #8e44ad;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.hold-duration-badge .hold-icon {
+    font-size: 14px;
+}
+
+body.dark .hold-duration-badge {
+    background: rgba(142, 68, 173, 0.2);
+    color: #bb8bce;
+}
+
+/* ============================================================
+   V2: DAILY METRICS FORM
+   ============================================================ */
+.daily-metrics-section {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.daily-metrics-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.metric-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.metric-row:last-child {
+    margin-bottom: 0;
+}
+
+.metric-label {
+    font-size: 13px;
+    color: var(--text-dark);
+    flex: 1;
+    min-width: 0;
+}
+
+.metric-slider-wrap {
+    flex: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.metric-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border-color);
+    outline: none;
+}
+
+.metric-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--phase-accent);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.metric-value {
+    min-width: 36px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--phase-accent);
+    background: var(--phase-accent-light);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+body.dark .daily-metrics-section {
+    background: #1e2128;
+}
+
+body.dark .daily-metrics-title {
+    color: #eee;
+}
+
+body.dark .metric-label {
+    color: #ccc;
+}
+
+body.dark .metric-slider {
+    background: #333;
+}
+
+/* ============================================================
+   V2: THROUGHOUT-DAY SECTION HEADER
+   ============================================================ */
+.throughout-day-header {
+    text-align: center;
+    padding: 12px 0 8px;
+    color: var(--text-light);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.throughout-day-header strong {
+    color: var(--text-dark);
+    font-size: 14px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+body.dark .throughout-day-header strong {
+    color: #eee;
+}
+
+/* ============================================================
+   V2: EXERCISE CARD — TIMED EXERCISE OVERRIDES
+   ============================================================ */
+.exercise-card--timed .exercise-inputs {
+    padding: 0;
+}
+
+.exercise-card--timed .timer-section {
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+body.dark .exercise-card--timed .timer-section {
+    border-color: #333;
+}
+
+/* ============================================================
+   V2: SUGGESTED REST DAY (Week Row)
+   ============================================================ */
+.week-day--suggested-rest .week-day-icon {
+    color: #3498db;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.week-day--suggested-rest {
+    background: rgba(52, 152, 219, 0.08);
+    border-radius: 6px;
+}

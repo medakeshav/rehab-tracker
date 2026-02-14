@@ -167,6 +167,94 @@ function getPainFreeRate() {
     return total === 0 ? 0 : Math.round((painFree / total) * 100);
 }
 
+// ========== Daily Metrics Chart (V2) ==========
+
+/**
+ * Render daily metrics chart (stiffness, hip flexor tightness, standing tolerance, back pain).
+ * Uses data from workout.dailyMetrics if available.
+ */
+function renderDailyMetricsChart() {
+    const canvas = document.getElementById('dailyMetricsChart');
+    if (!canvas) return; // Canvas may not exist yet - that's OK
+
+    const workouts = getFilteredWorkouts().filter((w) => w.dailyMetrics);
+    if (workouts.length === 0) return;
+
+    // Destroy existing chart
+    if (chartInstances['dailyMetricsChart']) {
+        chartInstances['dailyMetricsChart'].destroy();
+    }
+
+    const labels = workouts.map((w) => formatShortDate(w.date));
+    const stiffness = workouts.map((w) => w.dailyMetrics.morningStiffness);
+    const hipFlexor = workouts.map((w) => w.dailyMetrics.hipFlexorTightness);
+    const standing = workouts.map((w) => w.dailyMetrics.standingTolerance);
+    const backPain = workouts.map((w) => w.dailyMetrics.backPain);
+
+    const defaults = getChartDefaults();
+
+    chartInstances['dailyMetricsChart'] = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Morning Stiffness',
+                    data: stiffness,
+                    borderColor: '#f0a500',
+                    backgroundColor: 'rgba(240, 165, 0, 0.1)',
+                    tension: 0.3,
+                    fill: false,
+                },
+                {
+                    label: 'Hip Flexor Tightness',
+                    data: hipFlexor,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.3,
+                    fill: false,
+                },
+                {
+                    label: 'Standing Tolerance (min)',
+                    data: standing,
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    tension: 0.3,
+                    fill: false,
+                    yAxisID: 'y1',
+                },
+                {
+                    label: 'Back Pain',
+                    data: backPain,
+                    borderColor: '#8e44ad',
+                    backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                    tension: 0.3,
+                    fill: false,
+                },
+            ],
+        },
+        options: {
+            ...defaults,
+            scales: {
+                ...defaults.scales,
+                y: {
+                    ...defaults.scales.y,
+                    min: 0,
+                    max: 10,
+                    title: { display: true, text: '0-10 Scale' },
+                },
+                y1: {
+                    position: 'right',
+                    min: 0,
+                    max: 60,
+                    title: { display: true, text: 'Minutes' },
+                    grid: { drawOnChartArea: false },
+                },
+            },
+        },
+    });
+}
+
 /**
  * Render the pain trend line chart.
  */
@@ -961,6 +1049,7 @@ function renderAllAnalytics() {
 
     // Render everything
     renderSummaryCards();
+    renderDailyMetricsChart();
     renderPainTrendChart();
     renderPainStatsCards();
     renderAsymmetryChart();

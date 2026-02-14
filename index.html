@@ -105,7 +105,8 @@
                     </div>
                 </div>
 
-                <div class="phase-selector">
+                <!-- Phase selector hidden until Phase 2/3 plans are updated -->
+                <div class="phase-selector" id="phaseSelector" style="display: none">
                     <h3>Select Your Current Phase</h3>
                     <div class="phase-cards">
                         <div
@@ -146,6 +147,19 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Current Plan Info — tap to go to daily workout -->
+                <div class="plan-info-card"
+                     data-action="navigate"
+                     data-screen="daily"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Start Daily Workout">
+                    <h3>Phase 1A: Foundation</h3>
+                    <p>Right-Side Core Focus | Glute Med + Hamstring Priority</p>
+                    <div class="plan-info-week" id="planWeekInfo">Week 1</div>
+                    <div class="plan-info-cta">Tap to start workout →</div>
+                </div>
             </div>
 
             <!-- DAILY WORKOUT SCREEN -->
@@ -162,10 +176,41 @@
                     <input type="date" id="workoutDate" class="date-input" />
                 </div>
 
-                <div class="phase-info" id="phaseInfo">
+                <div class="phase-info" id="phaseInfo" style="display: none">
                     <span id="currentPhaseText">Phase 1: Foundation</span>
                     <button class="change-phase-btn" data-action="navigate" data-screen="home">
                         Change Phase
+                    </button>
+                </div>
+
+                <!-- Rest Day Banner (shown on Wed/Sun) -->
+                <div id="restDayBanner" class="rest-day-banner" style="display: none">
+                    <span class="rest-day-icon">😴</span>
+                    <span class="rest-day-text">Suggested rest day — evening workout is optional today</span>
+                    <button class="rest-day-dismiss" id="restDayDismiss" aria-label="Dismiss">&times;</button>
+                </div>
+
+                <!-- Time Block Tab Bar -->
+                <div class="time-block-tabs" id="timeBlockTabs">
+                    <button class="time-block-tab active" data-action="switch-time-block" data-block="morning">
+                        <span class="tab-icon">🌅</span>
+                        <span class="tab-label">Morning</span>
+                    </button>
+                    <button class="time-block-tab" data-action="switch-time-block" data-block="throughout_day">
+                        <span class="tab-icon">🏢</span>
+                        <span class="tab-label">Day</span>
+                    </button>
+                    <button class="time-block-tab" data-action="switch-time-block" data-block="evening">
+                        <span class="tab-icon">🌆</span>
+                        <span class="tab-label">Evening</span>
+                    </button>
+                    <button class="time-block-tab" data-action="switch-time-block" data-block="before_bed">
+                        <span class="tab-icon">🌙</span>
+                        <span class="tab-label">Bed</span>
+                    </button>
+                    <button class="time-block-tab" data-action="switch-time-block" data-block="bonus">
+                        <span class="tab-icon">⭐</span>
+                        <span class="tab-label">Bonus</span>
                     </button>
                 </div>
 
@@ -191,6 +236,9 @@
                 >
                     🔄 Clear Progress
                 </button>
+
+                <!-- Daily Metrics (rendered dynamically by exercises-ui.js) -->
+                <div id="dailyMetricsContainer"></div>
 
                 <div id="exerciseList" class="exercise-list" aria-label="Exercise list">
                     <!-- Exercises will be loaded dynamically -->
@@ -493,6 +541,23 @@
                         <div class="analytics-stat-value" id="summaryVariety">--</div>
                         <div class="analytics-stat-label">Variety</div>
                         <div class="analytics-stat-trend" id="summaryVarietyTrend"></div>
+                    </div>
+                </div>
+
+                <!-- Daily Metrics Section (V2) -->
+                <div class="analytics-section" id="dailyMetricsSection">
+                    <h3
+                        class="analytics-section-title"
+                        data-action="toggle-analytics-section"
+                        data-section="dailyMetricsSection"
+                    >
+                        📊 Daily Metrics Trends
+                        <span class="analytics-section-arrow">▼</span>
+                    </h3>
+                    <div class="analytics-section-body">
+                        <div class="analytics-chart-container">
+                            <canvas id="dailyMetricsChart"></canvas>
+                        </div>
                     </div>
                 </div>
 

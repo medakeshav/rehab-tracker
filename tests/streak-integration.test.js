@@ -43,6 +43,7 @@ vi.mock('../exercises.js', () => ({
         if (id.startsWith('balance')) return 'Balance';
         return 'Mobility';
     }),
+    getExercisesForTimeBlock: vi.fn(() => []),
 }));
 
 import {

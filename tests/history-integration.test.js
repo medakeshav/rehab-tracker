@@ -11,6 +11,10 @@ vi.mock('../js/utils.js', () => ({
         const total = exercises.reduce((sum, ex) => sum + ex.pain, 0);
         return `${(total / exercises.length).toFixed(1)}/10`;
     }),
+    normalizeDate: vi.fn((dateStr) => {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }),
 }));
 
 // Mock state.js
@@ -75,7 +79,9 @@ describe('History Integration', () => {
             ];
             showHistoryTab('workouts');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(1);
+            // Contains summary stats + date group header + card = 3 children
+            expect(content.children.length).toBeGreaterThanOrEqual(1);
+            expect(content.innerHTML).toContain('history-item');
         });
     });
 
@@ -112,7 +118,8 @@ describe('History Integration', () => {
             ];
             loadHistory('workouts');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(1);
+            // Summary stats + date group header + card
+            expect(content.querySelector('.history-item')).toBeTruthy();
             expect(content.innerHTML).toContain('Phase 1');
             expect(content.innerHTML).toContain('2');
         });
@@ -136,7 +143,7 @@ describe('History Integration', () => {
             ];
             loadHistory('weekly');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(1);
+            expect(content.querySelector('.history-item')).toBeTruthy();
             expect(content.innerHTML).toContain('Week 4');
         });
 
@@ -158,7 +165,7 @@ describe('History Integration', () => {
             ];
             loadHistory('monthly');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(1);
+            expect(content.querySelector('.history-item')).toBeTruthy();
             expect(content.innerHTML).toContain('Month 2');
         });
 
@@ -170,10 +177,10 @@ describe('History Integration', () => {
             ];
             loadHistory('workouts');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(3);
-            // First card should be the newest date
-            const firstCard = content.children[0].innerHTML;
-            expect(firstCard).toContain('Jan');
+            const cards = content.querySelectorAll('.history-item');
+            expect(cards.length).toBe(3);
+            // First card should be the newest date (Jan 20)
+            expect(cards[0].innerHTML).toContain('Jan');
         });
 
         it('should render multiple workout cards', () => {
@@ -183,7 +190,8 @@ describe('History Integration', () => {
             ];
             loadHistory('workouts');
             const content = document.getElementById('historyContent');
-            expect(content.children.length).toBe(2);
+            const cards = content.querySelectorAll('.history-item');
+            expect(cards.length).toBe(2);
         });
     });
 

@@ -7,7 +7,7 @@
 
 import confetti from 'canvas-confetti';
 import CONFIG from './config.js';
-import { getExercisesForPhase, getVisibleExercisesForPhase } from '../exercises.js';
+import { getExercisesForTimeBlock } from '../exercises.js';
 import { safeSetItem, showToast, showConfirmDialog } from './utils.js';
 import {
     currentPhase,
@@ -17,6 +17,7 @@ import {
     setProgressBarVersion,
     darkMode,
     setDarkMode,
+    activeTimeBlock,
 } from './state.js';
 
 /** @type {Function|null} Callback to reload exercises (set by app.js to avoid circular import) */
@@ -33,24 +34,30 @@ function setReloadExercises(fn) {
 // ========== Progress Counting (group-aware) ==========
 
 /**
- * Count completed vs total exercises, treating each group as a single exercise.
+ * Count completed vs total exercises for the active time block.
+ * Quick-log exercises count based on whether they have any logs.
  * @returns {{ total: number, done: number }}
  */
 function getCompletionCount() {
-    const visibleExercises = getVisibleExercisesForPhase(currentPhase);
-    const total = visibleExercises.length;
+    const exercises = getExercisesForTimeBlock(currentPhase, activeTimeBlock);
+
+    let total = 0;
     let done = 0;
-    visibleExercises.forEach((item) => {
-        if (item.isGroup) {
-            if (item.exercises.some((ex) => dailyProgress.completedExercises.includes(ex.id))) {
-                done++;
-            }
+
+    exercises.forEach((exercise) => {
+        if (exercise.exerciseType === 'quick_log') {
+            total++;
+            const count =
+                (dailyProgress.quickLogCounts && dailyProgress.quickLogCounts[exercise.id]) || 0;
+            if (count > 0) done++;
         } else {
-            if (dailyProgress.completedExercises.includes(item.id)) {
+            total++;
+            if (dailyProgress.completedExercises.includes(exercise.id)) {
                 done++;
             }
         }
     });
+
     return { total, done };
 }
 
@@ -86,46 +93,32 @@ function updateProgressBar() {
         }
     }
 
-    // Version C — Thumbnail Circles (group-aware)
-    const visibleExercises = getVisibleExercisesForPhase(currentPhase);
+    // Version C — Thumbnail Circles (time-block-aware)
+    const blockExercises = getExercisesForTimeBlock(currentPhase, activeTimeBlock);
     const barC = document.getElementById('progressBarC');
     if (barC) {
         if (PROGRESS_BAR_VERSION === 'C') {
             barC.style.display = 'flex';
             barC.innerHTML = '';
-            visibleExercises.forEach((item, index) => {
-                let isCompleted, name;
+            blockExercises.forEach((exercise, index) => {
+                let isCompleted;
 
-                if (item.isGroup) {
-                    isCompleted = item.exercises.some((ex) =>
-                        dailyProgress.completedExercises.includes(ex.id)
-                    );
-                    name = item.groupLabel;
+                if (exercise.exerciseType === 'quick_log') {
+                    const count =
+                        (dailyProgress.quickLogCounts &&
+                            dailyProgress.quickLogCounts[exercise.id]) ||
+                        0;
+                    isCompleted = count > 0;
                 } else {
-                    isCompleted = dailyProgress.completedExercises.includes(item.id);
-                    name = item.name;
+                    isCompleted = dailyProgress.completedExercises.includes(exercise.id);
                 }
 
                 const thumb = document.createElement('button');
                 thumb.className = 'progress-thumb' + (isCompleted ? ' completed' : '');
                 thumb.textContent = isCompleted ? '✓' : index + 1;
-                thumb.title = name;
+                thumb.title = exercise.name;
                 thumb.addEventListener('click', function () {
-                    if (item.isGroup) {
-                        // Scroll to the grouped card via data-group attribute
-                        const card = document.querySelector(
-                            `.exercise-card[data-group="${item.group}"]`
-                        );
-                        if (card) {
-                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            card.style.boxShadow = '0 0 0 3px var(--primary-color)';
-                            setTimeout(() => {
-                                card.style.boxShadow = '';
-                            }, 1000);
-                        }
-                    } else {
-                        scrollToExercise(item.id);
-                    }
+                    scrollToExercise(exercise.id);
                 });
                 barC.appendChild(thumb);
             });
@@ -168,6 +161,18 @@ function clearDailyProgress() {
         function () {
             dailyProgress.completedExercises = [];
             dailyProgress.exerciseData = {};
+            dailyProgress.quickLogCounts = {
+                hip_flexor_quick: 0,
+                glute_activation_quick: 0,
+                standing_posture_quick: 0,
+                seated_clamshells_quick: 0,
+            };
+            dailyProgress.dailyMetrics = {
+                morningStiffness: null,
+                hipFlexorTightness: null,
+                standingTolerance: null,
+                backPain: null,
+            };
             saveDailyProgress();
             if (reloadExercises) reloadExercises();
             updateProgressBar();
