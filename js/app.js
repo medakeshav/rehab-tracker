@@ -28,7 +28,6 @@ import {
     monthlyData,
     activeTimeBlock,
     setActiveTimeBlock,
-    getCurrentPlanWeek,
     getScheduleForDate,
     currentPhase,
 } from './state.js';
@@ -97,9 +96,6 @@ function initializeApp() {
     // Show rest day banner if applicable
     updateRestDayBanner();
 
-    // Update plan week info on home screen
-    updatePlanWeekInfo();
-
     // Update toggle button states
     updateSoundToggleBtn();
     updateProgressBarToggleBtn();
@@ -153,7 +149,6 @@ function navigateToQuickLog() {
     setActiveTabUI('throughout_day');
     loadExercises();
     updateRestDayBanner();
-    updatePlanWeekInfo();
 }
 
 function applyDeepLinkFromUrl() {
@@ -217,19 +212,6 @@ function updateRestDayBanner() {
         banner.style.display = 'flex';
     } else {
         banner.style.display = 'none';
-    }
-}
-
-// ========== Plan Week Info ==========
-
-/**
- * Update the plan week display on the home screen.
- */
-function updatePlanWeekInfo() {
-    const el = document.getElementById('planWeekInfo');
-    if (el) {
-        const week = getCurrentPlanWeek();
-        el.textContent = `Week ${week}`;
     }
 }
 
@@ -318,7 +300,6 @@ function setupDelegatedActions() {
                 if (screen === 'export') updateExportPreview();
                 if (screen === 'daily') {
                     updateRestDayBanner();
-                    updatePlanWeekInfo();
                 }
                 break;
             }
