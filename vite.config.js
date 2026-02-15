@@ -1,9 +1,20 @@
 import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ command }) => ({
     base: command === 'build' ? '/rehab-tracker/' : '/',
-    plugins: [tailwindcss()],
+    plugins: [
+        tailwindcss(),
+        VitePWA({
+            registerType: 'autoUpdate',
+            injectRegister: 'auto',
+            manifest: false,
+            workbox: {
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json}'],
+            },
+        }),
+    ],
     build: {
         outDir: 'dist',
     },
