@@ -4632,56 +4632,6 @@ body.dark .schedule-indicator {
     color: #aaa;
 }
 
-/* ============================================================
-   V2: PLAN INFO CARD (Home Screen)
-   ============================================================ */
-.plan-info-card {
-    background: linear-gradient(135deg, var(--phase-accent), var(--phase-accent-dark));
-    color: white;
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    margin: 16px 0;
-    text-align: center;
-}
-
-.plan-info-card h3 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 4px;
-}
-
-.plan-info-card p {
-    font-size: 13px;
-    opacity: 0.85;
-    margin: 0 0 10px;
-}
-
-.plan-info-week {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 4px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.plan-info-card[role="button"] {
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.plan-info-card[role="button"]:active {
-    transform: scale(0.97);
-}
-
-.plan-info-cta {
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0.9;
-    letter-spacing: 0.3px;
-}
-
 .quick-log-mode-badge {
     display: inline-block;
     margin-left: 8px;
