@@ -9,6 +9,7 @@
         <meta name="theme-color" content="#4472C4" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Rehab Tracker" />
         <meta name="description" content="Rehabilitation Exercise Tracker" />
         <title>Rehab Tracker</title>
         <link rel="manifest" href="manifest.json" />
@@ -105,6 +106,16 @@
                     </div>
                 </div>
 
+                <h3 class="section-heading">Quick Access</h3>
+                <button
+                    class="action-card-btn action-card-btn--primary"
+                    data-action="quick-log-navigate"
+                    aria-label="Open Throughout Day quick log"
+                >
+                    <span class="action-card-icon" data-icon="target"></span>
+                    <span class="action-card-label">Quick Log (Throughout Day)</span>
+                </button>
+
                 <!-- Phase selector — allows switching between rehab phases -->
                 <div class="phase-selector" id="phaseSelector">
                     <h3>Select Your Current Phase</h3>
@@ -168,7 +179,12 @@
                     <button class="back-btn" data-action="navigate" data-screen="home">
                         ← Back
                     </button>
-                    <h2>Daily Workout</h2>
+                    <h2>
+                        Daily Workout
+                        <span id="quickLogModeBadge" class="quick-log-mode-badge" style="display: none">
+                            Quick Log Mode
+                        </span>
+                    </h2>
                 </div>
 
                 <div class="date-selector">

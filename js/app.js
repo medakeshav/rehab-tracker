@@ -64,12 +64,16 @@ setOnAnalyticsScreen(() => renderAllAnalytics());
 setReloadExercises(() => loadExercises());
 setLoadExercises(() => loadExercises());
 
+const QUICK_LOG_HASHES = new Set(['#quicklog', '#quick-log']);
+let quickLogModeActive = false;
+
 // ========== DOM Ready ==========
 
 document.addEventListener('DOMContentLoaded', function () {
     initializeApp();
     setupEventListeners();
     initSwipeBack();
+    applyDeepLinkFromUrl();
     updateStats();
     initStreak();
     checkStreakReminder();
@@ -107,6 +111,7 @@ function initializeApp() {
 
     // Render greeting banner
     renderGreetingBanner();
+    updateQuickLogModeBadge();
 
     // Inject SVG icons into tab bar and menus
     injectIcons();
@@ -129,6 +134,44 @@ function switchTimeBlock(block) {
     setActiveTabUI(block);
     loadExercises();
     updateRestDayBanner();
+
+    if (quickLogModeActive && block !== 'throughout_day') {
+        quickLogModeActive = false;
+        updateQuickLogModeBadge();
+    }
+}
+
+function isQuickLogHash(hashValue) {
+    return QUICK_LOG_HASHES.has((hashValue || '').toLowerCase());
+}
+
+function navigateToQuickLog() {
+    quickLogModeActive = true;
+    updateQuickLogModeBadge();
+    setActiveTimeBlock('throughout_day');
+    showScreen('daily');
+    setActiveTabUI('throughout_day');
+    loadExercises();
+    updateRestDayBanner();
+    updatePlanWeekInfo();
+}
+
+function applyDeepLinkFromUrl() {
+    if (isQuickLogHash(window.location.hash)) {
+        navigateToQuickLog();
+        return;
+    }
+
+    if (quickLogModeActive) {
+        quickLogModeActive = false;
+        updateQuickLogModeBadge();
+    }
+}
+
+function updateQuickLogModeBadge() {
+    const badge = document.getElementById('quickLogModeBadge');
+    if (!badge) return;
+    badge.style.display = quickLogModeActive ? 'inline-block' : 'none';
 }
 
 /**
@@ -245,6 +288,9 @@ function setupEventListeners() {
 
     // Scroll to top button
     setupScrollToTop();
+
+    // Handle deep links when hash changes while app is open.
+    window.addEventListener('hashchange', applyDeepLinkFromUrl);
 }
 
 // ========== Delegated Action Handler ==========
@@ -260,6 +306,13 @@ function setupDelegatedActions() {
             case 'navigate': {
                 const screen = target.dataset.screen;
                 showScreen(screen);
+                if (screen !== 'daily' && quickLogModeActive) {
+                    quickLogModeActive = false;
+                    updateQuickLogModeBadge();
+                } else if (screen === 'daily' && !isQuickLogHash(window.location.hash)) {
+                    quickLogModeActive = false;
+                    updateQuickLogModeBadge();
+                }
                 if (screen === 'weekly') showPreviousWeeklyValues();
                 if (screen === 'monthly') showPreviousMonthlyValues();
                 if (screen === 'export') updateExportPreview();
@@ -277,6 +330,9 @@ function setupDelegatedActions() {
                 break;
             case 'switch-time-block':
                 switchTimeBlock(target.dataset.block);
+                break;
+            case 'quick-log-navigate':
+                navigateToQuickLog();
                 break;
             case 'toggle-sound':
                 toggleSound();

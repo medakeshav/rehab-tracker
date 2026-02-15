@@ -273,18 +273,26 @@ function createQuickLogCard(exercise) {
         </div>
     `;
 
+    const updateCountUI = () => {
+        const newCount = dailyProgress.quickLogCounts[exercise.id] || 0;
+        const countEl = card.querySelector(`#ql_count_${exercise.id}`);
+        const targetEl = card.querySelector('.quick-log-target');
+        if (countEl) countEl.textContent = newCount;
+        if (targetEl)
+            targetEl.textContent = `${newCount}/${target} ${exercise.quickLogUnit || 'times'} today`;
+    };
+
+    const incrementCount = () => {
+        incrementQuickLog(exercise.id);
+        updateCountUI();
+    };
+
     // Plus button
     const plusBtn = card.querySelector(`[data-ql-plus="${exercise.id}"]`);
     if (plusBtn) {
         plusBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            incrementQuickLog(exercise.id);
-            const newCount = dailyProgress.quickLogCounts[exercise.id] || 0;
-            const countEl = card.querySelector(`#ql_count_${exercise.id}`);
-            const targetEl = card.querySelector('.quick-log-target');
-            if (countEl) countEl.textContent = newCount;
-            if (targetEl)
-                targetEl.textContent = `${newCount}/${target} ${exercise.quickLogUnit || 'times'} today`;
+            incrementCount();
 
             // Pulse animation
             plusBtn.style.transform = 'scale(1.2)';
@@ -298,12 +306,7 @@ function createQuickLogCard(exercise) {
         minusBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             decrementQuickLog(exercise.id);
-            const newCount = dailyProgress.quickLogCounts[exercise.id] || 0;
-            const countEl = card.querySelector(`#ql_count_${exercise.id}`);
-            const targetEl = card.querySelector('.quick-log-target');
-            if (countEl) countEl.textContent = newCount;
-            if (targetEl)
-                targetEl.textContent = `${newCount}/${target} ${exercise.quickLogUnit || 'times'} today`;
+            updateCountUI();
         });
     }
 
@@ -312,9 +315,13 @@ function createQuickLogCard(exercise) {
     if (nameEl && exercise.instructions) {
         nameEl.addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
             showInstructionsBottomSheet(exercise);
         });
     }
+
+    // Tapping a card logs one rep quickly.
+    card.addEventListener('click', incrementCount);
 
     return card;
 }

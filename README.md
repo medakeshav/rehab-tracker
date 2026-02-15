@@ -68,6 +68,25 @@ Your app will be available at: `https://[your-username].github.io/rehab-tracker`
 3. Tap "Add to Home screen"
 4. Tap "Add"
 
+## Quick Log from Home Screen
+
+### Android app icon shortcut
+
+1. Install the app to home screen
+2. Long-press the app icon
+3. Tap **Quick Log**
+4. App opens directly to Throughout Day quick log
+
+### iPhone Shortcuts widget
+
+1. Open the **Shortcuts** app and create a new shortcut
+2. Add action: **Open URLs**
+3. Use this URL: `https://[your-username].github.io/rehab-tracker/#quicklog`
+4. Rename shortcut (example: "Rehab Quick Log")
+5. Add a **Shortcuts** widget to home screen and select this shortcut
+
+Note: iOS does not support true PWA widgets, so the Shortcuts widget is the recommended approach.
+
 ## Using the App
 
 ### Daily Workout
