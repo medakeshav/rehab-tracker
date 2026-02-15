@@ -112,11 +112,11 @@ Your app will be available at: `https://[your-username].github.io/rehab-tracker`
 
 ## Exercise Phases
 
-| Phase | Period     | Focus                                                   |
-| ----- | ---------- | ------------------------------------------------------- |
-| 1     | Weeks 1-8  | 15 exercises: foot/ankle, hip/glute, core, mobility     |
-| 2     | Weeks 9-20 | Phase 1 + 6 new: single-leg strength, dynamic stability |
-| 3     | Week 21+   | Phase 2 + 3 power/plyometric exercises                  |
+| Phase | Period      | Focus                                                                   |
+| ----- | ----------- | ----------------------------------------------------------------------- |
+| 1     | Weeks 1-8   | 15 exercises: foot/ankle, hip/glute, core, mobility                     |
+| 2     | Weeks 9-16  | Phase 1 + 6 new: single-leg strength, dynamic stability                 |
+| 3     | Weeks 17-32 | Phase 2 + 19 new: power development, plyometrics, upper body, sport-specific |
 
 ## Data Privacy
 
