@@ -18,7 +18,7 @@ npm run build                 # Production build → dist/
 All files use ES module `import`/`export`. Entry point is `js/app.js` (loaded as `<script type="module">`).
 
 ```
-exercises.js          — Exercise data for 3 phases (no deps)
+exercises.js          — Exercise data for 3 phases: Foundation, Functional Strength, Advanced Function & Power (no deps)
 js/config.js          — Centralized constants: timeouts, thresholds, defaults (no deps)
 js/dom-helpers.js     — Safe DOM utilities: h(), clearElement(), text(), fragment() (no deps)
 js/utils.js           — Utilities: toast, dialog, localStorage, date helpers (imports exercises, state)

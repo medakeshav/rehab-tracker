@@ -224,8 +224,8 @@ function selectPhase(phase) {
 function updatePhaseInfo() {
     const phaseNames = {
         1: 'Phase 1: Foundation (Weeks 1-8)',
-        2: 'Phase 2: Functional Strength (Weeks 9-20)',
-        3: 'Phase 3: Advanced (Week 21+)',
+        2: 'Phase 2: Functional Strength (Weeks 9-16)',
+        3: 'Phase 3: Advanced Function & Power (Weeks 17-32)',
     };
     document.getElementById('currentPhaseText').textContent = phaseNames[currentPhase];
 }

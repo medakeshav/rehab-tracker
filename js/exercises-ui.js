@@ -89,10 +89,11 @@ function loadExercises() {
     if (activeTimeBlock === 'evening' && currentPhase >= 2 && scheduleInfo.isWorkoutDay) {
         const indicator = document.createElement('div');
         indicator.className = 'schedule-indicator';
+        const phaseLabel = currentPhase === 2 ? 'Phase 2' : 'Phase 3';
         if (scheduleInfo.isMaintenanceDay) {
-            indicator.innerHTML = `<span class="schedule-badge schedule-badge--full">Full Workout</span> Phase 2 exercises + Phase 1 maintenance`;
+            indicator.innerHTML = `<span class="schedule-badge schedule-badge--full">Full Workout</span> ${phaseLabel} exercises + Phase 1 maintenance`;
         } else {
-            indicator.innerHTML = `<span class="schedule-badge schedule-badge--p2">Phase 2 Only</span> No maintenance exercises today`;
+            indicator.innerHTML = `<span class="schedule-badge schedule-badge--p2">${phaseLabel} Only</span> No maintenance exercises today`;
         }
         exerciseList.appendChild(indicator);
     }

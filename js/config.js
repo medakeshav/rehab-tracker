@@ -137,12 +137,35 @@ export const CONFIG = {
             },
         },
         3: {
-            /** Phase 3 schedule — TBD, defaults to no restrictions */
-            restDays: [],
-            workoutDays: [0, 1, 2, 3, 4, 5, 6],
-            maintenanceDays: [],
-            maintainedExercises: [],
-            maintenanceOverrides: {},
+            /** Phase 3 schedule — rest Wed + Sun, workout 5 days/week */
+            restDays: [0, 3],
+            /** Workout days: Mon=1(Power), Tue=2(Upper), Thu=4(Plyo), Fri=5(Full Body), Sat=6(Sport) */
+            workoutDays: [1, 2, 4, 5, 6],
+            /** Maintenance days (Phase 1 exercises included): Mon=1, Fri=5 */
+            maintenanceDays: [1, 5],
+            /** Phase 1 evening exercises to keep in Phase 3 (maintenance only) */
+            maintainedExercises: [
+                'dead_bug_holds',
+                'plank',
+                'bird_dog_holds',
+                'hip_flexor_warmup',
+                'decompression_cooldown',
+            ],
+            /** Volume overrides for maintained exercises in Phase 3 */
+            maintenanceOverrides: {
+                dead_bug_holds: {
+                    sets: 2,
+                    targetReps: 'L: 30s | R: 30s (EQUAL)',
+                },
+                plank: {
+                    sets: 2,
+                    targetReps: '60-90s variations',
+                },
+                bird_dog_holds: {
+                    sets: 2,
+                    targetReps: 'L: 12 | R: 15',
+                },
+            },
         },
     },
 
